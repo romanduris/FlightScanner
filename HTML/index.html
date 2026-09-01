@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interaktívny prehľad priamych letov z Bratislavy.">
+  <title>FlightScanner — lety z Bratislavy</title>
+  <link rel="preconnect" href="https://tile.openstreetmap.org">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="FlightScanner domov">
+      <span class="brand-mark" aria-hidden="true">✈</span>
+      <span>FLIGHT<span>SCANNER</span></span>
+    </a>
+    <div class="route-title">
+      <span class="airport-code">BTS</span>
+      <span class="route-arrow">→</span>
+      <strong>Európa a okolie</strong>
+      <span id="period-label" class="period-label">—</span>
+    </div>
+    <div class="scan-status"><i></i><span id="scan-time">Načítavam dáta…</span></div>
+  </header>
+
+  <main>
+    <section class="summary-grid" aria-label="Súhrn ponúk">
+      <article class="stat-card stat-primary">
+        <span class="stat-label">Zobrazené trasy</span>
+        <strong id="stat-routes">—</strong>
+        <small id="stat-routes-total">z — ponúk</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Krajiny</span>
+        <strong id="stat-countries">—</strong>
+        <small>priame spojenia</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Najnižšia cena</span>
+        <strong id="stat-cheapest">—</strong>
+        <small id="stat-cheapest-route">—</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Priemerná cena</span>
+        <strong id="stat-average">—</strong>
+        <small>jednosmerný basic tarif</small>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Najkratší let</span>
+        <strong id="stat-shortest">—</strong>
+        <small id="stat-shortest-route">—</small>
+      </article>
+    </section>
+
+    <section id="airline-summary" class="airline-summary" aria-label="Aerolinky"></section>
+
+    <section class="filter-panel" aria-label="Filtrovanie letov">
+      <div class="filter-heading">
+        <div>
+          <span class="eyebrow">Rýchly výber</span>
+          <h1>Nájdi si priamy let z Bratislavy</h1>
+        </div>
+        <button id="reset-filters" class="button button-ghost" type="button">↺ Zrušiť filtre</button>
+      </div>
+
+      <div class="filter-grid">
+        <label class="field field-search">
+          <span>Destinácia alebo let</span>
+          <span class="input-wrap"><b>⌕</b><input id="search-input" type="search" placeholder="Barcelona, BCN, FR5719…" autocomplete="off"></span>
+        </label>
+        <label class="field">
+          <span>Krajina</span>
+          <select id="country-filter"><option value="">Všetky krajiny</option></select>
+        </label>
+        <label class="field">
+          <span>Aerolinka</span>
+          <select id="airline-filter"><option value="">Všetky aerolinky</option></select>
+        </label>
+        <label class="field range-field">
+          <span>Max. cena <output id="price-output">—</output></span>
+          <input id="price-filter" type="range" min="0" step="5">
+        </label>
+        <label class="field range-field">
+          <span>Max. dĺžka <output id="duration-output">—</output></span>
+          <input id="duration-filter" type="range" min="0" step="15">
+        </label>
+      </div>
+
+      <div class="weekday-filter">
+        <span>Odlet v deň</span>
+        <div id="weekday-buttons" class="weekday-buttons" role="group" aria-label="Dni odletu"></div>
+        <div class="quick-price" role="group" aria-label="Rýchly cenový filter">
+          <button type="button" data-max-price="20">do 20 €</button>
+          <button type="button" data-max-price="30">do 30 €</button>
+          <button type="button" data-max-price="50">do 50 €</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-card">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow">Mapa spojení</span>
+          <h2>Kam sa lieta z BTS</h2>
+        </div>
+        <div class="map-actions">
+          <span><i class="legend-line ryanair"></i>Ryanair</span>
+          <span><i class="legend-line wizz"></i>Wizz Air</span>
+          <button id="fit-map" class="button button-ghost" type="button">◎ Zobraziť všetky</button>
+        </div>
+      </div>
+      <div id="map" aria-label="Mapa leteckých spojení z Bratislavy"></div>
+      <div id="map-fallback" class="map-fallback" hidden>
+        Mapu sa nepodarilo načítať. Skontroluj internetové pripojenie; tabuľka funguje aj offline.
+      </div>
+    </section>
+
+    <section class="results-card">
+      <div class="section-header results-heading">
+        <div>
+          <span class="eyebrow">Všetky ponuky</span>
+          <h2><span id="result-count">0</span> výsledkov</h2>
+        </div>
+        <p>Klikni na riadok pre kompletný rozpis letu.</p>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th><button data-sort="airline">Aerolinka <i></i></button></th>
+              <th><button data-sort="destination_name">Destinácia <i></i></button></th>
+              <th><button data-sort="country">Krajina <i></i></button></th>
+              <th><button data-sort="flight_number">Let <i></i></button></th>
+              <th><button data-sort="departure_local">Najlacnejší odlet <i></i></button></th>
+              <th><button data-sort="duration_minutes">Dĺžka <i></i></button></th>
+              <th><button data-sort="distance_km">Vzdialenosť <i></i></button></th>
+              <th class="price-head"><button data-sort="price">Cena <i></i></button></th>
+              <th aria-label="Detail"></th>
+            </tr>
+          </thead>
+          <tbody id="flight-rows"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state" hidden>
+          <strong>Žiadne lety nezodpovedajú filtrom</strong>
+          <span>Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="flight-detail" class="flight-dialog">
+    <button id="close-detail" class="dialog-close" type="button" aria-label="Zavrieť detail">×</button>
+    <div id="detail-content"></div>
+  </dialog>
+
+  <footer>
+    <span>FlightScanner · ceny sú dynamické a môžu sa pri rezervácii zmeniť</span>
+    <span>Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · logá sú majetkom aeroliniek</span>
+  </footer>
+
+  <script src="flight-data.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

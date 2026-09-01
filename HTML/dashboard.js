@@ -1,0 +1,435 @@
+(() => {
+  "use strict";
+
+  const payload = window.FLIGHT_DATA;
+  if (!payload || !Array.isArray(payload.offers)) {
+    document.body.innerHTML = '<main class="empty-state"><strong>Chýbajú dáta dashboardu</strong><span>Spusti: python3 3.GenerateDashboard.py</span></main>';
+    return;
+  }
+
+  const offers = payload.offers;
+  const weekdays = ["Pon", "Uto", "Str", "Štv", "Pia", "Sob", "Ned"];
+  const monthNames = ["január", "február", "marec", "apríl", "máj", "jún", "júl", "august", "september", "október", "november", "december"];
+  const logoUrls = {
+    "RYANAIR": "https://commons.wikimedia.org/wiki/Special:FilePath/Ryanair_logo.svg?width=260",
+    "Wizz Air": "https://commons.wikimedia.org/wiki/Special:FilePath/Wizz_Air_logo_2015.svg?width=260",
+  };
+  const airlineSites = {
+    "RYANAIR": "https://www.ryanair.com/",
+    "Wizz Air": "https://www.wizzair.com/",
+  };
+  const maxPrice = Math.ceil(Math.max(...offers.map((offer) => offer.price)) / 5) * 5;
+  const maxDuration = Math.ceil(Math.max(...offers.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
+  const state = {
+    search: "",
+    country: "",
+    airline: "",
+    maxPrice,
+    maxDuration,
+    selectedWeekdays: new Set(),
+    sortKey: "price",
+    sortDirection: "asc",
+    selectedOffer: null,
+  };
+  let map = null;
+  let routeLayer = null;
+  let visibleOffers = [...offers];
+
+  const elements = {
+    search: document.querySelector("#search-input"),
+    country: document.querySelector("#country-filter"),
+    airline: document.querySelector("#airline-filter"),
+    price: document.querySelector("#price-filter"),
+    priceOutput: document.querySelector("#price-output"),
+    duration: document.querySelector("#duration-filter"),
+    durationOutput: document.querySelector("#duration-output"),
+    weekdays: document.querySelector("#weekday-buttons"),
+    rows: document.querySelector("#flight-rows"),
+    resultCount: document.querySelector("#result-count"),
+    empty: document.querySelector("#empty-state"),
+    dialog: document.querySelector("#flight-detail"),
+    detail: document.querySelector("#detail-content"),
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+    })[character]);
+  }
+
+  function normalize(value) {
+    return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("sk");
+  }
+
+  function euro(value) {
+    return new Intl.NumberFormat("sk-SK", { style: "currency", currency: "EUR" }).format(value);
+  }
+
+  function integer(value) {
+    return new Intl.NumberFormat("sk-SK").format(value);
+  }
+
+  function duration(minutes) {
+    if (!minutes) return "—";
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    return `${hours} h ${String(rest).padStart(2, "0")} min`;
+  }
+
+  function flag(countryCode) {
+    if (!countryCode) return "🌐";
+    return [...countryCode.toUpperCase()].map((letter) => String.fromCodePoint(127397 + letter.charCodeAt())).join("");
+  }
+
+  function localDate(value, withYear = false) {
+    if (!value) return "—";
+    const [date, time = ""] = value.split("T");
+    const [year, month, day] = date.split("-").map(Number);
+    return `${day}. ${monthNames[month - 1]}${withYear ? ` ${year}` : ""}${time ? ` · ${time}` : ""}`;
+  }
+
+  function shortDate(value) {
+    if (!value) return ["—", "—"];
+    const [date, time] = value.split("T");
+    const [year, month, day] = date.split("-");
+    return [`${day}.${month}.${year}`, time || "—"];
+  }
+
+  function airlineClass(airline) {
+    return airline === "Wizz Air" ? "wizz" : "ryanair";
+  }
+
+  function airlineLogo(airline) {
+    const url = logoUrls[airline];
+    if (!url) return `<strong>${escapeHtml(airline)}</strong>`;
+    return `<img src="${url}" alt="${escapeHtml(airline)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('strong'),{textContent:this.alt}))">`;
+  }
+
+  function populateControls() {
+    const countries = [...new Set(offers.map((offer) => offer.country))].sort((a, b) => a.localeCompare(b, "sk"));
+    const airlines = [...new Set(offers.map((offer) => offer.airline))].sort((a, b) => a.localeCompare(b, "sk"));
+    elements.country.insertAdjacentHTML("beforeend", countries.map((country) => `<option>${escapeHtml(country)}</option>`).join(""));
+    elements.airline.insertAdjacentHTML("beforeend", airlines.map((airline) => `<option>${escapeHtml(airline)}</option>`).join(""));
+    elements.weekdays.innerHTML = weekdays.map((day) => `<button type="button" data-weekday="${day}" aria-pressed="false">${day}</button>`).join("");
+    elements.price.max = maxPrice;
+    elements.price.value = maxPrice;
+    elements.duration.max = maxDuration;
+    elements.duration.value = maxDuration;
+    updateRangeLabels();
+  }
+
+  function renderAirlineSummary() {
+    const groups = Object.groupBy ? Object.groupBy(offers, (offer) => offer.airline) : offers.reduce((result, offer) => {
+      (result[offer.airline] ||= []).push(offer);
+      return result;
+    }, {});
+    document.querySelector("#airline-summary").innerHTML = Object.entries(groups).map(([airline, airlineOffers]) => {
+      const best = Math.min(...airlineOffers.map((offer) => offer.price));
+      const countries = new Set(airlineOffers.map((offer) => offer.country)).size;
+      return `
+        <article class="airline-card">
+          <div class="airline-logo">${airlineLogo(airline)}</div>
+          <div class="airline-meta">
+            <span>Trasy<strong>${airlineOffers.length}</strong></span>
+            <span>Krajiny<strong>${countries}</strong></span>
+            <span>Priemer<strong>${euro(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length)}</strong></span>
+          </div>
+          <div class="airline-best"><span>od</span><strong>${euro(best)}</strong></div>
+        </article>`;
+    }).join("");
+  }
+
+  function updateRangeLabels() {
+    elements.priceOutput.value = `${euro(state.maxPrice)}`;
+    elements.durationOutput.value = duration(state.maxDuration);
+  }
+
+  function filteredAndSortedOffers() {
+    const query = normalize(state.search);
+    const filtered = offers.filter((offer) => {
+      const searchable = normalize(`${offer.destination_name} ${offer.destination_iata} ${offer.flight_number} ${offer.country} ${offer.airline}`);
+      const hasWeekday = state.selectedWeekdays.size === 0 || [...state.selectedWeekdays].some((day) =>
+        (offer.operating_schedule || []).some((item) => item.startsWith(`${day} `))
+      );
+      return (!query || searchable.includes(query))
+        && (!state.country || offer.country === state.country)
+        && (!state.airline || offer.airline === state.airline)
+        && offer.price <= state.maxPrice
+        && (offer.duration_minutes || Infinity) <= state.maxDuration
+        && hasWeekday;
+    });
+
+    const direction = state.sortDirection === "asc" ? 1 : -1;
+    return filtered.sort((a, b) => {
+      const valueA = a[state.sortKey] ?? "";
+      const valueB = b[state.sortKey] ?? "";
+      if (typeof valueA === "number" && typeof valueB === "number") return (valueA - valueB) * direction;
+      return String(valueA).localeCompare(String(valueB), "sk", { numeric: true }) * direction;
+    });
+  }
+
+  function renderStats(items) {
+    document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
+    document.querySelector("#stat-routes-total").textContent = `z ${offers.length} ponúk`;
+    document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country)).size;
+    if (!items.length) {
+      document.querySelector("#stat-cheapest").textContent = "—";
+      document.querySelector("#stat-cheapest-route").textContent = "bez výsledkov";
+      document.querySelector("#stat-average").textContent = "—";
+      document.querySelector("#stat-shortest").textContent = "—";
+      document.querySelector("#stat-shortest-route").textContent = "bez výsledkov";
+      return;
+    }
+    const cheapest = items.reduce((best, item) => item.price < best.price ? item : best);
+    const shortest = items.filter((item) => item.duration_minutes).reduce((best, item) => item.duration_minutes < best.duration_minutes ? item : best);
+    document.querySelector("#stat-cheapest").textContent = euro(cheapest.price);
+    document.querySelector("#stat-cheapest-route").textContent = `${cheapest.destination_name} · ${cheapest.airline}`;
+    document.querySelector("#stat-average").textContent = euro(items.reduce((sum, item) => sum + item.price, 0) / items.length);
+    document.querySelector("#stat-shortest").textContent = duration(shortest.duration_minutes);
+    document.querySelector("#stat-shortest-route").textContent = `${shortest.destination_name} (${shortest.destination_iata})`;
+  }
+
+  function renderTable(items) {
+    elements.resultCount.textContent = items.length;
+    elements.empty.hidden = items.length !== 0;
+    elements.rows.innerHTML = items.map((offer) => {
+      const [date, time] = shortDate(offer.departure_local);
+      const selected = state.selectedOffer === offer ? "selected" : "";
+      return `
+        <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}" tabindex="0">
+          <td><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
+          <td><span class="destination-cell"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></td>
+          <td><span class="country-cell"><span class="flag">${flag(offer.country_code)}</span>${escapeHtml(offer.country)}</span></td>
+          <td><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
+          <td><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
+          <td><strong>${duration(offer.duration_minutes)}</strong></td>
+          <td>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
+          <td class="price-cell">${euro(offer.price)}<small>${offer.price_per_hour ? `${euro(offer.price_per_hour)}/h` : ""}</small></td>
+          <td><span class="detail-chevron">›</span></td>
+        </tr>`;
+    }).join("");
+
+    elements.rows.querySelectorAll("tr").forEach((row, index) => {
+      const activate = () => showOffer(items[index]);
+      row.addEventListener("click", activate);
+      row.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          activate();
+        }
+      });
+    });
+  }
+
+  function renderSortHeaders() {
+    document.querySelectorAll("th button[data-sort]").forEach((button) => {
+      const active = button.dataset.sort === state.sortKey;
+      button.classList.toggle("active", active);
+      button.classList.toggle("desc", active && state.sortDirection === "desc");
+    });
+  }
+
+  function showOffer(offer) {
+    state.selectedOffer = offer;
+    const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(item)}</span>`).join("");
+    const cssClass = airlineClass(offer.airline);
+    elements.detail.innerHTML = `
+      <div class="detail-hero ${cssClass}">
+        <div class="detail-airline">${airlineLogo(offer.airline)}</div>
+        <div class="detail-route">
+          <div><b>BTS</b><small>Bratislava</small></div>
+          <span class="detail-plane">✈</span>
+          <div><b>${escapeHtml(offer.destination_iata)}</b><small>${escapeHtml(offer.destination_name)}, ${escapeHtml(offer.country)}</small></div>
+        </div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-price">
+          <div><span>Najnižšia nájdená cena</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
+          <div><span>Cena za hodinu</span><strong>${offer.price_per_hour ? euro(offer.price_per_hour) : "—"}</strong></div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item"><span>Číslo letu</span><strong>${escapeHtml(offer.flight_number || "—")}</strong></div>
+          <div class="detail-item"><span>Dĺžka letu</span><strong>${duration(offer.duration_minutes)}</strong></div>
+          <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
+          <div class="detail-item"><span>Krajina</span><strong>${flag(offer.country_code)} ${escapeHtml(offer.country)}</strong></div>
+          <div class="detail-item"><span>Najlacnejší odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
+          <div class="detail-item"><span>Prílet</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
+          <div class="detail-item"><span>Typ ceny</span><strong>Basic · jednosmerná</strong></div>
+          <div class="detail-item"><span>Časy</span><strong>Miestne časy letísk</strong></div>
+        </div>
+        <h3 class="schedule-title">Všetky dni a časy odletov v mesiaci</h3>
+        <div class="schedule-list">${schedule || "Časy nie sú dostupné"}</div>
+        <a class="booking-link ${cssClass}" href="${airlineSites[offer.airline] || "#"}" target="_blank" rel="noopener">Otvoriť stránku ${escapeHtml(offer.airline)} ↗</a>
+      </div>`;
+    if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();
+    focusRouteOnMap(offer);
+    renderTable(visibleOffers);
+  }
+
+  function bearing(start, end) {
+    const lat1 = start[0] * Math.PI / 180;
+    const lat2 = end[0] * Math.PI / 180;
+    const deltaLongitude = (end[1] - start[1]) * Math.PI / 180;
+    const y = Math.sin(deltaLongitude) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLongitude);
+    return (Math.atan2(y, x) * 180 / Math.PI + 90 + 360) % 360;
+  }
+
+  function initMap() {
+    if (typeof window.L === "undefined") {
+      document.querySelector("#map").hidden = true;
+      document.querySelector("#map-fallback").hidden = false;
+      return;
+    }
+    map = L.map("map", { zoomControl: true, minZoom: 2 }).setView([48.5, 15], 4);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map);
+    routeLayer = L.layerGroup().addTo(map);
+    const origin = payload.origin;
+    L.circleMarker([origin.latitude, origin.longitude], {
+      radius: 8, color: "#fff", weight: 3, fillColor: "#f4ce24", fillOpacity: 1,
+    }).bindPopup("<strong>Bratislava (BTS)</strong><br>Všetky lety odlietajú odtiaľto.").addTo(map);
+  }
+
+  function renderMap(items) {
+    if (!map || !routeLayer) return;
+    routeLayer.clearLayers();
+    const origin = [payload.origin.latitude, payload.origin.longitude];
+    items.filter((offer) => offer.latitude != null && offer.longitude != null).forEach((offer) => {
+      const destination = [offer.latitude, offer.longitude];
+      const cssClass = airlineClass(offer.airline);
+      const color = cssClass === "wizz" ? "#c01878" : "#174a9d";
+      L.polyline([origin, destination], {
+        color, weight: 1.35, opacity: .46, dashArray: cssClass === "wizz" ? "4 4" : null,
+      }).addTo(routeLayer);
+      const arrowPoint = [
+        origin[0] + (destination[0] - origin[0]) * .68,
+        origin[1] + (destination[1] - origin[1]) * .68,
+      ];
+      const angle = bearing(origin, destination);
+      L.marker(arrowPoint, {
+        interactive: false,
+        icon: L.divIcon({
+          className: "",
+          iconSize: [18, 18],
+          iconAnchor: [9, 9],
+          html: `<div class="plane-arrow ${cssClass}" style="transform:rotate(${angle}deg)">➤</div>`,
+        }),
+      }).addTo(routeLayer);
+      const marker = L.circleMarker(destination, {
+        radius: 4.5, color: "#fff", weight: 1.5, fillColor: color, fillOpacity: .95,
+      }).addTo(routeLayer);
+      marker.bindPopup(`
+        <div class="map-popup">
+          <strong>${escapeHtml(offer.destination_name)} (${escapeHtml(offer.destination_iata)})</strong>
+          <div class="popup-route">${flag(offer.country_code)} ${escapeHtml(offer.country)} · ${escapeHtml(offer.airline)}</div>
+          <div class="popup-line"><span>Cena od</span><b>${euro(offer.price)}</b></div>
+          <div class="popup-line"><span>Dĺžka</span><b>${duration(offer.duration_minutes)}</b></div>
+          <button type="button" data-map-offer="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}">Detail letu</button>
+        </div>`);
+      marker.on("popupopen", (event) => {
+        const button = event.popup.getElement()?.querySelector("[data-map-offer]");
+        button?.addEventListener("click", () => showOffer(offer), { once: true });
+      });
+    });
+  }
+
+  function fitVisibleMap() {
+    if (!map) return;
+    const points = [[payload.origin.latitude, payload.origin.longitude], ...visibleOffers
+      .filter((offer) => offer.latitude != null && offer.longitude != null)
+      .map((offer) => [offer.latitude, offer.longitude])];
+    if (points.length > 1) map.fitBounds(points, { padding: [28, 28], maxZoom: 6 });
+  }
+
+  function focusRouteOnMap(offer) {
+    if (!map || offer.latitude == null) return;
+    map.fitBounds([
+      [payload.origin.latitude, payload.origin.longitude],
+      [offer.latitude, offer.longitude],
+    ], { padding: [65, 65], maxZoom: 6 });
+  }
+
+  function render() {
+    visibleOffers = filteredAndSortedOffers();
+    renderStats(visibleOffers);
+    renderTable(visibleOffers);
+    renderMap(visibleOffers);
+    renderSortHeaders();
+  }
+
+  function resetFilters() {
+    state.search = "";
+    state.country = "";
+    state.airline = "";
+    state.maxPrice = maxPrice;
+    state.maxDuration = maxDuration;
+    state.selectedWeekdays.clear();
+    elements.search.value = "";
+    elements.country.value = "";
+    elements.airline.value = "";
+    elements.price.value = maxPrice;
+    elements.duration.value = maxDuration;
+    elements.weekdays.querySelectorAll("button").forEach((button) => {
+      button.classList.remove("active");
+      button.setAttribute("aria-pressed", "false");
+    });
+    updateRangeLabels();
+    render();
+    fitVisibleMap();
+  }
+
+  function bindEvents() {
+    elements.search.addEventListener("input", (event) => { state.search = event.target.value; render(); });
+    elements.country.addEventListener("change", (event) => { state.country = event.target.value; render(); });
+    elements.airline.addEventListener("change", (event) => { state.airline = event.target.value; render(); });
+    elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.weekdays.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-weekday]");
+      if (!button) return;
+      const day = button.dataset.weekday;
+      if (state.selectedWeekdays.has(day)) state.selectedWeekdays.delete(day);
+      else state.selectedWeekdays.add(day);
+      button.classList.toggle("active");
+      button.setAttribute("aria-pressed", String(button.classList.contains("active")));
+      render();
+    });
+    document.querySelectorAll("[data-max-price]").forEach((button) => button.addEventListener("click", () => {
+      state.maxPrice = Number(button.dataset.maxPrice);
+      elements.price.value = state.maxPrice;
+      updateRangeLabels();
+      render();
+    }));
+    document.querySelectorAll("th button[data-sort]").forEach((button) => button.addEventListener("click", () => {
+      if (state.sortKey === button.dataset.sort) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+      else {
+        state.sortKey = button.dataset.sort;
+        state.sortDirection = "asc";
+      }
+      render();
+    }));
+    document.querySelector("#reset-filters").addEventListener("click", resetFilters);
+    document.querySelector("#fit-map").addEventListener("click", fitVisibleMap);
+    document.querySelector("#close-detail").addEventListener("click", () => elements.dialog.close());
+    elements.dialog.addEventListener("click", (event) => {
+      if (event.target === elements.dialog) elements.dialog.close();
+    });
+  }
+
+  function initHeader() {
+    document.querySelector("#period-label").textContent = `${monthNames[payload.month - 1]} ${payload.year}`;
+    const scanned = new Date(payload.scanned_at_utc);
+    document.querySelector("#scan-time").textContent = `Dáta aktualizované ${scanned.toLocaleString("sk-SK", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC`;
+  }
+
+  populateControls();
+  renderAirlineSummary();
+  initHeader();
+  initMap();
+  bindEvents();
+  render();
+  fitVisibleMap();
+})();

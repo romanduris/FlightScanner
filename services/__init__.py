@@ -1,0 +1,1 @@
+"""Spoločné služby FlightScanneru."""

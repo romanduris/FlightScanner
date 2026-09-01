@@ -1,0 +1,418 @@
+{
+  "airport": {
+    "name": "Letisko M. R. Štefánika – Airport Bratislava",
+    "iata": "BTS"
+  },
+  "source_url": "https://www.bts.aero/lety/letecke-spolocnosti/",
+  "data_origin": "official_web",
+  "schedule_source_url": "https://www.bts.aero/lety/letovy-poriadok-leto-2026/odlety/",
+  "schedule_data_origin": "official_schedule",
+  "unmapped_flight_prefixes": [],
+  "generated_at_utc": "2026-09-01T12:03:36.401751+00:00",
+  "airline_count": 16,
+  "airlines": [
+    {
+      "name": "RYANAIR",
+      "flight_type": "pravidelné lety",
+      "destination_count": 33,
+      "destinations": [
+        {
+          "name": "ALGHERO",
+          "iata": "AHO"
+        },
+        {
+          "name": "ALICANTE",
+          "iata": "ALC"
+        },
+        {
+          "name": "ATÉNY",
+          "iata": "ATH"
+        },
+        {
+          "name": "BARCELONA",
+          "iata": "BCN"
+        },
+        {
+          "name": "BARI",
+          "iata": "BRI"
+        },
+        {
+          "name": "BRUSEL-CHARLEROI",
+          "iata": "CRL"
+        },
+        {
+          "name": "BURGAS",
+          "iata": "BOJ"
+        },
+        {
+          "name": "DALAMAN",
+          "iata": "DLM"
+        },
+        {
+          "name": "DUBLIN",
+          "iata": "DUB"
+        },
+        {
+          "name": "EDINBURGH",
+          "iata": "EDI"
+        },
+        {
+          "name": "EINDHOVEN",
+          "iata": "EIN"
+        },
+        {
+          "name": "GDANSK",
+          "iata": "GDN"
+        },
+        {
+          "name": "KORFU",
+          "iata": "CFU"
+        },
+        {
+          "name": "LAMEZIA TERME",
+          "iata": "SUF"
+        },
+        {
+          "name": "LANZAROTE",
+          "iata": "ACE"
+        },
+        {
+          "name": "LEEDS-BRADFORD",
+          "iata": "LBA"
+        },
+        {
+          "name": "LONDÝN-STANSTED",
+          "iata": "STN"
+        },
+        {
+          "name": "MALAGA",
+          "iata": "AGP"
+        },
+        {
+          "name": "MALTA",
+          "iata": "MLA"
+        },
+        {
+          "name": "MANCHESTER",
+          "iata": "MAN"
+        },
+        {
+          "name": "MILÁNO-MALPENSA",
+          "iata": "MXP"
+        },
+        {
+          "name": "NEAPOL",
+          "iata": "NAP"
+        },
+        {
+          "name": "PAFOS",
+          "iata": "PFO"
+        },
+        {
+          "name": "PALERMO",
+          "iata": "PMO"
+        },
+        {
+          "name": "PALMA DE MALLORKA",
+          "iata": "PMI"
+        },
+        {
+          "name": "PISA",
+          "iata": "PSA"
+        },
+        {
+          "name": "RÍM-CIAMPINO",
+          "iata": "CIA"
+        },
+        {
+          "name": "SKIATHOS",
+          "iata": "JSI"
+        },
+        {
+          "name": "SOLÚN/THESSALONIKI",
+          "iata": "SKG"
+        },
+        {
+          "name": "TIRANA",
+          "iata": "TIA"
+        },
+        {
+          "name": "TRAPANI",
+          "iata": "TPS"
+        },
+        {
+          "name": "VARŠAVA-MODLIN",
+          "iata": "WMI"
+        },
+        {
+          "name": "ZADAR",
+          "iata": "ZAD"
+        }
+      ]
+    },
+    {
+      "name": "Wizz Air",
+      "flight_type": "pravidelné lety",
+      "destination_count": 30,
+      "destinations": [
+        {
+          "name": "ALICANTE",
+          "iata": "ALC"
+        },
+        {
+          "name": "ATÉNY",
+          "iata": "ATH"
+        },
+        {
+          "name": "BARCELONA",
+          "iata": "BCN"
+        },
+        {
+          "name": "BAZILEJ-MULHOUSE-FREIBURG",
+          "iata": "BSL"
+        },
+        {
+          "name": "BERLÍN",
+          "iata": "BER"
+        },
+        {
+          "name": "DORTMUND",
+          "iata": "DTM"
+        },
+        {
+          "name": "JEREVAN",
+          "iata": "EVN"
+        },
+        {
+          "name": "KIŠIŇOV",
+          "iata": "RMO"
+        },
+        {
+          "name": "KOŠICE",
+          "iata": "KSC"
+        },
+        {
+          "name": "KUTAISI",
+          "iata": "KUT"
+        },
+        {
+          "name": "LAMEZIA TERME",
+          "iata": "SUF"
+        },
+        {
+          "name": "LARNAKA",
+          "iata": "LCA"
+        },
+        {
+          "name": "LONDÝN-LUTON",
+          "iata": "LTN"
+        },
+        {
+          "name": "MALAGA",
+          "iata": "AGP"
+        },
+        {
+          "name": "MYKONOS",
+          "iata": "JMK"
+        },
+        {
+          "name": "NEAPOL",
+          "iata": "NAP"
+        },
+        {
+          "name": "NICE",
+          "iata": "NCE"
+        },
+        {
+          "name": "OHRID",
+          "iata": "OHD"
+        },
+        {
+          "name": "OSLO",
+          "iata": "OSL"
+        },
+        {
+          "name": "PALERMO",
+          "iata": "PMO"
+        },
+        {
+          "name": "PLOVDIV",
+          "iata": "PDV"
+        },
+        {
+          "name": "PODGORICA",
+          "iata": "TGD"
+        },
+        {
+          "name": "PRIŠTINA",
+          "iata": "PRN"
+        },
+        {
+          "name": "RÍM-FIUMICINO",
+          "iata": "FCO"
+        },
+        {
+          "name": "SKOPJE",
+          "iata": "SKP"
+        },
+        {
+          "name": "TEL AVIV",
+          "iata": "TLV"
+        },
+        {
+          "name": "TIRANA",
+          "iata": "TIA"
+        },
+        {
+          "name": "TUZLA",
+          "iata": "TZL"
+        },
+        {
+          "name": "VARNA",
+          "iata": "VAR"
+        },
+        {
+          "name": "VARŠAVA-CHOPIN",
+          "iata": "WAW"
+        }
+      ]
+    },
+    {
+      "name": "Pegasus Airlines",
+      "flight_type": "pravidelné lety",
+      "destination_count": 2,
+      "destinations": [
+        {
+          "name": "ANTALYA",
+          "iata": "AYT"
+        },
+        {
+          "name": "ISTANBUL SABIHA GOKCEN",
+          "iata": "SAW"
+        }
+      ]
+    },
+    {
+      "name": "Air Cairo",
+      "flight_type": "pravidelné lety",
+      "destination_count": 1,
+      "destinations": [
+        {
+          "name": "HURGADA",
+          "iata": "HRG"
+        }
+      ]
+    },
+    {
+      "name": "Air Montenegro",
+      "flight_type": "pravidelné lety",
+      "destination_count": 1,
+      "destinations": [
+        {
+          "name": "PODGORICA",
+          "iata": "TGD"
+        }
+      ]
+    },
+    {
+      "name": "SMARTWINGS",
+      "flight_type": "pravidelné lety",
+      "destination_count": 7,
+      "destinations": [
+        {
+          "name": "BURGAS",
+          "iata": "BOJ"
+        },
+        {
+          "name": "IRAKLIO",
+          "iata": "HER"
+        },
+        {
+          "name": "KORFU",
+          "iata": "CFU"
+        },
+        {
+          "name": "LARNAKA",
+          "iata": "LCA"
+        },
+        {
+          "name": "PALMA DE MALLORKA",
+          "iata": "PMI"
+        },
+        {
+          "name": "RODOS",
+          "iata": "RHO"
+        },
+        {
+          "name": "ZAKYNTOS",
+          "iata": "ZTH"
+        }
+      ]
+    },
+    {
+      "name": "SunExpress Airlines",
+      "flight_type": "pravidelné lety",
+      "destination_count": 1,
+      "destinations": [
+        {
+          "name": "ANTALYA",
+          "iata": "AYT"
+        }
+      ]
+    },
+    {
+      "name": "AirExplore",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "ABS Jets",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "AIR - TRANSPORT EUROPE",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "EHC service",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "Elite Jet",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "Go2Sky",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "JetAge",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "Tatra Jet",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    },
+    {
+      "name": "SEAGLE SK.ATO.02",
+      "flight_type": "nepravidelné lety",
+      "destination_count": null,
+      "destinations": []
+    }
+  ]
+}
