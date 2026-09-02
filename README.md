@@ -5,16 +5,13 @@ Skener najnižších cien priamych letov z Bratislavy a interaktívny HTML dashb
 ## Spustenie
 
 ```bash
-# 1. Obnov aerolinky a destinácie z webu letiska
-python3 1.ListOfAirlines.py
+# Obnov všetko potrebné pre dashboard a skenuj najbližších 30 dní
+python3 Main.py
 
-# 2. Naskenuj ceny a letové časy Ryanair + Wizz Air
-python3 2.Destination.py --year 2026 --month 9
+# Voliteľne zmeň rozsah, napríklad na 45 dní
+python3 Main.py --days 45
 
-# 3. Priprav najnovšie dáta pre dashboard
-python3 3.GenerateDashboard.py
-
-# 4. Spusti stránku v Codespace
+# Spusti stránku v Codespace
 python3 -m http.server 1455 --directory HTML
 ```
 
@@ -28,7 +25,8 @@ Dashboard obsahuje mapu trás, filtre podľa krajiny, aerolinky, ceny, dĺžky a
 odletu, radenie tabuľky a detail každej ponuky. Pri filtrovaní podľa dňa zobrazí
 pri každej trase najlacnejší konkrétny odlet v zvolený deň. Detail zobrazuje aj
 dostupné priame návraty do Bratislavy počas 10 dní po najlacnejšom odlete, cenu
-cesty späť a celkovú cenu oboch smerov. Dáta stránky sú v
+cesty späť a celkovú cenu oboch smerov. `Main.py` postupne obnoví zoznam
+aerolínií, naskenuje ceny a vygeneruje dáta stránky. Dáta stránky sú v
 `HTML/flight-data.js` a vytvárajú sa z najnovšieho `Data/destinations_YYYY_MM.json`.
 
 Mapa a logá potrebujú internetové pripojenie. Tabuľka a filtre fungujú lokálne.

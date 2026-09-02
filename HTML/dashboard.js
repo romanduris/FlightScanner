@@ -517,7 +517,16 @@
   }
 
   function initHeader() {
-    document.querySelector("#period-label").textContent = `${monthNames[payload.month - 1]} ${payload.year}`;
+    const start = isoDate(payload.start_date);
+    const end = isoDate(payload.end_date);
+    const rangeLabel = start && end && start.getUTCFullYear() !== end.getUTCFullYear()
+      ? `${calendarDate(start)} ${start.getUTCFullYear()} – ${calendarDate(end)} ${end.getUTCFullYear()}`
+      : start && end
+        ? `${calendarDate(start)} – ${calendarDate(end)} ${end.getUTCFullYear()}`
+        : null;
+    document.querySelector("#period-label").textContent = start && end
+      ? rangeLabel
+      : `${monthNames[payload.month - 1]} ${payload.year}`;
     const scanned = new Date(payload.scanned_at_utc);
     document.querySelector("#scan-time").textContent = `Dáta aktualizované ${scanned.toLocaleString("sk-SK", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC`;
   }

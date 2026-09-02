@@ -43,6 +43,9 @@ global.window = {
   FLIGHT_DATA: {
     year: 2026,
     month: 9,
+    start_date: "2026-09-02",
+    end_date: "2026-10-01",
+    scan_days: 30,
     scanned_at_utc: "2026-09-02T08:00:00+00:00",
     return_window_days: 10,
     origin: { latitude: 48.17, longitude: 17.21 },
@@ -107,6 +110,7 @@ element("#weekday-buttons").listeners.click({
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /42,29/);
 assert.doesNotMatch(rows.innerHTML, /28\.09\.2026/);
+assert.match(element("#period-label").textContent, /2\. septembra – 1\. októbra 2026/);
 
 const css = fs.readFileSync(
   path.join(__dirname, "..", "HTML", "dashboard.css"),

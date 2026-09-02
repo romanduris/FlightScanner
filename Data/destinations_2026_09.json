@@ -2,11 +2,14 @@
   "origin_iata": "BTS",
   "year": 2026,
   "month": 9,
+  "start_date": "2026-09-02",
+  "end_date": "2026-10-01",
+  "scan_days": 30,
   "trip_type": "one_way",
   "fare_type": "basic",
   "return_window_days": 10,
   "times_are_local": true,
-  "scanned_at_utc": "2026-09-02T08:53:08.302415+00:00",
+  "scanned_at_utc": "2026-09-02T09:27:46.352288+00:00",
   "providers": [
     "RyanairProvider",
     "WizzAirProvider"
@@ -15,18 +18,18 @@
     "RYANAIR": {
       "destinations": 33,
       "offers": 33,
-      "return_offers": 641,
+      "return_offers": 664,
       "failures": 0
     },
     "Wizz Air": {
       "destinations": 30,
       "offers": 30,
-      "return_offers": 550,
+      "return_offers": 563,
       "failures": 0
     }
   },
   "offer_count": 63,
-  "return_offer_count": 1191,
+  "return_offer_count": 1227,
   "offers": [
     {
       "airline": "RYANAIR",
@@ -213,7 +216,7 @@
         {
           "departure_local": "2026-09-23T16:45",
           "arrival_local": "2026-09-23T18:45",
-          "price": 72.99,
+          "price": 83.99,
           "currency": "EUR",
           "flight_number": "FR6399",
           "duration_minutes": 120
@@ -270,6 +273,14 @@
           "departure_local": "2026-09-30T16:45",
           "arrival_local": "2026-09-30T18:45",
           "price": 56.99,
+          "currency": "EUR",
+          "flight_number": "FR6399",
+          "duration_minutes": 120
+        },
+        {
+          "departure_local": "2026-10-01T19:50",
+          "arrival_local": "2026-10-01T21:50",
+          "price": 33.99,
           "currency": "EUR",
           "flight_number": "FR6399",
           "duration_minutes": 120
@@ -447,7 +458,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-18T18:45",
           "arrival_local": "2026-09-18T20:40",
-          "price": 98.99,
+          "price": 101.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 115
@@ -579,7 +590,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-30T19:10",
           "arrival_local": "2026-09-30T21:05",
-          "price": 138.99,
+          "price": 152.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 115
@@ -690,6 +701,17 @@
           "departure_local": "2026-10-10T15:25",
           "arrival_local": "2026-10-10T17:20",
           "price": 78.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 115
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "AHO",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T09:00",
+          "arrival_local": "2026-10-11T10:55",
+          "price": 94.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 115
@@ -831,7 +853,7 @@
         {
           "departure_local": "2026-09-28T22:10",
           "arrival_local": "2026-09-29T01:15",
-          "price": 31.99,
+          "price": 37.99,
           "currency": "EUR",
           "flight_number": "FR5699",
           "duration_minutes": 185
@@ -840,6 +862,14 @@
           "departure_local": "2026-09-30T05:50",
           "arrival_local": "2026-09-30T08:55",
           "price": 37.99,
+          "currency": "EUR",
+          "flight_number": "FR5699",
+          "duration_minutes": 185
+        },
+        {
+          "departure_local": "2026-10-01T16:55",
+          "arrival_local": "2026-10-01T20:00",
+          "price": 45.99,
           "currency": "EUR",
           "flight_number": "FR5699",
           "duration_minutes": 185
@@ -1028,7 +1058,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-02T21:05",
           "arrival_local": "2026-10-02T23:55",
-          "price": 90.99,
+          "price": 92.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 170
@@ -1260,7 +1290,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-20T12:20",
           "arrival_local": "2026-09-20T13:45",
-          "price": 121.99,
+          "price": 110.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 145
@@ -1304,7 +1334,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-02T11:50",
           "arrival_local": "2026-10-02T13:15",
-          "price": 50.99,
+          "price": 43.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 145
@@ -1338,6 +1368,17 @@
           "departure_local": "2026-10-09T11:50",
           "arrival_local": "2026-10-09T13:15",
           "price": 36.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 145
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "ATH",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T12:20",
+          "arrival_local": "2026-10-11T13:45",
+          "price": 50.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 145
@@ -1586,6 +1627,14 @@
         {
           "departure_local": "2026-09-30T14:45",
           "arrival_local": "2026-09-30T17:20",
+          "price": 24.99,
+          "currency": "EUR",
+          "flight_number": "FR5719",
+          "duration_minutes": 155
+        },
+        {
+          "departure_local": "2026-10-01T17:45",
+          "arrival_local": "2026-10-01T20:20",
           "price": 24.99,
           "currency": "EUR",
           "flight_number": "FR5719",
@@ -2010,6 +2059,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 150
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "BCN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T22:05",
+          "arrival_local": "2026-10-12T00:35",
+          "price": 41.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 150
         }
       ],
       "return_search_error": null
@@ -2316,6 +2376,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 100
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "BRI",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T18:10",
+          "arrival_local": "2026-10-11T19:50",
+          "price": 27.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 100
         }
       ],
       "return_search_error": null
@@ -2357,7 +2428,7 @@
         {
           "departure_local": "2026-09-11T07:25",
           "arrival_local": "2026-09-11T09:15",
-          "price": 50.99,
+          "price": 51.99,
           "currency": "EUR",
           "flight_number": "FR2853",
           "duration_minutes": 110
@@ -2555,7 +2626,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-05T21:55",
           "arrival_local": "2026-10-05T23:40",
-          "price": 29.99,
+          "price": 32.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 105
@@ -3006,6 +3077,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 155
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "DLM",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-09T22:10",
+          "arrival_local": "2026-10-09T23:50",
+          "price": 40.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 160
         }
       ],
       "return_search_error": null
@@ -3184,7 +3266,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-05T08:20",
           "arrival_local": "2026-09-05T12:05",
-          "price": 42.99,
+          "price": 49.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 165
@@ -3408,6 +3490,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 165
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "DUB",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T17:15",
+          "arrival_local": "2026-10-11T21:00",
+          "price": 59.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 165
         }
       ],
       "return_search_error": null
@@ -3525,6 +3618,14 @@
           "currency": "EUR",
           "flight_number": "FR6643",
           "duration_minutes": 170
+        },
+        {
+          "departure_local": "2026-10-01T15:45",
+          "arrival_local": "2026-10-01T17:30",
+          "price": 42.99,
+          "currency": "EUR",
+          "flight_number": "FR6643",
+          "duration_minutes": 165
         }
       ],
       "return_offers": [
@@ -3534,7 +3635,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-05T05:45",
           "arrival_local": "2026-09-05T09:20",
-          "price": 23.32,
+          "price": 19.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 155
@@ -3692,6 +3793,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 155
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "EDI",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-10T05:45",
+          "arrival_local": "2026-10-10T09:20",
+          "price": 77.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 155
         }
       ],
       "return_search_error": null
@@ -3742,7 +3854,7 @@
         {
           "departure_local": "2026-09-07T08:30",
           "arrival_local": "2026-09-07T10:20",
-          "price": 149.99,
+          "price": 159.99,
           "currency": "EUR",
           "flight_number": "FR1871",
           "duration_minutes": 110
@@ -3850,6 +3962,14 @@
           "currency": "EUR",
           "flight_number": "FR1871",
           "duration_minutes": 110
+        },
+        {
+          "departure_local": "2026-10-01T06:40",
+          "arrival_local": "2026-10-01T08:30",
+          "price": 34.99,
+          "currency": "EUR",
+          "flight_number": "FR1871",
+          "duration_minutes": 110
         }
       ],
       "return_offers": [
@@ -3914,7 +4034,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-13T16:50",
           "arrival_local": "2026-09-13T18:30",
-          "price": 68.99,
+          "price": 50.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 100
@@ -4024,7 +4144,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-30T17:20",
           "arrival_local": "2026-09-30T19:00",
-          "price": 19.99,
+          "price": 30.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 100
@@ -4083,6 +4203,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 100
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "EIN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T16:50",
+          "arrival_local": "2026-10-11T18:30",
+          "price": 73.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 100
         }
       ],
       "return_search_error": null
@@ -4092,15 +4223,16 @@
       "origin_iata": "BTS",
       "destination_name": "GDANSK",
       "destination_iata": "GDN",
-      "flight_number": "FR6826",
-      "departure_local": "2026-09-08T23:00",
-      "arrival_local": "2026-09-09T00:25",
-      "price": 15.96,
+      "flight_number": "FR6593",
+      "departure_local": "2026-10-01T12:05",
+      "arrival_local": "2026-10-01T13:30",
+      "price": 14.99,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
         "Uto 23:00",
         "Str 13:50",
+        "Štv 12:05",
         "Sob 13:20"
       ],
       "duration_minutes": 85,
@@ -4124,7 +4256,7 @@
         {
           "departure_local": "2026-09-08T23:00",
           "arrival_local": "2026-09-09T00:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6826",
           "duration_minutes": 85
@@ -4148,7 +4280,7 @@
         {
           "departure_local": "2026-09-15T23:00",
           "arrival_local": "2026-09-16T00:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6826",
           "duration_minutes": 85
@@ -4156,7 +4288,7 @@
         {
           "departure_local": "2026-09-16T13:50",
           "arrival_local": "2026-09-16T15:15",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6593",
           "duration_minutes": 85
@@ -4172,7 +4304,7 @@
         {
           "departure_local": "2026-09-22T23:00",
           "arrival_local": "2026-09-23T00:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6826",
           "duration_minutes": 85
@@ -4180,7 +4312,7 @@
         {
           "departure_local": "2026-09-23T13:50",
           "arrival_local": "2026-09-23T15:15",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6593",
           "duration_minutes": 85
@@ -4196,7 +4328,7 @@
         {
           "departure_local": "2026-09-29T23:00",
           "arrival_local": "2026-09-30T00:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR6826",
           "duration_minutes": 85
@@ -4204,7 +4336,15 @@
         {
           "departure_local": "2026-09-30T13:50",
           "arrival_local": "2026-09-30T15:15",
-          "price": 15.96,
+          "price": 15.93,
+          "currency": "EUR",
+          "flight_number": "FR6593",
+          "duration_minutes": 85
+        },
+        {
+          "departure_local": "2026-10-01T12:05",
+          "arrival_local": "2026-10-01T13:30",
+          "price": 14.99,
           "currency": "EUR",
           "flight_number": "FR6593",
           "duration_minutes": 85
@@ -4228,7 +4368,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-08T21:10",
           "arrival_local": "2026-09-08T22:35",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4239,7 +4379,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-09T12:00",
           "arrival_local": "2026-09-09T13:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4272,7 +4412,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-16T12:00",
           "arrival_local": "2026-09-16T13:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4305,7 +4445,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-23T12:00",
           "arrival_local": "2026-09-23T13:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4327,7 +4467,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-29T21:10",
           "arrival_local": "2026-09-29T22:35",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4338,7 +4478,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-30T12:00",
           "arrival_local": "2026-09-30T13:25",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -4426,19 +4566,12 @@
       "operating_schedule": [
         "Uto 14:55",
         "Str 11:35",
+        "Štv 17:20",
         "Pia 21:10",
         "Ned 20:25"
       ],
       "duration_minutes": 110,
       "outbound_offers": [
-        {
-          "departure_local": "2026-09-02T11:35",
-          "arrival_local": "2026-09-02T14:25",
-          "price": 160.99,
-          "currency": "EUR",
-          "flight_number": "FR1782",
-          "duration_minutes": 110
-        },
         {
           "departure_local": "2026-09-04T21:10",
           "arrival_local": "2026-09-04T23:59",
@@ -4565,6 +4698,14 @@
           "price": 42.99,
           "currency": "EUR",
           "flight_number": "FR1782",
+          "duration_minutes": 110
+        },
+        {
+          "departure_local": "2026-10-01T17:20",
+          "arrival_local": "2026-10-01T20:10",
+          "price": 35.99,
+          "currency": "EUR",
+          "flight_number": "FR1745",
           "duration_minutes": 110
         }
       ],
@@ -4810,6 +4951,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 110
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "CFU",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T23:40",
+          "arrival_local": "2026-10-12T00:30",
+          "price": 49.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 110
         }
       ],
       "return_search_error": null
@@ -4932,6 +5084,14 @@
           "departure_local": "2026-09-30T19:00",
           "arrival_local": "2026-09-30T21:05",
           "price": 25.99,
+          "currency": "EUR",
+          "flight_number": "FR5761",
+          "duration_minutes": 125
+        },
+        {
+          "departure_local": "2026-10-01T14:40",
+          "arrival_local": "2026-10-01T16:45",
+          "price": 36.99,
           "currency": "EUR",
           "flight_number": "FR5761",
           "duration_minutes": 125
@@ -5113,6 +5273,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "SUF",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T08:40",
+          "arrival_local": "2026-10-11T10:55",
+          "price": 34.59,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 135
         }
       ],
       "return_search_error": null
@@ -5210,6 +5381,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 280
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "ACE",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-09T07:10",
+          "arrival_local": "2026-10-09T12:50",
+          "price": 98.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 280
         }
       ],
       "return_search_error": null
@@ -5220,9 +5402,9 @@
       "destination_name": "LEEDS-BRADFORD",
       "destination_iata": "LBA",
       "flight_number": "FR5042",
-      "departure_local": "2026-09-28T06:05",
-      "arrival_local": "2026-09-28T07:30",
-      "price": 21.99,
+      "departure_local": "2026-10-01T07:10",
+      "arrival_local": "2026-10-01T08:35",
+      "price": 14.99,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -5294,6 +5476,14 @@
           "currency": "EUR",
           "flight_number": "FR5042",
           "duration_minutes": 145
+        },
+        {
+          "departure_local": "2026-10-01T07:10",
+          "arrival_local": "2026-10-01T08:35",
+          "price": 14.99,
+          "currency": "EUR",
+          "flight_number": "FR5042",
+          "duration_minutes": 145
         }
       ],
       "return_offers": [
@@ -5303,7 +5493,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-07T07:55",
           "arrival_local": "2026-09-07T11:15",
-          "price": 17.63,
+          "price": 17.62,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 140
@@ -5325,7 +5515,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-14T07:55",
           "arrival_local": "2026-09-14T11:15",
-          "price": 17.49,
+          "price": 17.48,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 140
@@ -5347,7 +5537,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-21T07:55",
           "arrival_local": "2026-09-21T11:15",
-          "price": 17.49,
+          "price": 17.48,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 140
@@ -5422,7 +5612,6 @@
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
-        "Uto 10:20",
         "Uto 23:20",
         "Str 15:30",
         "Štv 08:45",
@@ -5507,7 +5696,7 @@
         {
           "departure_local": "2026-09-16T15:30",
           "arrival_local": "2026-09-16T16:50",
-          "price": 61.99,
+          "price": 63.99,
           "currency": "EUR",
           "flight_number": "FR62",
           "duration_minutes": 140
@@ -5604,6 +5793,14 @@
           "departure_local": "2026-09-30T15:30",
           "arrival_local": "2026-09-30T16:50",
           "price": 24.99,
+          "currency": "EUR",
+          "flight_number": "FR62",
+          "duration_minutes": 140
+        },
+        {
+          "departure_local": "2026-10-01T08:45",
+          "arrival_local": "2026-10-01T10:05",
+          "price": 56.99,
           "currency": "EUR",
           "flight_number": "FR62",
           "duration_minutes": 140
@@ -5950,6 +6147,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 130
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "STN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T18:15",
+          "arrival_local": "2026-10-11T21:25",
+          "price": 56.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 130
         }
       ],
       "return_search_error": null
@@ -6016,7 +6224,7 @@
         {
           "departure_local": "2026-09-14T20:15",
           "arrival_local": "2026-09-14T23:45",
-          "price": 62.99,
+          "price": 64.99,
           "currency": "EUR",
           "flight_number": "FR5776",
           "duration_minutes": 210
@@ -6091,6 +6299,14 @@
           "price": 64.99,
           "currency": "EUR",
           "flight_number": "FR6690",
+          "duration_minutes": 210
+        },
+        {
+          "departure_local": "2026-10-01T21:45",
+          "arrival_local": "2026-10-02T01:15",
+          "price": 63.99,
+          "currency": "EUR",
+          "flight_number": "FR5776",
           "duration_minutes": 210
         }
       ],
@@ -6303,6 +6519,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 200
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "AGP",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T15:35",
+          "arrival_local": "2026-10-11T18:55",
+          "price": 104.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 200
         }
       ],
       "return_search_error": null
@@ -6315,7 +6542,7 @@
       "flight_number": "FR1529",
       "departure_local": "2026-09-07T22:35",
       "arrival_local": "2026-09-08T00:55",
-      "price": 23.99,
+      "price": 22.99,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -6345,7 +6572,7 @@
         {
           "departure_local": "2026-09-07T22:35",
           "arrival_local": "2026-09-08T00:55",
-          "price": 23.99,
+          "price": 22.99,
           "currency": "EUR",
           "flight_number": "FR1529",
           "duration_minutes": 140
@@ -6452,6 +6679,14 @@
           "price": 24.99,
           "currency": "EUR",
           "flight_number": "FR7109",
+          "duration_minutes": 140
+        },
+        {
+          "departure_local": "2026-10-01T22:55",
+          "arrival_local": "2026-10-02T01:15",
+          "price": 45.99,
+          "currency": "EUR",
+          "flight_number": "FR1529",
           "duration_minutes": 140
         }
       ],
@@ -6572,7 +6807,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-24T20:15",
           "arrival_local": "2026-09-24T22:30",
-          "price": 62.99,
+          "price": 66.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
@@ -6627,7 +6862,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-02T15:00",
           "arrival_local": "2026-10-02T17:15",
-          "price": 50.99,
+          "price": 51.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
@@ -6683,6 +6918,17 @@
           "departure_local": "2026-10-09T15:00",
           "arrival_local": "2026-10-09T17:15",
           "price": 41.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 135
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "MLA",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T11:00",
+          "arrival_local": "2026-10-11T13:15",
+          "price": 99.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
@@ -6791,7 +7037,7 @@
         {
           "departure_local": "2026-09-30T20:55",
           "arrival_local": "2026-09-30T22:25",
-          "price": 33.99,
+          "price": 32.99,
           "currency": "EUR",
           "flight_number": "FR35",
           "duration_minutes": 150
@@ -6870,7 +7116,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-21T15:50",
           "arrival_local": "2026-09-21T19:15",
-          "price": 16.99,
+          "price": 17.74,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 145
@@ -6999,7 +7245,7 @@
         {
           "departure_local": "2026-09-03T19:00",
           "arrival_local": "2026-09-03T20:35",
-          "price": 146.99,
+          "price": 159.99,
           "currency": "EUR",
           "flight_number": "FR5733",
           "duration_minutes": 95
@@ -7143,7 +7389,7 @@
         {
           "departure_local": "2026-09-21T15:35",
           "arrival_local": "2026-09-21T17:10",
-          "price": 33.99,
+          "price": 34.99,
           "currency": "EUR",
           "flight_number": "FR5733",
           "duration_minutes": 95
@@ -7219,6 +7465,14 @@
           "currency": "EUR",
           "flight_number": "FR5733",
           "duration_minutes": 95
+        },
+        {
+          "departure_local": "2026-10-01T19:00",
+          "arrival_local": "2026-10-01T20:35",
+          "price": 16.49,
+          "currency": "EUR",
+          "flight_number": "FR5733",
+          "duration_minutes": 95
         }
       ],
       "return_offers": [
@@ -7250,7 +7504,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-05T14:10",
           "arrival_local": "2026-09-05T15:40",
-          "price": 14.99,
+          "price": 16.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 90
@@ -7636,6 +7890,17 @@
           "departure_local": "2026-10-10T14:10",
           "arrival_local": "2026-10-10T15:40",
           "price": 20.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 90
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "MXP",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T13:25",
+          "arrival_local": "2026-10-11T14:55",
+          "price": 36.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 90
@@ -8138,7 +8403,7 @@
         {
           "departure_local": "2026-09-24T08:55",
           "arrival_local": "2026-09-24T12:50",
-          "price": 77.99,
+          "price": 84.99,
           "currency": "EUR",
           "flight_number": "FR3328",
           "duration_minutes": 175
@@ -8155,6 +8420,14 @@
           "departure_local": "2026-09-28T18:35",
           "arrival_local": "2026-09-28T22:30",
           "price": 67.99,
+          "currency": "EUR",
+          "flight_number": "FR3328",
+          "duration_minutes": 175
+        },
+        {
+          "departure_local": "2026-10-01T08:55",
+          "arrival_local": "2026-10-01T12:50",
+          "price": 85.99,
           "currency": "EUR",
           "flight_number": "FR3328",
           "duration_minutes": 175
@@ -8310,7 +8583,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-05T22:55",
           "arrival_local": "2026-10-06T01:00",
-          "price": 76.99,
+          "price": 79.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 185
@@ -8322,6 +8595,17 @@
           "departure_local": "2026-10-08T06:25",
           "arrival_local": "2026-10-08T08:30",
           "price": 56.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 185
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "PFO",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-10T06:10",
+          "arrival_local": "2026-10-10T08:15",
+          "price": 62.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 185
@@ -8360,7 +8644,7 @@
         {
           "departure_local": "2026-09-04T22:55",
           "arrival_local": "2026-09-05T01:05",
-          "price": 30.99,
+          "price": 28.99,
           "currency": "EUR",
           "flight_number": "FR5803",
           "duration_minutes": 130
@@ -8424,7 +8708,7 @@
         {
           "departure_local": "2026-09-15T13:35",
           "arrival_local": "2026-09-15T15:45",
-          "price": 37.99,
+          "price": 44.99,
           "currency": "EUR",
           "flight_number": "FR5803",
           "duration_minutes": 130
@@ -8635,7 +8919,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-18T20:15",
           "arrival_local": "2026-09-18T22:30",
-          "price": 49.99,
+          "price": 48.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
@@ -8801,6 +9085,17 @@
           "departure_local": "2026-10-10T20:55",
           "arrival_local": "2026-10-10T23:10",
           "price": 43.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 135
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "PMO",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T22:50",
+          "arrival_local": "2026-10-12T01:05",
+          "price": 44.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 135
@@ -9079,9 +9374,9 @@
       "destination_name": "PISA",
       "destination_iata": "PSA",
       "flight_number": "FR9850",
-      "departure_local": "2026-09-21T08:05",
-      "arrival_local": "2026-09-21T09:55",
-      "price": 24.99,
+      "departure_local": "2026-10-01T13:10",
+      "arrival_local": "2026-10-01T15:00",
+      "price": 14.99,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -9150,6 +9445,14 @@
           "departure_local": "2026-09-28T08:05",
           "arrival_local": "2026-09-28T09:55",
           "price": 24.99,
+          "currency": "EUR",
+          "flight_number": "FR9850",
+          "duration_minutes": 110
+        },
+        {
+          "departure_local": "2026-10-01T13:10",
+          "arrival_local": "2026-10-01T15:00",
+          "price": 14.99,
           "currency": "EUR",
           "flight_number": "FR9850",
           "duration_minutes": 110
@@ -9272,6 +9575,17 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-08T15:25",
           "arrival_local": "2026-10-08T17:05",
+          "price": 29.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 100
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "PSA",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-10T09:25",
+          "arrival_local": "2026-10-10T11:05",
           "price": 29.99,
           "currency": "EUR",
           "flight_number": null,
@@ -9522,6 +9836,14 @@
           "departure_local": "2026-09-30T08:15",
           "arrival_local": "2026-09-30T09:50",
           "price": 24.99,
+          "currency": "EUR",
+          "flight_number": "FR4225",
+          "duration_minutes": 95
+        },
+        {
+          "departure_local": "2026-10-01T08:00",
+          "arrival_local": "2026-10-01T09:35",
+          "price": 56.99,
           "currency": "EUR",
           "flight_number": "FR4225",
           "duration_minutes": 95
@@ -9930,6 +10252,17 @@
           "destination_iata": "BTS",
           "departure_local": "2026-10-10T11:25",
           "arrival_local": "2026-10-10T13:00",
+          "price": 41.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 95
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "CIA",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T12:50",
+          "arrival_local": "2026-10-11T14:25",
           "price": 41.99,
           "currency": "EUR",
           "flight_number": null,
@@ -10868,6 +11201,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 100
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "TIA",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T10:20",
+          "arrival_local": "2026-10-11T12:00",
+          "price": 27.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 100
         }
       ],
       "return_search_error": null
@@ -10961,7 +11305,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-08T10:10",
           "arrival_local": "2026-09-08T12:10",
-          "price": 28.99,
+          "price": 14.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 120
@@ -11053,6 +11397,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 120
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "TPS",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T15:35",
+          "arrival_local": "2026-10-11T17:35",
+          "price": 84.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 120
         }
       ],
       "return_search_error": null
@@ -11098,7 +11453,7 @@
         {
           "departure_local": "2026-09-04T06:50",
           "arrival_local": "2026-09-04T08:15",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11114,7 +11469,7 @@
         {
           "departure_local": "2026-09-06T16:45",
           "arrival_local": "2026-09-06T18:10",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11122,7 +11477,7 @@
         {
           "departure_local": "2026-09-07T15:40",
           "arrival_local": "2026-09-07T17:05",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11130,7 +11485,7 @@
         {
           "departure_local": "2026-09-08T19:25",
           "arrival_local": "2026-09-08T20:50",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11146,7 +11501,7 @@
         {
           "departure_local": "2026-09-10T20:45",
           "arrival_local": "2026-09-10T22:10",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11162,7 +11517,7 @@
         {
           "departure_local": "2026-09-12T15:10",
           "arrival_local": "2026-09-12T16:35",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11170,7 +11525,7 @@
         {
           "departure_local": "2026-09-13T16:45",
           "arrival_local": "2026-09-13T18:10",
-          "price": 14.99,
+          "price": 16.99,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11178,7 +11533,7 @@
         {
           "departure_local": "2026-09-14T15:40",
           "arrival_local": "2026-09-14T17:05",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11194,7 +11549,7 @@
         {
           "departure_local": "2026-09-17T20:45",
           "arrival_local": "2026-09-17T22:10",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11226,7 +11581,7 @@
         {
           "departure_local": "2026-09-21T15:40",
           "arrival_local": "2026-09-21T17:05",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11258,7 +11613,7 @@
         {
           "departure_local": "2026-09-26T15:10",
           "arrival_local": "2026-09-26T16:35",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11282,7 +11637,15 @@
         {
           "departure_local": "2026-09-29T19:25",
           "arrival_local": "2026-09-29T20:50",
-          "price": 15.96,
+          "price": 15.93,
+          "currency": "EUR",
+          "flight_number": "FR3639",
+          "duration_minutes": 85
+        },
+        {
+          "departure_local": "2026-10-01T20:45",
+          "arrival_local": "2026-10-01T22:10",
+          "price": 16.99,
           "currency": "EUR",
           "flight_number": "FR3639",
           "duration_minutes": 85
@@ -11361,7 +11724,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-09T16:35",
           "arrival_local": "2026-09-09T18:00",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11394,7 +11757,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-12T17:00",
           "arrival_local": "2026-09-12T18:25",
-          "price": 14.99,
+          "price": 16.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11427,7 +11790,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-15T21:15",
           "arrival_local": "2026-09-15T22:40",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11471,7 +11834,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-20T18:35",
           "arrival_local": "2026-09-20T20:00",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11504,7 +11867,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-24T18:50",
           "arrival_local": "2026-09-24T20:15",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11515,7 +11878,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-25T08:40",
           "arrival_local": "2026-09-25T10:05",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11559,7 +11922,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-29T21:15",
           "arrival_local": "2026-09-29T22:40",
-          "price": 15.96,
+          "price": 15.93,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
@@ -11662,6 +12025,28 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 85
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "WMI",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-10T17:00",
+          "arrival_local": "2026-10-10T18:25",
+          "price": 16.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 85
+        },
+        {
+          "airline": "RYANAIR",
+          "origin_iata": "WMI",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T13:10",
+          "arrival_local": "2026-10-11T14:35",
+          "price": 14.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": 85
         }
       ],
       "return_search_error": null
@@ -11743,7 +12128,7 @@
         {
           "departure_local": "2026-09-19T07:30",
           "arrival_local": "2026-09-19T08:45",
-          "price": 21.99,
+          "price": 23.99,
           "currency": "EUR",
           "flight_number": "FR6824",
           "duration_minutes": 75
@@ -11865,7 +12250,7 @@
           "destination_iata": "BTS",
           "departure_local": "2026-09-21T15:25",
           "arrival_local": "2026-09-21T16:35",
-          "price": 70.99,
+          "price": 79.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": 70
@@ -12285,17 +12670,6 @@
           "airline": "Wizz Air",
           "origin_iata": "ATH",
           "destination_iata": "BTS",
-          "departure_local": "2026-09-02T23:50",
-          "arrival_local": null,
-          "price": 69.99,
-          "currency": "EUR",
-          "flight_number": null,
-          "duration_minutes": null
-        },
-        {
-          "airline": "Wizz Air",
-          "origin_iata": "ATH",
-          "destination_iata": "BTS",
           "departure_local": "2026-09-04T23:50",
           "arrival_local": null,
           "price": 79.99,
@@ -12455,9 +12829,9 @@
       "destination_name": "BARCELONA",
       "destination_iata": "BCN",
       "flight_number": "W67021",
-      "departure_local": "2026-09-28T09:10",
-      "arrival_local": "2026-09-28T11:40",
-      "price": 29.99,
+      "departure_local": "2026-10-01T19:20",
+      "arrival_local": "2026-10-01T21:50",
+      "price": 24.99,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -12612,6 +12986,14 @@
           "departure_local": "2026-09-30T09:10",
           "arrival_local": "2026-09-30T11:40",
           "price": 35.99,
+          "currency": "EUR",
+          "flight_number": "W67021",
+          "duration_minutes": 150
+        },
+        {
+          "departure_local": "2026-10-01T19:20",
+          "arrival_local": "2026-10-01T21:50",
+          "price": 24.99,
           "currency": "EUR",
           "flight_number": "W67021",
           "duration_minutes": 150
@@ -13024,6 +13406,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "BCN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T12:40",
+          "arrival_local": null,
+          "price": 89.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -13034,9 +13427,9 @@
       "destination_name": "BAZILEJ-MULHOUSE-FREIBURG",
       "destination_iata": "BSL",
       "flight_number": "W67033",
-      "departure_local": "2026-09-24T06:00",
-      "arrival_local": "2026-09-24T07:35",
-      "price": 20.89,
+      "departure_local": "2026-10-01T15:25",
+      "arrival_local": "2026-10-01T17:00",
+      "price": 20.19,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -13098,6 +13491,14 @@
           "departure_local": "2026-09-27T10:05",
           "arrival_local": "2026-09-27T11:40",
           "price": 42.29,
+          "currency": "EUR",
+          "flight_number": "W67033",
+          "duration_minutes": 95
+        },
+        {
+          "departure_local": "2026-10-01T15:25",
+          "arrival_local": "2026-10-01T17:00",
+          "price": 20.19,
           "currency": "EUR",
           "flight_number": "W67033",
           "duration_minutes": 95
@@ -13210,6 +13611,17 @@
           "departure_local": "2026-10-08T17:35",
           "arrival_local": null,
           "price": 25.79,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "BSL",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T12:15",
+          "arrival_local": null,
+          "price": 65.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -13542,6 +13954,17 @@
           "origin_iata": "BER",
           "destination_iata": "BTS",
           "departure_local": "2026-10-09T07:50",
+          "arrival_local": null,
+          "price": 28.54,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "BER",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T07:50",
           "arrival_local": null,
           "price": 28.54,
           "currency": "EUR",
@@ -13891,6 +14314,14 @@
           "currency": "EUR",
           "flight_number": "W67862",
           "duration_minutes": 185
+        },
+        {
+          "departure_local": "2026-10-01T07:55",
+          "arrival_local": "2026-10-01T13:20",
+          "price": 69.99,
+          "currency": "EUR",
+          "flight_number": "W67862",
+          "duration_minutes": 205
         }
       ],
       "return_offers": [
@@ -14044,6 +14475,7 @@
         "Pon 16:05",
         "Str 21:30",
         "Štv 09:10",
+        "Štv 15:45",
         "Pia 15:45"
       ],
       "duration_minutes": 100,
@@ -14147,6 +14579,14 @@
         {
           "departure_local": "2026-09-30T21:30",
           "arrival_local": "2026-10-01T00:10",
+          "price": 26.84,
+          "currency": "EUR",
+          "flight_number": "W43996",
+          "duration_minutes": 100
+        },
+        {
+          "departure_local": "2026-10-01T15:45",
+          "arrival_local": "2026-10-01T18:25",
           "price": 26.84,
           "currency": "EUR",
           "flight_number": "W43996",
@@ -14590,6 +15030,14 @@
           "currency": "EUR",
           "flight_number": "W67001",
           "duration_minutes": 55
+        },
+        {
+          "departure_local": "2026-10-01T06:00",
+          "arrival_local": "2026-10-01T06:55",
+          "price": 25.79,
+          "currency": "EUR",
+          "flight_number": "W67001",
+          "duration_minutes": 55
         }
       ],
       "return_offers": [
@@ -15010,6 +15458,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "KSC",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T07:30",
+          "arrival_local": null,
+          "price": 21.79,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -15029,6 +15488,7 @@
         "Pon 17:45",
         "Str 15:30",
         "Str 16:40",
+        "Štv 06:00",
         "Pia 16:55",
         "Ned 17:25"
       ],
@@ -15118,6 +15578,14 @@
           "departure_local": "2026-09-30T15:30",
           "arrival_local": "2026-09-30T20:45",
           "price": 49.99,
+          "currency": "EUR",
+          "flight_number": "W67065",
+          "duration_minutes": 195
+        },
+        {
+          "departure_local": "2026-10-01T06:00",
+          "arrival_local": "2026-10-01T11:15",
+          "price": 79.99,
           "currency": "EUR",
           "flight_number": "W67065",
           "duration_minutes": 195
@@ -15219,6 +15687,17 @@
           "departure_local": "2026-10-08T11:50",
           "arrival_local": null,
           "price": 89.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "KUT",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T23:15",
+          "arrival_local": null,
+          "price": 179.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -15721,6 +16200,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "LCA",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T19:10",
+          "arrival_local": null,
+          "price": 134.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -15740,6 +16230,7 @@
         "Uto 10:35",
         "Str 10:15",
         "Štv 10:25",
+        "Štv 10:35",
         "Sob 10:25",
         "Ned 10:35"
       ],
@@ -15808,6 +16299,14 @@
           "currency": "EUR",
           "flight_number": "W67069",
           "duration_minutes": 130
+        },
+        {
+          "departure_local": "2026-10-01T10:35",
+          "arrival_local": "2026-10-01T12:00",
+          "price": 89.99,
+          "currency": "EUR",
+          "flight_number": "W67069",
+          "duration_minutes": 145
         }
       ],
       "return_offers": [
@@ -16052,6 +16551,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "LTN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T12:40",
+          "arrival_local": null,
+          "price": 79.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -16173,17 +16683,6 @@
         }
       ],
       "return_offers": [
-        {
-          "airline": "Wizz Air",
-          "origin_iata": "AGP",
-          "destination_iata": "BTS",
-          "departure_local": "2026-09-02T20:10",
-          "arrival_local": null,
-          "price": 79.99,
-          "currency": "EUR",
-          "flight_number": null,
-          "duration_minutes": null
-        },
         {
           "airline": "Wizz Air",
           "origin_iata": "AGP",
@@ -16400,6 +16899,17 @@
           "departure_local": "2026-10-09T20:10",
           "arrival_local": null,
           "price": 79.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "AGP",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T20:10",
+          "arrival_local": null,
+          "price": 69.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -16760,6 +17270,14 @@
           "currency": "EUR",
           "flight_number": "W67011",
           "duration_minutes": 100
+        },
+        {
+          "departure_local": "2026-10-01T14:25",
+          "arrival_local": "2026-10-01T16:05",
+          "price": 42.29,
+          "currency": "EUR",
+          "flight_number": "W67011",
+          "duration_minutes": 100
         }
       ],
       "return_offers": [
@@ -17004,6 +17522,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "NAP",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T16:40",
+          "arrival_local": null,
+          "price": 42.29,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -17022,6 +17551,7 @@
       "operating_schedule": [
         "Uto 19:20",
         "Štv 06:00",
+        "Štv 09:10",
         "Sob 19:20"
       ],
       "duration_minutes": 115,
@@ -17102,6 +17632,14 @@
           "departure_local": "2026-09-26T19:20",
           "arrival_local": "2026-09-26T21:15",
           "price": 28.54,
+          "currency": "EUR",
+          "flight_number": "W67051",
+          "duration_minutes": 115
+        },
+        {
+          "departure_local": "2026-10-01T09:10",
+          "arrival_local": "2026-10-01T11:05",
+          "price": 45.89,
           "currency": "EUR",
           "flight_number": "W67051",
           "duration_minutes": 115
@@ -17414,6 +17952,14 @@
           "currency": "EUR",
           "flight_number": "W67043",
           "duration_minutes": 95
+        },
+        {
+          "departure_local": "2026-10-01T09:50",
+          "arrival_local": "2026-10-01T11:25",
+          "price": 20.19,
+          "currency": "EUR",
+          "flight_number": "W67043",
+          "duration_minutes": 95
         }
       ],
       "return_offers": [
@@ -17614,6 +18160,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "OHD",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T07:50",
+          "arrival_local": null,
+          "price": 25.79,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -17718,17 +18275,6 @@
         }
       ],
       "return_offers": [
-        {
-          "airline": "Wizz Air",
-          "origin_iata": "OSL",
-          "destination_iata": "BTS",
-          "departure_local": "2026-09-02T16:35",
-          "arrival_local": null,
-          "price": 69.99,
-          "currency": "EUR",
-          "flight_number": null,
-          "duration_minutes": null
-        },
         {
           "airline": "Wizz Air",
           "origin_iata": "OSL",
@@ -18002,6 +18548,14 @@
           "currency": "EUR",
           "flight_number": "W67013",
           "duration_minutes": 135
+        },
+        {
+          "departure_local": "2026-10-01T18:50",
+          "arrival_local": "2026-10-01T21:05",
+          "price": 45.89,
+          "currency": "EUR",
+          "flight_number": "W67013",
+          "duration_minutes": 135
         }
       ],
       "return_offers": [
@@ -18232,6 +18786,17 @@
           "departure_local": "2026-10-10T21:40",
           "arrival_local": null,
           "price": 35.34,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "PMO",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T21:40",
+          "arrival_local": null,
+          "price": 51.29,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -18546,6 +19111,14 @@
           "departure_local": "2026-09-29T05:50",
           "arrival_local": "2026-09-29T07:15",
           "price": 22.59,
+          "currency": "EUR",
+          "flight_number": "W67047",
+          "duration_minutes": 85
+        },
+        {
+          "departure_local": "2026-10-01T05:50",
+          "arrival_local": "2026-10-01T07:15",
+          "price": 21.79,
           "currency": "EUR",
           "flight_number": "W67047",
           "duration_minutes": 85
@@ -18880,6 +19453,14 @@
           "currency": "EUR",
           "flight_number": "W67045",
           "duration_minutes": 80
+        },
+        {
+          "departure_local": "2026-10-01T06:30",
+          "arrival_local": "2026-10-01T07:50",
+          "price": 21.79,
+          "currency": "EUR",
+          "flight_number": "W67045",
+          "duration_minutes": 80
         }
       ],
       "return_offers": [
@@ -19066,6 +19647,17 @@
           "departure_local": "2026-10-10T08:25",
           "arrival_local": null,
           "price": 21.79,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "PRN",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T08:25",
+          "arrival_local": null,
+          "price": 28.54,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -19569,6 +20161,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "FCO",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T11:55",
+          "arrival_local": null,
+          "price": 35.34,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -19593,14 +20196,6 @@
       ],
       "duration_minutes": 90,
       "outbound_offers": [
-        {
-          "departure_local": "2026-09-02T14:15",
-          "arrival_local": "2026-09-02T15:45",
-          "price": 14.99,
-          "currency": "EUR",
-          "flight_number": "W64762",
-          "duration_minutes": 90
-        },
         {
           "departure_local": "2026-09-04T08:35",
           "arrival_local": "2026-09-04T10:05",
@@ -19953,6 +20548,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "SKP",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T20:20",
+          "arrival_local": null,
+          "price": 45.89,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -20125,17 +20731,6 @@
         }
       ],
       "return_offers": [
-        {
-          "airline": "Wizz Air",
-          "origin_iata": "TLV",
-          "destination_iata": "BTS",
-          "departure_local": "2026-09-02T22:40",
-          "arrival_local": null,
-          "price": 129.99,
-          "currency": "EUR",
-          "flight_number": null,
-          "duration_minutes": null
-        },
         {
           "airline": "Wizz Air",
           "origin_iata": "TLV",
@@ -20418,6 +21013,17 @@
           "departure_local": "2026-10-10T22:30",
           "arrival_local": null,
           "price": 65.99,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "TLV",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T22:40",
+          "arrival_local": null,
+          "price": 75.99,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
@@ -20836,6 +21442,14 @@
           "currency": "EUR",
           "flight_number": "W64244",
           "duration_minutes": 65
+        },
+        {
+          "departure_local": "2026-10-01T13:05",
+          "arrival_local": "2026-10-01T14:10",
+          "price": 13.79,
+          "currency": "EUR",
+          "flight_number": "W64244",
+          "duration_minutes": 65
         }
       ],
       "return_offers": [
@@ -21069,6 +21683,17 @@
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "TZL",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T16:20",
+          "arrival_local": null,
+          "price": 26.84,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
         }
       ],
       "return_search_error": null
@@ -21079,9 +21704,9 @@
       "destination_name": "VARNA",
       "destination_iata": "VAR",
       "flight_number": "W67005",
-      "departure_local": "2026-09-24T19:55",
-      "arrival_local": "2026-09-24T22:45",
-      "price": 14.09,
+      "departure_local": "2026-10-01T19:55",
+      "arrival_local": "2026-10-01T22:45",
+      "price": 13.79,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -21209,6 +21834,14 @@
           "departure_local": "2026-09-29T20:25",
           "arrival_local": "2026-09-29T23:15",
           "price": 16.64,
+          "currency": "EUR",
+          "flight_number": "W67005",
+          "duration_minutes": 110
+        },
+        {
+          "departure_local": "2026-10-01T19:55",
+          "arrival_local": "2026-10-01T22:45",
+          "price": 13.79,
           "currency": "EUR",
           "flight_number": "W67005",
           "duration_minutes": 110
@@ -21433,9 +22066,9 @@
       "destination_name": "VARŠAVA-CHOPIN",
       "destination_iata": "WAW",
       "flight_number": "W61424",
-      "departure_local": "2026-09-23T13:30",
-      "arrival_local": "2026-09-23T14:40",
-      "price": 14.09,
+      "departure_local": "2026-10-01T10:35",
+      "arrival_local": "2026-10-01T11:25",
+      "price": 13.79,
       "currency": "EUR",
       "fare_type": "basic_one_way",
       "operating_schedule": [
@@ -21445,7 +22078,7 @@
         "Sob 13:55",
         "Ned 13:25"
       ],
-      "duration_minutes": 70,
+      "duration_minutes": 50,
       "outbound_offers": [
         {
           "departure_local": "2026-09-03T10:35",
@@ -21606,6 +22239,14 @@
           "currency": "EUR",
           "flight_number": "W61424",
           "duration_minutes": 70
+        },
+        {
+          "departure_local": "2026-10-01T10:35",
+          "arrival_local": "2026-10-01T11:25",
+          "price": 13.79,
+          "currency": "EUR",
+          "flight_number": "W61424",
+          "duration_minutes": 50
         }
       ],
       "return_offers": [
@@ -21902,6 +22543,17 @@
           "departure_local": "2026-10-10T12:00",
           "arrival_local": null,
           "price": 20.19,
+          "currency": "EUR",
+          "flight_number": null,
+          "duration_minutes": null
+        },
+        {
+          "airline": "Wizz Air",
+          "origin_iata": "WAW",
+          "destination_iata": "BTS",
+          "departure_local": "2026-10-11T11:35",
+          "arrival_local": null,
+          "price": 21.79,
           "currency": "EUR",
           "flight_number": null,
           "duration_minutes": null
