@@ -105,6 +105,7 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .legend-line.wizz { background: var(--pink); }
 #map { height: 430px; background: #dce5ed; }
 .map-fallback { display: grid; place-items: center; height: 180px; padding: 20px; color: var(--muted); text-align: center; background: #edf2f7; }
+.map-fallback[hidden] { display: none; }
 .leaflet-container { font-family: inherit; }
 .leaflet-popup-content { margin: 10px 12px; min-width: 180px; font-size: 10px; }
 .map-popup strong { font-size: 12px; }

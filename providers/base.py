@@ -25,6 +25,21 @@ class Destination:
 
 
 @dataclass(frozen=True)
+class OutboundOffer:
+    """Konkrétny cenový odlet v rámci skenovaného mesiaca."""
+
+    departure_local: str
+    arrival_local: str
+    price: float
+    currency: str
+    flight_number: str | None = None
+    duration_minutes: int | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ReturnOffer:
     """Cenová možnosť návratu do pôvodného letiska."""
 
@@ -58,6 +73,7 @@ class FlightOffer:
     fare_type: str = "basic_one_way"
     operating_schedule: tuple[str, ...] = ()
     duration_minutes: int | None = None
+    outbound_offers: tuple[OutboundOffer, ...] = ()
     return_offers: tuple[ReturnOffer, ...] = ()
     return_search_error: str | None = None
 

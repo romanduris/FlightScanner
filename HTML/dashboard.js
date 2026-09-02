@@ -124,6 +124,30 @@
     return `${weekday} ${calendarDate(parsed)}`;
   }
 
+  function weekdayFor(value) {
+    const parsed = isoDate(value);
+    return parsed ? weekdays[(parsed.getUTCDay() + 6) % 7] : null;
+  }
+
+  function offerForSelectedWeekdays(offer) {
+    const options = Array.isArray(offer.outbound_offers) && offer.outbound_offers.length
+      ? offer.outbound_offers
+      : [offer];
+    const matching = state.selectedWeekdays.size
+      ? options.filter((item) => state.selectedWeekdays.has(weekdayFor(item.departure_local)))
+      : options;
+    if (!matching.length) return null;
+    const selected = matching.reduce((best, item) => item.price < best.price
+      || (item.price === best.price && item.departure_local < best.departure_local) ? item : best);
+    return {
+      ...offer,
+      ...selected,
+      price_per_hour: selected.duration_minutes
+        ? Math.round((selected.price / (selected.duration_minutes / 60)) * 100) / 100
+        : null,
+    };
+  }
+
   function airlineClass(airline) {
     return airline === "Wizz Air" ? "wizz" : "ryanair";
   }
@@ -175,17 +199,13 @@
 
   function filteredAndSortedOffers() {
     const query = normalize(state.search);
-    const filtered = offers.filter((offer) => {
+    const filtered = offers.map(offerForSelectedWeekdays).filter(Boolean).filter((offer) => {
       const searchable = normalize(`${offer.destination_name} ${offer.destination_iata} ${offer.flight_number} ${offer.country} ${offer.airline}`);
-      const hasWeekday = state.selectedWeekdays.size === 0 || [...state.selectedWeekdays].some((day) =>
-        (offer.operating_schedule || []).some((item) => item.startsWith(`${day} `))
-      );
       return (!query || searchable.includes(query))
         && (!state.country || offer.country === state.country)
         && (!state.airline || offer.airline === state.airline)
         && offer.price <= state.maxPrice
-        && (offer.duration_minutes || Infinity) <= state.maxDuration
-        && hasWeekday;
+        && (offer.duration_minutes || Infinity) <= state.maxDuration;
     });
 
     const direction = state.sortDirection === "asc" ? 1 : -1;
@@ -269,24 +289,30 @@
       content = '<div class="return-empty">Spiatočné lety ešte nie sú v dátach. Spusti scanner znova.</div>';
     } else if (offer.return_search_error) {
       content = '<div class="return-empty">Spiatočné lety sa pri poslednom skene nepodarilo načítať.</div>';
-    } else if (!offer.return_offers.length) {
-      content = '<div class="return-empty">V tomto období sa nenašiel žiadny priamy let späť do Bratislavy.</div>';
     } else {
-      const lowestReturnPrice = Math.min(...offer.return_offers.map((item) => item.price));
-      content = `<div class="return-list">${offer.return_offers.map((item) => {
-        const time = String(item.departure_local || "").split("T")[1] || "—";
-        const cheapest = item.price === lowestReturnPrice;
-        return `
-          <article class="return-option${cheapest ? " cheapest" : ""}">
-            <div class="return-when">
-              <strong>${returnDate(item.departure_local)}</strong>
-              <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
-            </div>
-            <span class="return-badge">${cheapest ? "Najlacnejší návrat" : ""}</span>
-            <div class="return-price"><span>Cesta späť</span><strong>${euro(item.price)}</strong></div>
-            <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>
-          </article>`;
-      }).join("")}</div>`;
+      const availableReturns = offer.return_offers.filter((item) => {
+        const departure = isoDate(item.departure_local);
+        return departure && firstDay && lastDay && departure >= firstDay && departure <= lastDay;
+      });
+      if (!availableReturns.length) {
+        content = '<div class="return-empty">V tomto období sa nenašiel žiadny priamy let späť do Bratislavy.</div>';
+      } else {
+        const lowestReturnPrice = Math.min(...availableReturns.map((item) => item.price));
+        content = `<div class="return-list">${availableReturns.map((item) => {
+          const time = String(item.departure_local || "").split("T")[1] || "—";
+          const cheapest = item.price === lowestReturnPrice;
+          return `
+            <article class="return-option${cheapest ? " cheapest" : ""}">
+              <div class="return-when">
+                <strong>${returnDate(item.departure_local)}</strong>
+                <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
+              </div>
+              <span class="return-badge">${cheapest ? "Najlacnejší návrat" : ""}</span>
+              <div class="return-price"><span>Cesta späť</span><strong>${euro(item.price)}</strong></div>
+              <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>
+            </article>`;
+        }).join("")}</div>`;
+      }
     }
 
     return `
@@ -314,7 +340,7 @@
       </div>
       <div class="detail-body">
         <div class="detail-price">
-          <div><span>Najnižšia nájdená cena</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
+          <div><span>${state.selectedWeekdays.size ? "Najlacnejší odlet vo vybraný deň" : "Najnižšia nájdená cena"}</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
           <div><span>Cena za hodinu</span><strong>${offer.price_per_hour ? euro(offer.price_per_hour) : "—"}</strong></div>
         </div>
         <div class="detail-grid">

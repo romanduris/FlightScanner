@@ -22,6 +22,7 @@ try:
         Destination,
         FlightOffer,
         JsonHttpClient,
+        OutboundOffer,
         ProviderError,
         RETURN_WINDOW_DAYS,
         ReturnOffer,
@@ -35,6 +36,7 @@ except ImportError:  # Umožní aj priame spustenie: python3 providers/ryanair.p
         Destination,
         FlightOffer,
         JsonHttpClient,
+        OutboundOffer,
         ProviderError,
         RETURN_WINDOW_DAYS,
         ReturnOffer,
@@ -117,26 +119,51 @@ class RyanairProvider(BaseAirlineProvider):
         year: int,
         month: int,
     ) -> FlightOffer | None:
-        fare = self._get_lowest_fare(origin_iata, destination.iata, year, month)
-        if fare is None:
+        fares = self._get_monthly_fares(
+            origin_iata, destination.iata, year, month
+        )
+        if not fares:
             return None
 
-        departure = parse_local_datetime(fare["departureDate"])
-        arrival = parse_local_datetime(fare["arrivalDate"])
-        flight_number, operating_schedule = self._get_schedule_details(
+        flight_numbers, operating_schedule = self._get_schedule_details(
             origin_iata,
             destination.iata,
-            departure,
             year,
             month,
         )
+        outbound_offers: list[OutboundOffer] = []
+        for fare in fares:
+            price = fare.get("price") or {}
+            try:
+                departure = parse_local_datetime(str(fare["departureDate"]))
+                arrival = parse_local_datetime(str(fare["arrivalDate"]))
+                price_value = float(price["value"])
+                currency = str(price["currencyCode"])
+            except (KeyError, TypeError, ValueError) as error:
+                raise ProviderError("Ryanair vrátil neplatný formát ceny.") from error
+            outbound_offers.append(
+                OutboundOffer(
+                    departure_local=departure.isoformat(timespec="minutes"),
+                    arrival_local=arrival.isoformat(timespec="minutes"),
+                    price=price_value,
+                    currency=currency,
+                    flight_number=flight_numbers.get(
+                        departure.isoformat(timespec="minutes")
+                    ),
+                    duration_minutes=calculate_duration_minutes(
+                        departure,
+                        arrival,
+                        origin_iata,
+                        destination.iata,
+                    ),
+                )
+            )
 
-        price = fare.get("price") or {}
-        try:
-            price_value = float(price["value"])
-            currency = str(price["currencyCode"])
-        except (KeyError, TypeError, ValueError) as error:
-            raise ProviderError("Ryanair vrátil neplatný formát ceny.") from error
+        outbound_offers.sort(key=lambda item: item.departure_local)
+        cheapest = min(
+            outbound_offers,
+            key=lambda item: (item.price, item.departure_local),
+        )
 
         return_offers: tuple[ReturnOffer, ...] = ()
         return_search_error: str | None = None
@@ -144,7 +171,10 @@ class RyanairProvider(BaseAirlineProvider):
             return_offers = self._get_return_offers(
                 origin_iata=destination.iata,
                 destination_iata=origin_iata,
-                outbound_departure=departure,
+                outbound_departures=[
+                    parse_local_datetime(item.departure_local)
+                    for item in outbound_offers
+                ],
             )
         except ProviderError as error:
             # Chyba spiatočného skenu nesmie skryť použiteľnú cenu letu tam.
@@ -155,18 +185,14 @@ class RyanairProvider(BaseAirlineProvider):
             origin_iata=origin_iata,
             destination_name=destination.name,
             destination_iata=destination.iata,
-            flight_number=flight_number,
-            departure_local=departure.isoformat(timespec="minutes"),
-            arrival_local=arrival.isoformat(timespec="minutes"),
-            price=price_value,
-            currency=currency,
+            flight_number=cheapest.flight_number,
+            departure_local=cheapest.departure_local,
+            arrival_local=cheapest.arrival_local,
+            price=cheapest.price,
+            currency=cheapest.currency,
             operating_schedule=operating_schedule,
-            duration_minutes=calculate_duration_minutes(
-                departure,
-                arrival,
-                origin_iata,
-                destination.iata,
-            ),
+            duration_minutes=cheapest.duration_minutes,
+            outbound_offers=tuple(outbound_offers),
             return_offers=return_offers,
             return_search_error=return_search_error,
         )
@@ -175,12 +201,14 @@ class RyanairProvider(BaseAirlineProvider):
         self,
         origin_iata: str,
         destination_iata: str,
-        outbound_departure: datetime,
+        outbound_departures: list[datetime],
     ) -> tuple[ReturnOffer, ...]:
-        """Načíta najlacnejší spiatočný let pre každý z ďalších 10 dní."""
+        """Načíta spiatočné lety potrebné pre všetky mesačné odlety."""
 
-        first_day = outbound_departure.date() + timedelta(days=1)
-        last_day = outbound_departure.date() + timedelta(days=RETURN_WINDOW_DAYS)
+        first_day = min(outbound_departures).date() + timedelta(days=1)
+        last_day = max(outbound_departures).date() + timedelta(
+            days=RETURN_WINDOW_DAYS
+        )
         month_starts: list[date] = []
         cursor = first_day.replace(day=1)
         while cursor <= last_day:
@@ -246,13 +274,13 @@ class RyanairProvider(BaseAirlineProvider):
 
         return tuple(sorted(return_offers, key=lambda item: item.departure_local))
 
-    def _get_lowest_fare(
+    def _get_monthly_fares(
         self,
         origin_iata: str,
         destination_iata: str,
         year: int,
         month: int,
-    ) -> dict[str, Any] | None:
+    ) -> list[dict[str, Any]]:
         base_url = FARE_API_URL.format(
             origin=origin_iata,
             destination=destination_iata,
@@ -264,23 +292,26 @@ class RyanairProvider(BaseAirlineProvider):
             }
         )
         payload = self.client.get_json(f"{base_url}?{query}")
-        outbound = payload.get("outbound") or {}
-        fare = outbound.get("minFare")
-
-        if not fare or fare.get("unavailable") or fare.get("price") is None:
-            return None
-        if not fare.get("departureDate") or not fare.get("arrivalDate"):
-            raise ProviderError("Najnižšej cene chýba dátum odletu alebo príletu.")
-        return fare
+        fares = (payload.get("outbound") or {}).get("fares") or []
+        if not isinstance(fares, list):
+            raise ProviderError("Ryanair vrátil neplatný zoznam cien.")
+        return [
+            fare
+            for fare in fares
+            if isinstance(fare, dict)
+            and not fare.get("unavailable")
+            and fare.get("price") is not None
+            and fare.get("departureDate")
+            and fare.get("arrivalDate")
+        ]
 
     def _get_schedule_details(
         self,
         origin_iata: str,
         destination_iata: str,
-        departure: datetime,
         year: int,
         month: int,
-    ) -> tuple[str | None, tuple[str, ...]]:
+    ) -> tuple[dict[str, str], tuple[str, ...]]:
         url = SCHEDULE_API_URL.format(
             origin=origin_iata,
             destination=destination_iata,
@@ -291,10 +322,10 @@ class RyanairProvider(BaseAirlineProvider):
             payload = self.client.get_json(url)
         except ProviderError:
             # Cena, dátum a čas sú stále použiteľné aj bez čísla letu.
-            return None, ()
+            return {}, ()
 
         monthly_departures: list[datetime] = []
-        selected_flight_number: str | None = None
+        flight_numbers: dict[str, str] = {}
         for day in payload.get("days") or []:
             try:
                 day_number = int(day["day"])
@@ -315,10 +346,12 @@ class RyanairProvider(BaseAirlineProvider):
                     continue
 
                 monthly_departures.append(scheduled_departure)
-                if scheduled_departure == departure and number:
-                    selected_flight_number = f"{carrier}{number}"
+                if number:
+                    flight_numbers[
+                        scheduled_departure.isoformat(timespec="minutes")
+                    ] = f"{carrier}{number}"
 
-        return selected_flight_number, build_weekly_schedule(monthly_departures)
+        return flight_numbers, build_weekly_schedule(monthly_departures)
 
 
 def load_ryanair_destinations(path: Path) -> list[Destination]:

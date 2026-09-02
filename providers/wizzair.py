@@ -25,6 +25,7 @@ from .base import (
     Destination,
     FlightOffer,
     JsonHttpClient,
+    OutboundOffer,
     ProviderError,
     RETURN_WINDOW_DAYS,
     ReturnOffer,
@@ -131,9 +132,6 @@ class WizzAirProvider(BaseAirlineProvider):
                         return_offers=self._get_return_offers(
                             origin_iata=destination.iata,
                             destination_iata=origin_iata,
-                            outbound_departure=parse_local_datetime(
-                                offer.departure_local
-                            ),
                             flights=returns_by_destination.get(
                                 destination.iata, []
                             ),
@@ -287,13 +285,10 @@ class WizzAirProvider(BaseAirlineProvider):
         self,
         origin_iata: str,
         destination_iata: str,
-        outbound_departure: datetime,
         flights: list[dict[str, Any]],
     ) -> tuple[ReturnOffer, ...]:
-        """Načíta všetky cenové možnosti návratu počas ďalších 10 dní."""
+        """Vytvorí spiatočné možnosti pre všetky mesačné odlety."""
 
-        first_day = outbound_departure.date() + timedelta(days=1)
-        last_day = outbound_departure.date() + timedelta(days=RETURN_WINDOW_DAYS)
         return_offers: list[ReturnOffer] = []
         for flight in flights:
             if flight.get("priceType") != "price":
@@ -307,7 +302,7 @@ class WizzAirProvider(BaseAirlineProvider):
                 raise ProviderError(
                     "Wizz Air vrátil neplatný formát spiatočného letu."
                 ) from error
-            if amount <= 0 or not first_day <= departure.date() <= last_day:
+            if amount <= 0:
                 continue
             return_offers.append(
                 ReturnOffer(
@@ -329,7 +324,7 @@ class WizzAirProvider(BaseAirlineProvider):
         flights: list[dict[str, Any]],
         bts_schedule: list[ScheduledFlight],
     ) -> FlightOffer | None:
-        priced_flights: list[tuple[float, datetime, str, dict[str, Any]]] = []
+        priced_flights: list[tuple[float, datetime, str]] = []
         monthly_departures: list[datetime] = []
         for flight in flights:
             departure_value = flight.get("departureDate")
@@ -351,41 +346,59 @@ class WizzAirProvider(BaseAirlineProvider):
             except (KeyError, TypeError, ValueError) as error:
                 raise ProviderError("Wizz Air vrátil neplatný formát letu.") from error
             if amount > 0:
-                priced_flights.append((amount, departure, currency, flight))
+                priced_flights.append((amount, departure, currency))
 
         if not priced_flights:
             return None
 
-        amount, departure, currency, _ = min(
-            priced_flights, key=lambda item: (item[0], item[1])
-        )
-        scheduled_flight = find_scheduled_flight(
-            bts_schedule,
-            destination.iata,
-            departure,
-            carrier_prefixes=("W6", "W4"),
-        )
-        if scheduled_flight is None:
-            raise ProviderError(
-                "Najlacnejší let sa nepodarilo spojiť s cestovným poriadkom BTS."
+        outbound_offers: list[OutboundOffer] = []
+        for amount, departure, currency in priced_flights:
+            scheduled_flight = find_scheduled_flight(
+                bts_schedule,
+                destination.iata,
+                departure,
+                carrier_prefixes=("W6", "W4"),
+            )
+            if scheduled_flight is None:
+                continue
+            arrival = scheduled_flight.arrival_datetime_for(departure)
+            outbound_offers.append(
+                OutboundOffer(
+                    departure_local=departure.isoformat(timespec="minutes"),
+                    arrival_local=arrival.isoformat(timespec="minutes"),
+                    price=amount,
+                    currency=currency,
+                    flight_number=scheduled_flight.flight_number,
+                    duration_minutes=calculate_duration_minutes(
+                        departure,
+                        arrival,
+                        origin_iata,
+                        destination.iata,
+                    ),
+                )
             )
 
-        arrival = scheduled_flight.arrival_datetime_for(departure)
+        if not outbound_offers:
+            raise ProviderError(
+                "Cenové lety sa nepodarilo spojiť s cestovným poriadkom BTS."
+            )
+
+        outbound_offers.sort(key=lambda item: item.departure_local)
+        cheapest = min(
+            outbound_offers,
+            key=lambda item: (item.price, item.departure_local),
+        )
         return FlightOffer(
             airline=self.airline_name,
             origin_iata=origin_iata,
             destination_name=destination.name,
             destination_iata=destination.iata,
-            flight_number=scheduled_flight.flight_number,
-            departure_local=departure.isoformat(timespec="minutes"),
-            arrival_local=arrival.isoformat(timespec="minutes"),
-            price=amount,
-            currency=currency,
+            flight_number=cheapest.flight_number,
+            departure_local=cheapest.departure_local,
+            arrival_local=cheapest.arrival_local,
+            price=cheapest.price,
+            currency=cheapest.currency,
             operating_schedule=build_weekly_schedule(monthly_departures),
-            duration_minutes=calculate_duration_minutes(
-                departure,
-                arrival,
-                origin_iata,
-                destination.iata,
-            ),
+            duration_minutes=cheapest.duration_minutes,
+            outbound_offers=tuple(outbound_offers),
         )
