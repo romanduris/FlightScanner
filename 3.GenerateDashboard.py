@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ from services.airport_data import get_airport_info
 PROJECT_DIR = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_DIR / "Data"
 HTML_DIR = PROJECT_DIR / "HTML"
+LOCAL_ASSETS = ("dashboard.css", "flight-data.js", "dashboard.js")
 
 
 def find_latest_data_file() -> Path:
@@ -114,6 +116,29 @@ def save_javascript_data(payload: dict[str, Any], output_path: Path) -> None:
     )
 
 
+def update_html_asset_versions(index_path: Path, scanned_at_utc: str) -> None:
+    """Pridá lokálnym assetom verziu, aby prehliadač nepoužil starú cache."""
+
+    version = re.sub(r"[^0-9]", "", scanned_at_utc)
+    if not version:
+        raise ValueError("V dátach chýba čas skenu pre verziu HTML assetov.")
+
+    html = index_path.read_text(encoding="utf-8")
+    for asset in LOCAL_ASSETS:
+        pattern = rf'((?:href|src)="{re.escape(asset)})(?:\?v=[^"]*)?(\")'
+        html, replacements = re.subn(
+            pattern,
+            rf"\g<1>?v={version}\g<2>",
+            html,
+        )
+        if replacements != 1:
+            raise ValueError(
+                f"V {index_path} sa nenašiel práve jeden odkaz na {asset}."
+            )
+
+    index_path.write_text(html, encoding="utf-8")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Vygeneruje dáta pre HTML dashboard.")
     parser.add_argument(
@@ -143,6 +168,10 @@ def main() -> int:
         payload = json.loads(source.read_text(encoding="utf-8"))
         enriched, unknown_airports = enrich_payload(payload)
         save_javascript_data(enriched, output)
+        update_html_asset_versions(
+            HTML_DIR / "index.html",
+            str(enriched.get("scanned_at_utc") or ""),
+        )
     except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as error:
         print(f"Chyba: {error}", file=sys.stderr)
         return 1

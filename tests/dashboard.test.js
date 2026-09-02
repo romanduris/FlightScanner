@@ -126,7 +126,7 @@ const javascript = fs.readFileSync(
   path.join(__dirname, "..", "HTML", "dashboard.js"),
   "utf8",
 );
-assert.match(html, /<span>BTS<\/span><span>FLIGHT<\/span><span>SCANER<\/span>/);
+assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 

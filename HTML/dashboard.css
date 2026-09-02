@@ -40,8 +40,8 @@ button { color: inherit; }
 }
 
 .brand { display: flex; align-items: center; gap: 9px; color: white; text-decoration: none; font-size: 15px; font-weight: 900; letter-spacing: .4px; }
-.brand-name span:nth-child(odd) { color: var(--yellow); }
-.brand-name span:nth-child(2) { color: white; }
+.brand-name .brand-bts, .brand-name .brand-scaner { color: var(--yellow); }
+.brand-name .brand-flight { color: white; }
 .brand-mark { display: grid; place-items: center; width: 31px; height: 31px; border-radius: 9px; background: var(--yellow); color: var(--blue-dark); font-size: 17px; transform: rotate(-14deg); }
 .route-title { display: flex; align-items: center; gap: 9px; font-size: 12px; }
 .airport-code { padding: 5px 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; font-weight: 900; letter-spacing: .7px; background: rgba(255,255,255,.08); }
