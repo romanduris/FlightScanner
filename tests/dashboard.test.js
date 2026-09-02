@@ -113,9 +113,16 @@ global.document = {
 require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 
 const rows = element("#flight-rows");
+assert.match(rows.innerHTML, /10\.09\.2026/);
+assert.doesNotMatch(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
+assert.equal(element("#days-filter").max, 30);
+assert.equal(element("#days-output").value, "14 dní");
+
+element("#days-filter").listeners.input({ target: { value: "30" } });
+assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
-assert.match(rows.innerHTML, /14,09/);
-assert.ok(rows.innerHTML.indexOf("SKORŠÍ LET") < rows.innerHTML.indexOf("ATÉNY"));
+assert.ok(rows.innerHTML.indexOf("10.09.2026") < rows.innerHTML.indexOf("18.09.2026"));
+assert.ok(rows.innerHTML.indexOf("18.09.2026") < rows.innerHTML.indexOf("28.09.2026"));
 
 const fridayButton = {
   dataset: { weekday: "Pia" },
@@ -129,6 +136,7 @@ element("#weekday-buttons").listeners.click({
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /42,29/);
 assert.doesNotMatch(rows.innerHTML, /28\.09\.2026/);
+assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
 assert.match(element("#period-label").textContent, /2\. septembra – 1\. októbra 2026/);
 
 const css = fs.readFileSync(
@@ -147,6 +155,7 @@ const javascript = fs.readFileSync(
 );
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.match(html, /data-sort="departure_local">Odlet/);
+assert.match(html, /id="days-filter"[^>]+max="30"[^>]+value="14"/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 

@@ -18,14 +18,29 @@
     "RYANAIR": "https://www.ryanair.com/",
     "Wizz Air": "https://www.wizzair.com/",
   };
-  const maxPrice = Math.ceil(Math.max(...offers.map((offer) => offer.price)) / 5) * 5;
-  const maxDuration = Math.ceil(Math.max(...offers.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
+  const flights = offers.flatMap((offer) => {
+    const outboundOffers = Array.isArray(offer.outbound_offers) && offer.outbound_offers.length
+      ? offer.outbound_offers
+      : [offer];
+    return outboundOffers.map((outbound) => ({
+      ...offer,
+      ...outbound,
+      price_per_hour: outbound.duration_minutes
+        ? Math.round((outbound.price / (outbound.duration_minutes / 60)) * 100) / 100
+        : null,
+    }));
+  });
+  const scanDays = Math.max(1, Number(payload.scan_days) || 30);
+  const defaultVisibleDays = Math.min(14, scanDays);
+  const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
+  const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
   const state = {
     search: "",
     country: "",
     airline: "",
     maxPrice,
     maxDuration,
+    visibleDays: defaultVisibleDays,
     selectedWeekdays: new Set(),
     sortKey: "departure_local",
     sortDirection: "asc",
@@ -33,7 +48,7 @@
   };
   let map = null;
   let routeLayer = null;
-  let visibleOffers = [...offers];
+  let visibleOffers = [...flights];
 
   const elements = {
     search: document.querySelector("#search-input"),
@@ -43,6 +58,8 @@
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
     durationOutput: document.querySelector("#duration-output"),
+    days: document.querySelector("#days-filter"),
+    daysOutput: document.querySelector("#days-output"),
     weekdays: document.querySelector("#weekday-buttons"),
     rows: document.querySelector("#flight-rows"),
     resultCount: document.querySelector("#result-count"),
@@ -129,23 +146,10 @@
     return parsed ? weekdays[(parsed.getUTCDay() + 6) % 7] : null;
   }
 
-  function offerForSelectedWeekdays(offer) {
-    const options = Array.isArray(offer.outbound_offers) && offer.outbound_offers.length
-      ? offer.outbound_offers
-      : [offer];
-    const matching = state.selectedWeekdays.size
-      ? options.filter((item) => state.selectedWeekdays.has(weekdayFor(item.departure_local)))
-      : options;
-    if (!matching.length) return null;
-    const selected = matching.reduce((best, item) => item.price < best.price
-      || (item.price === best.price && item.departure_local < best.departure_local) ? item : best);
-    return {
-      ...offer,
-      ...selected,
-      price_per_hour: selected.duration_minutes
-        ? Math.round((selected.price / (selected.duration_minutes / 60)) * 100) / 100
-        : null,
-    };
+  function dayCountLabel(value) {
+    if (value === 1) return "1 deň";
+    if (value >= 2 && value <= 4) return `${value} dni`;
+    return `${value} dní`;
   }
 
   function airlineClass(airline) {
@@ -168,6 +172,8 @@
     elements.price.value = maxPrice;
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
+    elements.days.max = scanDays;
+    elements.days.value = defaultVisibleDays;
     updateRangeLabels();
   }
 
@@ -195,15 +201,21 @@
   function updateRangeLabels() {
     elements.priceOutput.value = `${euro(state.maxPrice)}`;
     elements.durationOutput.value = duration(state.maxDuration);
+    elements.daysOutput.value = dayCountLabel(state.visibleDays);
   }
 
   function filteredAndSortedOffers() {
     const query = normalize(state.search);
-    const filtered = offers.map(offerForSelectedWeekdays).filter(Boolean).filter((offer) => {
+    const firstVisibleDate = isoDate(payload.start_date);
+    const lastVisibleDate = addDays(payload.start_date, state.visibleDays - 1);
+    const filtered = flights.filter((offer) => {
       const searchable = normalize(`${offer.destination_name} ${offer.destination_iata} ${offer.flight_number} ${offer.country} ${offer.airline}`);
+      const departureDate = isoDate(offer.departure_local);
       return (!query || searchable.includes(query))
         && (!state.country || offer.country === state.country)
         && (!state.airline || offer.airline === state.airline)
+        && (!state.selectedWeekdays.size || state.selectedWeekdays.has(weekdayFor(offer.departure_local)))
+        && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
         && offer.price <= state.maxPrice
         && (offer.duration_minutes || Infinity) <= state.maxDuration;
     });
@@ -245,7 +257,7 @@
       const [date, time] = shortDate(offer.departure_local);
       const selected = state.selectedOffer === offer ? "selected" : "";
       return `
-        <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}" tabindex="0">
+        <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}|${offer.departure_local}`)}" tabindex="0">
           <td><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
           <td><span class="destination-cell"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></td>
           <td><span class="country-cell"><span class="flag">${flag(offer.country_code)}</span>${escapeHtml(offer.country)}</span></td>
@@ -340,7 +352,7 @@
       </div>
       <div class="detail-body">
         <div class="detail-price">
-          <div><span>${state.selectedWeekdays.size ? "Najlacnejší odlet vo vybraný deň" : "Najnižšia nájdená cena"}</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
+          <div><span>Cena vybraného odletu</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
           <div><span>Cena za hodinu</span><strong>${offer.price_per_hour ? euro(offer.price_per_hour) : "—"}</strong></div>
         </div>
         <div class="detail-grid">
@@ -348,7 +360,7 @@
           <div class="detail-item"><span>Dĺžka letu</span><strong>${duration(offer.duration_minutes)}</strong></div>
           <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
           <div class="detail-item"><span>Krajina</span><strong>${flag(offer.country_code)} ${escapeHtml(offer.country)}</strong></div>
-          <div class="detail-item"><span>Najlacnejší odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
+          <div class="detail-item"><span>Odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
           <div class="detail-item"><span>Prílet</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
           <div class="detail-item"><span>Typ ceny</span><strong>Basic · jednosmerná</strong></div>
           <div class="detail-item"><span>Časy</span><strong>Miestne časy letísk</strong></div>
@@ -385,7 +397,13 @@
     if (!map || !routeLayer) return;
     routeLayer.clearLayers();
     const origin = [payload.origin.latitude, payload.origin.longitude];
+    const routes = new Map();
     items.filter((offer) => offer.latitude != null && offer.longitude != null).forEach((offer) => {
+      const routeKey = `${offer.airline}|${offer.destination_iata}`;
+      const current = routes.get(routeKey);
+      if (!current || offer.price < current.price) routes.set(routeKey, offer);
+    });
+    routes.forEach((offer) => {
       const destination = [offer.latitude, offer.longitude];
       const cssClass = airlineClass(offer.airline);
       const color = cssClass === "wizz" ? "#c01878" : "#174a9d";
@@ -440,12 +458,14 @@
     state.airline = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
+    state.visibleDays = defaultVisibleDays;
     state.selectedWeekdays.clear();
     elements.search.value = "";
     elements.country.value = "";
     elements.airline.value = "";
     elements.price.value = maxPrice;
     elements.duration.value = maxDuration;
+    elements.days.value = defaultVisibleDays;
     elements.weekdays.querySelectorAll("button").forEach((button) => {
       button.classList.remove("active");
       button.setAttribute("aria-pressed", "false");
@@ -461,6 +481,12 @@
     elements.airline.addEventListener("change", (event) => { state.airline = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.days.addEventListener("input", (event) => {
+      state.visibleDays = Number(event.target.value);
+      updateRangeLabels();
+      render();
+      fitVisibleMap();
+    });
     elements.weekdays.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-weekday]");
       if (!button) return;

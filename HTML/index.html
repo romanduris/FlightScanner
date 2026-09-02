@@ -120,8 +120,12 @@
       <div class="section-header results-heading">
         <div>
           <span class="eyebrow">Všetky ponuky</span>
-          <h2><span id="result-count">0</span> výsledkov</h2>
+          <h2><span id="result-count">0</span> letov</h2>
         </div>
+        <label class="results-range" for="days-filter">
+          <span>Zobraziť najbližších <output id="days-output">14 dní</output></span>
+          <input id="days-filter" type="range" min="1" max="30" value="14" step="1">
+        </label>
         <p>Klikni na riadok pre kompletný rozpis letu.</p>
       </div>
       <div class="table-scroll">
