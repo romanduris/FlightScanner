@@ -83,7 +83,23 @@ global.window = {
           currency: "EUR",
         },
       ],
-      return_offers: [],
+      return_offers: [
+        {
+          origin_iata: "ATH",
+          departure_local: "2026-09-20T10:00",
+          price: 25.99,
+        },
+        {
+          origin_iata: "ATH",
+          departure_local: "2026-09-22T10:00",
+          price: 19.99,
+        },
+        {
+          origin_iata: "ATH",
+          departure_local: "2026-09-29T10:00",
+          price: 9.99,
+        },
+      ],
     }],
   },
 };
@@ -117,6 +133,7 @@ require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
+assert.match(rows.innerHTML, /25,99\s*€\*/);
 assert.doesNotMatch(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
 assert.equal(element("#date-from-filter").max, 29);
 assert.equal(element("#date-to-filter").max, 29);
@@ -183,6 +200,10 @@ assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
 assert.match(html, /id="date-from-filter"[^>]+value="0"/);
 assert.match(html, /id="date-to-filter"[^>]+value="13"/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
+assert.doesNotMatch(rows.innerHTML, /\/h/);
+assert.match(html, /class="table-note">\* Najnižšia nájdená cena samostatného spiatočného letu/);
+assert.match(javascript, /class="scan-label">Dáta aktualizované/);
+assert.doesNotMatch(css, /\.scan-status span\s*\{\s*display:\s*none/);
 assert.doesNotMatch(html, /data-sort="country">Krajina/);
 assert.match(html, /class="column-destination"><button data-sort="destination_name">Destinácia/);
 assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);

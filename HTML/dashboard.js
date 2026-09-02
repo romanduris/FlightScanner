@@ -259,11 +259,31 @@
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country)).size;
   }
 
+  function availableReturnOffers(offer) {
+    if (!Array.isArray(offer.return_offers) || offer.return_search_error) return [];
+    const windowDays = Number(payload.return_window_days) || 10;
+    const firstDay = addDays(offer.departure_local, 1);
+    const lastDay = addDays(offer.departure_local, windowDays);
+    return offer.return_offers.filter((item) => {
+      const departure = isoDate(item.departure_local);
+      return departure && firstDay && lastDay
+        && departure >= firstDay
+        && departure <= lastDay
+        && Number.isFinite(Number(item.price));
+    });
+  }
+
+  function cheapestReturnPrice(offer) {
+    const availableReturns = availableReturnOffers(offer);
+    return availableReturns.length ? Math.min(...availableReturns.map((item) => Number(item.price))) : null;
+  }
+
   function renderTable(items) {
     elements.resultCount.textContent = items.length;
     elements.empty.hidden = items.length !== 0;
     elements.rows.innerHTML = items.map((offer) => {
       const [date, time] = shortDate(offer.departure_local);
+      const returnPrice = cheapestReturnPrice(offer);
       const selected = state.selectedOffer === offer ? "selected" : "";
       return `
         <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}|${offer.departure_local}`)}" tabindex="0">
@@ -273,7 +293,7 @@
           <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell">${euro(offer.price)}<small>${offer.price_per_hour ? `${euro(offer.price_per_hour)}/h` : ""}</small></td>
+          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? "spiatočná —" : `${euro(returnPrice)}*`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");
@@ -310,10 +330,7 @@
     } else if (offer.return_search_error) {
       content = '<div class="return-empty">Spiatočné lety sa pri poslednom skene nepodarilo načítať.</div>';
     } else {
-      const availableReturns = offer.return_offers.filter((item) => {
-        const departure = isoDate(item.departure_local);
-        return departure && firstDay && lastDay && departure >= firstDay && departure <= lastDay;
-      });
+      const availableReturns = availableReturnOffers(offer);
       if (!availableReturns.length) {
         content = '<div class="return-empty">V tomto období sa nenašiel žiadny priamy let späť do Bratislavy.</div>';
       } else {
@@ -551,7 +568,7 @@
       ? rangeLabel
       : `${monthNames[payload.month - 1]} ${payload.year}`;
     const scanned = new Date(payload.scanned_at_utc);
-    document.querySelector("#scan-time").textContent = `Dáta aktualizované ${scanned.toLocaleString("sk-SK", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC`;
+    document.querySelector("#scan-time").innerHTML = `<span class="scan-label">Dáta aktualizované</span><span class="scan-date">${scanned.toLocaleString("sk-SK", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC</span>`;
   }
 
   populateControls();
