@@ -30,3 +30,15 @@ aerolínií, naskenuje ceny a vygeneruje dáta stránky. Dáta stránky sú v
 `HTML/flight-data.js` a vytvárajú sa z najnovšieho `Data/destinations_YYYY_MM.json`.
 
 Mapa a logá potrebujú internetové pripojenie. Tabuľka a filtre fungujú lokálne.
+
+## Automatická aktualizácia verejnej stránky
+
+Workflow `.github/workflows/refresh-dashboard.yml` spúšťa `Main.py` každý deň
+o 05:17 a 17:17 UTC. Po úspešnom skene skopíruje obsah `HTML/` do verejného
+repozitára `romanduris/FlightScanner-web`; GitHub Pages potom stránku automaticky
+nasadí.
+
+Súkromný repozitár `FlightScanner` musí mať Actions secret
+`FLIGHTSCANNER_WEB_TOKEN`. Použi fine-grained personal access token s prístupom
+iba k repozitáru `FlightScanner-web` a oprávnením **Contents: Read and write**.
+Workflow sa dá spustiť aj ručne v záložke Actions, kde možno zmeniť počet dní.
