@@ -2,8 +2,8 @@ name: Refresh and deploy flight dashboard
 
 on:
   schedule:
-    # GitHub používa UTC. Časy mimo celej hodiny znižujú pravdepodobnosť meškania.
-    - cron: "17 5,17 * * *"
+    - cron: "0 9,12,15,18 * * *"
+      timezone: "Europe/Bratislava"
   workflow_dispatch:
     inputs:
       days:
