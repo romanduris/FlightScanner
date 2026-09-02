@@ -267,15 +267,14 @@
       const selected = state.selectedOffer === offer ? "selected" : "";
       return `
         <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}|${offer.departure_local}`)}" tabindex="0">
-          <td><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
-          <td><span class="destination-cell"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></td>
-          <td><span class="country-cell">${flag(offer.country_code)}${escapeHtml(offer.country)}</span></td>
-          <td><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
-          <td><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
-          <td><strong>${duration(offer.duration_minutes)}</strong></td>
-          <td>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="price-cell">${euro(offer.price)}<small>${offer.price_per_hour ? `${euro(offer.price_per_hour)}/h` : ""}</small></td>
-          <td><span class="detail-chevron">›</span></td>
+          <td class="column-airline"><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
+          <td class="column-destination"><span class="destination-cell">${flag(offer.country_code)}<span class="destination-copy"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></span></td>
+          <td class="column-flight"><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
+          <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
+          <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
+          <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
+          <td class="column-price price-cell">${euro(offer.price)}<small>${offer.price_per_hour ? `${euro(offer.price_per_hour)}/h` : ""}</small></td>
+          <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");
 

@@ -183,6 +183,10 @@ assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
 assert.match(html, /id="date-from-filter"[^>]+value="0"/);
 assert.match(html, /id="date-to-filter"[^>]+value="13"/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
+assert.doesNotMatch(html, /data-sort="country">Krajina/);
+assert.match(html, /class="column-destination"><button data-sort="destination_name">Destinácia/);
+assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);
+assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 

@@ -120,15 +120,14 @@
         <table>
           <thead>
             <tr>
-              <th><button data-sort="airline">Aerolinka <i></i></button></th>
-              <th><button data-sort="destination_name">Destinácia <i></i></button></th>
-              <th><button data-sort="country">Krajina <i></i></button></th>
-              <th><button data-sort="flight_number">Let <i></i></button></th>
-              <th><button data-sort="departure_local">Odlet <i></i></button></th>
-              <th><button data-sort="duration_minutes">Dĺžka <i></i></button></th>
-              <th><button data-sort="distance_km">Vzdialenosť <i></i></button></th>
-              <th class="price-head"><button data-sort="price">Cena <i></i></button></th>
-              <th aria-label="Detail"></th>
+              <th class="column-airline"><button data-sort="airline">Aerolinka <i></i></button></th>
+              <th class="column-destination"><button data-sort="destination_name">Destinácia <i></i></button></th>
+              <th class="column-flight"><button data-sort="flight_number">Let <i></i></button></th>
+              <th class="column-departure"><button data-sort="departure_local">Odlet <i></i></button></th>
+              <th class="column-duration"><button data-sort="duration_minutes">Dĺžka <i></i></button></th>
+              <th class="column-distance"><button data-sort="distance_km">Vzdialenosť <i></i></button></th>
+              <th class="column-price price-head"><button data-sort="price">Cena <i></i></button></th>
+              <th class="column-detail" aria-label="Detail"></th>
             </tr>
           </thead>
           <tbody id="flight-rows"></tbody>
