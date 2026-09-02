@@ -1,6 +1,13 @@
 """Poskytovatelia letov a cien jednotlivých leteckých spoločností."""
 
-from .base import BaseAirlineProvider, Destination, FlightOffer, RouteFailure
+from .base import (
+    BaseAirlineProvider,
+    Destination,
+    FlightOffer,
+    RETURN_WINDOW_DAYS,
+    ReturnOffer,
+    RouteFailure,
+)
 
 
 def get_provider_classes() -> tuple[type[BaseAirlineProvider], ...]:
@@ -17,6 +24,8 @@ __all__ = [
     "BaseAirlineProvider",
     "Destination",
     "FlightOffer",
+    "RETURN_WINDOW_DAYS",
+    "ReturnOffer",
     "RouteFailure",
     "get_provider_classes",
 ]

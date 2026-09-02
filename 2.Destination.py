@@ -15,6 +15,7 @@ from providers import (
     BaseAirlineProvider,
     Destination,
     FlightOffer,
+    RETURN_WINDOW_DAYS,
     RouteFailure,
     get_provider_classes,
 )
@@ -103,6 +104,7 @@ def scan_all_providers(
             summary[provider.airline_name] = {
                 "destinations": 0,
                 "offers": 0,
+                "return_offers": 0,
                 "failures": 1,
             }
             continue
@@ -123,6 +125,7 @@ def scan_all_providers(
         summary[provider.airline_name] = {
             "destinations": len(destinations),
             "offers": len(offers),
+            "return_offers": sum(len(offer.return_offers) for offer in offers),
             "failures": len(failures),
         }
 
@@ -146,11 +149,13 @@ def save_results(
         "month": month,
         "trip_type": "one_way",
         "fare_type": "basic",
+        "return_window_days": RETURN_WINDOW_DAYS,
         "times_are_local": True,
         "scanned_at_utc": scanned_at.isoformat(),
         "providers": [provider.__name__ for provider in PROVIDER_CLASSES],
         "summary": summary,
         "offer_count": len(offers),
+        "return_offer_count": sum(len(offer.return_offers) for offer in offers),
         "offers": [offer.to_dict() for offer in offers],
         "failures": {
             airline: [failure.to_dict() for failure in failures]
@@ -224,7 +229,8 @@ def print_results(
     for airline, values in summary.items():
         print(
             f"  - {airline}: {values['offers']}/{values['destinations']} "
-            f"ponúk, chyby alebo bez ceny: {values['failures']}"
+            f"ponúk, návraty: {values['return_offers']}, "
+            f"chyby alebo bez ceny: {values['failures']}"
         )
 
     if offers:
@@ -239,7 +245,11 @@ def print_results(
             f"{cheapest_names}"
         )
 
-    print(f"Spolu ponúk: {len(offers)}, chyby alebo bez ceny: {failed_count}")
+    return_offer_count = sum(len(offer.return_offers) for offer in offers)
+    print(
+        f"Spolu ponúk: {len(offers)}, spiatočných možností: "
+        f"{return_offer_count}, chyby alebo bez ceny: {failed_count}"
+    )
     print(f"Sken vykonaný: {scanned_at.strftime('%d.%m.%Y %H:%M:%S')} UTC")
     print(f"JSON uložený do: {output_file.relative_to(PROJECT_DIR)}")
     print("Ceny sú dynamické a pri rezervácii sa môžu zmeniť.")

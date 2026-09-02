@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import re
 import time
-from datetime import datetime, timedelta
+from dataclasses import replace
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -25,6 +26,8 @@ from .base import (
     FlightOffer,
     JsonHttpClient,
     ProviderError,
+    RETURN_WINDOW_DAYS,
+    ReturnOffer,
     RouteFailure,
     build_weekly_schedule,
     parse_local_datetime,
@@ -37,8 +40,8 @@ WIZZ_CONFIG_URL = "https://ssr-weu2.wizzair.com/en-gb"
 WIZZ_API_URL_PATTERN = re.compile(
     r'apiUrl:"(https://be\.wizzair\.com/[^"/]+/Api)"'
 )
-# Druhý prvok flightList Wizz interpretuje ako spiatočný smer, preto pri
-# jednosmernom skene posielame vždy práve jednu trasu.
+# Dvojica položiek flightList tvorí smer tam a späť pre jednu destináciu.
+# Jednotlivé destinácie preto posielame oddelene.
 ROUTES_PER_REQUEST = 1
 
 
@@ -64,8 +67,10 @@ class WizzAirProvider(BaseAirlineProvider):
         try:
             schedule_url = schedule_url_from_airlines_json(AIRLINES_FILE)
             bts_schedule = load_bts_schedule(schedule_url)
-            monthly_flights, request_failures = self._load_monthly_flights(
-                origin_iata, destinations, year, month
+            monthly_flights, monthly_return_flights, request_failures = (
+                self._load_monthly_flights(
+                    origin_iata, destinations, year, month
+                )
             )
         except BtsScheduleError as error:
             raise ProviderError(str(error)) from error
@@ -78,6 +83,11 @@ class WizzAirProvider(BaseAirlineProvider):
             destination_iata = str(flight.get("arrivalStation") or "").upper()
             if destination_iata in destination_by_iata:
                 flights_by_destination.setdefault(destination_iata, []).append(flight)
+        returns_by_destination: dict[str, list[dict[str, Any]]] = {}
+        for flight in monthly_return_flights:
+            return_origin_iata = str(flight.get("departureStation") or "").upper()
+            if return_origin_iata in destination_by_iata:
+                returns_by_destination.setdefault(return_origin_iata, []).append(flight)
 
         offers: list[FlightOffer] = []
         failures: list[RouteFailure] = []
@@ -115,6 +125,23 @@ class WizzAirProvider(BaseAirlineProvider):
                     )
                 )
             else:
+                try:
+                    offer = replace(
+                        offer,
+                        return_offers=self._get_return_offers(
+                            origin_iata=destination.iata,
+                            destination_iata=origin_iata,
+                            outbound_departure=parse_local_datetime(
+                                offer.departure_local
+                            ),
+                            flights=returns_by_destination.get(
+                                destination.iata, []
+                            ),
+                        ),
+                    )
+                except ProviderError as error:
+                    # Chyba spiatočného skenu nesmie skryť použiteľný let tam.
+                    offer = replace(offer, return_search_error=str(error))
                 offers.append(offer)
 
         offers.sort(key=lambda item: item.destination_name)
@@ -154,16 +181,28 @@ class WizzAirProvider(BaseAirlineProvider):
         destinations: list[Destination],
         year: int,
         month: int,
-    ) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, str]]:
         api_url = self._discover_api_url()
-        first_day = f"{year:04d}-{month:02d}-01"
+        requested_first_day = date(year, month, 1)
         if month == 12:
             next_month = datetime(year + 1, 1, 1)
         else:
             next_month = datetime(year, month + 1, 1)
-        last_day = (next_month.date() - timedelta(days=1)).isoformat()
+        requested_last_day = next_month.date() - timedelta(days=1)
+        first_day = max(
+            requested_first_day,
+            datetime.now(timezone.utc).date(),
+        )
+        if first_day > requested_last_day:
+            return [], [], {}
+        first_day_value = first_day.isoformat()
+        last_day = requested_last_day.isoformat()
+        return_last_day = (
+            requested_last_day + timedelta(days=RETURN_WINDOW_DAYS)
+        ).isoformat()
 
         all_flights: list[dict[str, Any]] = []
+        all_return_flights: list[dict[str, Any]] = []
         request_failures: dict[str, str] = {}
         pending_batches = [
             destinations[start : start + ROUTES_PER_REQUEST]
@@ -177,13 +216,22 @@ class WizzAirProvider(BaseAirlineProvider):
             for batch in pending_batches:
                 payload = {
                     "flightList": [
-                        {
-                            "departureStation": origin_iata,
-                            "arrivalStation": destination.iata,
-                            "from": first_day,
-                            "to": last_day,
-                        }
+                        route
                         for destination in batch
+                        for route in (
+                            {
+                                "departureStation": origin_iata,
+                                "arrivalStation": destination.iata,
+                                "from": first_day_value,
+                                "to": last_day,
+                            },
+                            {
+                                "departureStation": destination.iata,
+                                "arrivalStation": origin_iata,
+                                "from": first_day_value,
+                                "to": return_last_day,
+                            },
+                        )
                     ],
                     "priceType": "regular",
                     "adultCount": 1,
@@ -206,7 +254,10 @@ class WizzAirProvider(BaseAirlineProvider):
                     continue
 
                 outbound_flights = response.get("outboundFlights") or []
-                if not isinstance(outbound_flights, list):
+                return_flights = response.get("returnFlights") or []
+                if not isinstance(outbound_flights, list) or not isinstance(
+                    return_flights, list
+                ):
                     for destination in batch:
                         request_failures[destination.iata] = (
                             "Wizz Air vrátil neplatný zoznam letov."
@@ -216,6 +267,9 @@ class WizzAirProvider(BaseAirlineProvider):
 
                 all_flights.extend(
                     flight for flight in outbound_flights if isinstance(flight, dict)
+                )
+                all_return_flights.extend(
+                    flight for flight in return_flights if isinstance(flight, dict)
                 )
                 for destination in batch:
                     request_failures.pop(destination.iata, None)
@@ -227,7 +281,46 @@ class WizzAirProvider(BaseAirlineProvider):
             if round_number == 0:
                 time.sleep(1)
 
-        return all_flights, request_failures
+        return all_flights, all_return_flights, request_failures
+
+    def _get_return_offers(
+        self,
+        origin_iata: str,
+        destination_iata: str,
+        outbound_departure: datetime,
+        flights: list[dict[str, Any]],
+    ) -> tuple[ReturnOffer, ...]:
+        """Načíta všetky cenové možnosti návratu počas ďalších 10 dní."""
+
+        first_day = outbound_departure.date() + timedelta(days=1)
+        last_day = outbound_departure.date() + timedelta(days=RETURN_WINDOW_DAYS)
+        return_offers: list[ReturnOffer] = []
+        for flight in flights:
+            if flight.get("priceType") != "price":
+                continue
+            price = flight.get("price") or {}
+            try:
+                amount = float(price["amount"])
+                currency = str(price["currencyCode"])
+                departure = parse_local_datetime(str(flight["departureDate"]))
+            except (KeyError, TypeError, ValueError) as error:
+                raise ProviderError(
+                    "Wizz Air vrátil neplatný formát spiatočného letu."
+                ) from error
+            if amount <= 0 or not first_day <= departure.date() <= last_day:
+                continue
+            return_offers.append(
+                ReturnOffer(
+                    airline=self.airline_name,
+                    origin_iata=origin_iata,
+                    destination_iata=destination_iata,
+                    departure_local=departure.isoformat(timespec="minutes"),
+                    arrival_local=None,
+                    price=amount,
+                    currency=currency,
+                )
+            )
+        return tuple(sorted(return_offers, key=lambda item: item.departure_local))
 
     def _build_cheapest_offer(
         self,

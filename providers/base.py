@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 
 
 WEEKDAY_LABELS = ("Pon", "Uto", "Str", "Štv", "Pia", "Sob", "Ned")
+RETURN_WINDOW_DAYS = 10
 
 
 @dataclass(frozen=True)
@@ -24,8 +25,26 @@ class Destination:
 
 
 @dataclass(frozen=True)
+class ReturnOffer:
+    """Cenová možnosť návratu do pôvodného letiska."""
+
+    airline: str
+    origin_iata: str
+    destination_iata: str
+    departure_local: str
+    arrival_local: str | None
+    price: float
+    currency: str
+    flight_number: str | None = None
+    duration_minutes: int | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class FlightOffer:
-    """Najlacnejší nájdený let pre jednu destináciu a obdobie."""
+    """Najlacnejší nájdený let pre jednu destináciu a jeho možné návraty."""
 
     airline: str
     origin_iata: str
@@ -39,6 +58,8 @@ class FlightOffer:
     fare_type: str = "basic_one_way"
     operating_schedule: tuple[str, ...] = ()
     duration_minutes: int | None = None
+    return_offers: tuple[ReturnOffer, ...] = ()
+    return_search_error: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

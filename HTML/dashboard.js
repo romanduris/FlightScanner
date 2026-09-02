@@ -95,6 +95,35 @@
     return [`${day}.${month}.${year}`, time || "—"];
   }
 
+  function isoDate(value) {
+    const [year, month, day] = String(value || "").split("T")[0].split("-").map(Number);
+    return year && month && day ? new Date(Date.UTC(year, month - 1, day)) : null;
+  }
+
+  function addDays(value, days) {
+    const result = isoDate(value);
+    if (!result) return null;
+    result.setUTCDate(result.getUTCDate() + days);
+    return result;
+  }
+
+  function calendarDate(value) {
+    const parsed = value instanceof Date ? value : isoDate(value);
+    if (!parsed) return "—";
+    return new Intl.DateTimeFormat("sk-SK", {
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+    }).format(parsed);
+  }
+
+  function returnDate(value) {
+    const parsed = isoDate(value);
+    if (!parsed) return "—";
+    const weekday = weekdays[(parsed.getUTCDay() + 6) % 7];
+    return `${weekday} ${calendarDate(parsed)}`;
+  }
+
   function airlineClass(airline) {
     return airline === "Wizz Air" ? "wizz" : "ryanair";
   }
@@ -229,6 +258,47 @@
     });
   }
 
+  function renderReturnOffers(offer) {
+    const windowDays = Number(payload.return_window_days) || 10;
+    const firstDay = addDays(offer.departure_local, 1);
+    const lastDay = addDays(offer.departure_local, windowDays);
+    const period = firstDay && lastDay ? `${calendarDate(firstDay)} – ${calendarDate(lastDay)}` : "nasledujúcich 10 dní";
+    let content = "";
+
+    if (!Array.isArray(offer.return_offers)) {
+      content = '<div class="return-empty">Spiatočné lety ešte nie sú v dátach. Spusti scanner znova.</div>';
+    } else if (offer.return_search_error) {
+      content = '<div class="return-empty">Spiatočné lety sa pri poslednom skene nepodarilo načítať.</div>';
+    } else if (!offer.return_offers.length) {
+      content = '<div class="return-empty">V tomto období sa nenašiel žiadny priamy let späť do Bratislavy.</div>';
+    } else {
+      const lowestReturnPrice = Math.min(...offer.return_offers.map((item) => item.price));
+      content = `<div class="return-list">${offer.return_offers.map((item) => {
+        const time = String(item.departure_local || "").split("T")[1] || "—";
+        const cheapest = item.price === lowestReturnPrice;
+        return `
+          <article class="return-option${cheapest ? " cheapest" : ""}">
+            <div class="return-when">
+              <strong>${returnDate(item.departure_local)}</strong>
+              <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
+            </div>
+            <span class="return-badge">${cheapest ? "Najlacnejší návrat" : ""}</span>
+            <div class="return-price"><span>Cesta späť</span><strong>${euro(item.price)}</strong></div>
+            <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>
+          </article>`;
+      }).join("")}</div>`;
+    }
+
+    return `
+      <section class="return-section">
+        <div class="return-heading">
+          <div><span class="eyebrow">Cesta späť</span><h3>Spiatočné lety do Bratislavy</h3></div>
+          <small>${period} · ceny za 1 dospelého</small>
+        </div>
+        ${content}
+      </section>`;
+  }
+
   function showOffer(offer) {
     state.selectedOffer = offer;
     const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(item)}</span>`).join("");
@@ -259,6 +329,7 @@
         </div>
         <h3 class="schedule-title">Všetky dni a časy odletov v mesiaci</h3>
         <div class="schedule-list">${schedule || "Časy nie sú dostupné"}</div>
+        ${renderReturnOffers(offer)}
         <a class="booking-link ${cssClass}" href="${airlineSites[offer.airline] || "#"}" target="_blank" rel="noopener">Otvoriť stránku ${escapeHtml(offer.airline)} ↗</a>
       </div>`;
     if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();

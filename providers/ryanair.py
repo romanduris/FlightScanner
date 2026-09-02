@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -23,6 +23,8 @@ try:
         FlightOffer,
         JsonHttpClient,
         ProviderError,
+        RETURN_WINDOW_DAYS,
+        ReturnOffer,
         RouteFailure,
         build_weekly_schedule,
         parse_local_datetime,
@@ -34,6 +36,8 @@ except ImportError:  # Umožní aj priame spustenie: python3 providers/ryanair.p
         FlightOffer,
         JsonHttpClient,
         ProviderError,
+        RETURN_WINDOW_DAYS,
+        ReturnOffer,
         RouteFailure,
         build_weekly_schedule,
         parse_local_datetime,
@@ -134,6 +138,18 @@ class RyanairProvider(BaseAirlineProvider):
         except (KeyError, TypeError, ValueError) as error:
             raise ProviderError("Ryanair vrátil neplatný formát ceny.") from error
 
+        return_offers: tuple[ReturnOffer, ...] = ()
+        return_search_error: str | None = None
+        try:
+            return_offers = self._get_return_offers(
+                origin_iata=destination.iata,
+                destination_iata=origin_iata,
+                outbound_departure=departure,
+            )
+        except ProviderError as error:
+            # Chyba spiatočného skenu nesmie skryť použiteľnú cenu letu tam.
+            return_search_error = str(error)
+
         return FlightOffer(
             airline=self.airline_name,
             origin_iata=origin_iata,
@@ -151,7 +167,84 @@ class RyanairProvider(BaseAirlineProvider):
                 origin_iata,
                 destination.iata,
             ),
+            return_offers=return_offers,
+            return_search_error=return_search_error,
         )
+
+    def _get_return_offers(
+        self,
+        origin_iata: str,
+        destination_iata: str,
+        outbound_departure: datetime,
+    ) -> tuple[ReturnOffer, ...]:
+        """Načíta najlacnejší spiatočný let pre každý z ďalších 10 dní."""
+
+        first_day = outbound_departure.date() + timedelta(days=1)
+        last_day = outbound_departure.date() + timedelta(days=RETURN_WINDOW_DAYS)
+        month_starts: list[date] = []
+        cursor = first_day.replace(day=1)
+        while cursor <= last_day:
+            month_starts.append(cursor)
+            cursor = (
+                date(cursor.year + 1, 1, 1)
+                if cursor.month == 12
+                else date(cursor.year, cursor.month + 1, 1)
+            )
+
+        return_offers: list[ReturnOffer] = []
+        for month_start in month_starts:
+            base_url = FARE_API_URL.format(
+                origin=origin_iata,
+                destination=destination_iata,
+            )
+            query = urlencode(
+                {
+                    "outboundMonthOfDate": month_start.isoformat(),
+                    "currency": "EUR",
+                }
+            )
+            payload = self.client.get_json(f"{base_url}?{query}")
+            for fare in (payload.get("outbound") or {}).get("fares") or []:
+                departure_value = fare.get("departureDate")
+                arrival_value = fare.get("arrivalDate")
+                price = fare.get("price") or {}
+                if (
+                    fare.get("unavailable")
+                    or not departure_value
+                    or not arrival_value
+                    or not price
+                ):
+                    continue
+                departure = parse_local_datetime(str(departure_value))
+                if not first_day <= departure.date() <= last_day:
+                    continue
+                arrival = parse_local_datetime(str(arrival_value))
+                try:
+                    amount = float(price["value"])
+                    currency = str(price["currencyCode"])
+                except (KeyError, TypeError, ValueError) as error:
+                    raise ProviderError(
+                        "Ryanair vrátil neplatný formát spiatočnej ceny."
+                    ) from error
+                return_offers.append(
+                    ReturnOffer(
+                        airline=self.airline_name,
+                        origin_iata=origin_iata,
+                        destination_iata=destination_iata,
+                        departure_local=departure.isoformat(timespec="minutes"),
+                        arrival_local=arrival.isoformat(timespec="minutes"),
+                        price=amount,
+                        currency=currency,
+                        duration_minutes=calculate_duration_minutes(
+                            departure,
+                            arrival,
+                            origin_iata,
+                            destination_iata,
+                        ),
+                    )
+                )
+
+        return tuple(sorted(return_offers, key=lambda item: item.departure_local))
 
     def _get_lowest_fare(
         self,
