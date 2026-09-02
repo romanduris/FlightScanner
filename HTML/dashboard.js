@@ -293,7 +293,7 @@
           <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? "spiatočná —" : `${euro(returnPrice)}*`}</small></td>
+          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? "spolu —" : `${euro(offer.price + returnPrice)}*`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");

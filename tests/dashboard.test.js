@@ -133,7 +133,7 @@ require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
-assert.match(rows.innerHTML, /25,99\s*€\*/);
+assert.match(rows.innerHTML, /124,99\s*€\*/);
 assert.doesNotMatch(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
 assert.equal(element("#date-from-filter").max, 29);
 assert.equal(element("#date-to-filter").max, 29);
@@ -201,7 +201,7 @@ assert.match(html, /id="date-from-filter"[^>]+value="0"/);
 assert.match(html, /id="date-to-filter"[^>]+value="13"/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
-assert.match(html, /class="table-note">\* Najnižšia nájdená cena samostatného spiatočného letu/);
+assert.match(html, /class="table-note">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
 assert.match(javascript, /class="scan-label">Dáta aktualizované/);
 assert.doesNotMatch(css, /\.scan-status span\s*\{\s*display:\s*none/);
 assert.doesNotMatch(html, /data-sort="country">Krajina/);
