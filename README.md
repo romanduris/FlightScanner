@@ -34,11 +34,8 @@ Mapa a logá potrebujú internetové pripojenie. Tabuľka a filtre fungujú lok�
 ## Automatická aktualizácia verejnej stránky
 
 Workflow `.github/workflows/refresh-dashboard.yml` spúšťa `Main.py` každý deň
-o 05:17 a 17:17 UTC. Po úspešnom skene skopíruje obsah `HTML/` do verejného
-repozitára `romanduris/FlightScanner-web`; GitHub Pages potom stránku automaticky
-nasadí.
-
-Súkromný repozitár `FlightScanner` musí mať Actions secret
-`FLIGHTSCANNER_WEB_TOKEN`. Použi fine-grained personal access token s prístupom
-iba k repozitáru `FlightScanner-web` a oprávnením **Contents: Read and write**.
-Workflow sa dá spustiť aj ručne v záložke Actions, kde možno zmeniť počet dní.
+o 05:17 a 17:17 UTC. Po úspešnom skene odošle obsah `HTML/` priamo na GitHub
+Pages toho istého verejného repozitára. Stránka je dostupná na adrese
+`https://romanduris.github.io/FlightScanner/` a nie je potrebný žiadny osobný
+token ani druhý repozitár. Workflow sa dá spustiť aj ručne v záložke Actions,
+kde možno zmeniť počet dní.
