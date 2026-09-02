@@ -27,7 +27,7 @@
     maxPrice,
     maxDuration,
     selectedWeekdays: new Set(),
-    sortKey: "price",
+    sortKey: "departure_local",
     sortDirection: "asc",
     selectedOffer: null,
   };

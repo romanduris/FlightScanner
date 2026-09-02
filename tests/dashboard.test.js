@@ -86,6 +86,24 @@ global.window = {
     }],
   },
 };
+global.window.FLIGHT_DATA.offers.push({
+  ...global.window.FLIGHT_DATA.offers[0],
+  airline: "RYANAIR",
+  destination_name: "SKORŠÍ LET",
+  destination_iata: "TST",
+  flight_number: "FR0001",
+  departure_local: "2026-09-10T08:00",
+  arrival_local: "2026-09-10T09:00",
+  price: 99,
+  outbound_offers: [{
+    departure_local: "2026-09-10T08:00",
+    arrival_local: "2026-09-10T09:00",
+    duration_minutes: 60,
+    flight_number: "FR0001",
+    price: 99,
+    currency: "EUR",
+  }],
+});
 global.document = {
   body: new Element(),
   querySelector: element,
@@ -97,6 +115,7 @@ require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.match(rows.innerHTML, /14,09/);
+assert.ok(rows.innerHTML.indexOf("SKORŠÍ LET") < rows.innerHTML.indexOf("ATÉNY"));
 
 const fridayButton = {
   dataset: { weekday: "Pia" },
@@ -127,6 +146,7 @@ const javascript = fs.readFileSync(
   "utf8",
 );
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
+assert.match(html, /data-sort="departure_local">Odlet/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 
