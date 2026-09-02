@@ -500,7 +500,33 @@
     fitVisibleMap();
   }
 
+  function bindCollapsibleSections() {
+    document.querySelectorAll("[data-collapsible]").forEach((section) => {
+      const toggle = section.querySelector(".section-toggle");
+      if (!toggle) return;
+      const contentId = toggle.getAttribute("aria-controls");
+      const content = contentId ? document.querySelector(`#${contentId}`) : null;
+      if (!content) return;
+
+      toggle.addEventListener("click", () => {
+        const collapsed = toggle.getAttribute("aria-expanded") === "true";
+        toggle.setAttribute("aria-expanded", String(!collapsed));
+        toggle.setAttribute("aria-label", `${collapsed ? "Zobraziť" : "Skryť"} ${toggle.dataset.sectionName}`);
+        section.classList.toggle("collapsed", collapsed);
+        content.hidden = collapsed;
+
+        if (!collapsed && contentId === "map-content" && map) {
+          window.setTimeout(() => {
+            map.invalidateSize();
+            fitVisibleMap();
+          }, 0);
+        }
+      });
+    });
+  }
+
   function bindEvents() {
+    bindCollapsibleSections();
     elements.country.addEventListener("change", (event) => {
       state.country = event.target.value;
       state.destination = "";

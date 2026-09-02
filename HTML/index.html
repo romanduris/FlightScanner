@@ -30,61 +30,74 @@
   </header>
 
   <main>
-    <section class="overview-grid" aria-label="Súhrn ponúk">
-      <div class="summary-grid">
-        <article class="stat-card stat-primary">
-          <span class="stat-label">Destinácie</span>
-          <strong id="stat-routes">—</strong>
-          <small id="stat-routes-total">z — destinácií</small>
-        </article>
-        <article class="stat-card">
-          <span class="stat-label">Krajiny</span>
-          <strong id="stat-countries">—</strong>
-          <small>priame spojenia</small>
-        </article>
+    <section class="overview-section collapsible-section" data-collapsible aria-label="Súhrn ponúk">
+      <button class="section-toggle overview-toggle" type="button" aria-expanded="true" aria-controls="overview-content" aria-label="Skryť prehľad letov" data-section-name="prehľad letov">
+        <span class="section-chevron" aria-hidden="true"></span><span class="section-toggle-label">Prehľad letov</span>
+      </button>
+      <div id="overview-content" class="overview-grid collapsible-content">
+        <div class="summary-grid">
+          <article class="stat-card stat-primary">
+            <span class="stat-label">Destinácie</span>
+            <strong id="stat-routes">—</strong>
+            <small id="stat-routes-total">z — destinácií</small>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label">Krajiny</span>
+            <strong id="stat-countries">—</strong>
+            <small>priame spojenia</small>
+          </article>
+        </div>
+        <div id="airline-summary" class="airline-summary" aria-label="Aerolinky"></div>
       </div>
-      <div id="airline-summary" class="airline-summary" aria-label="Aerolinky"></div>
     </section>
 
-    <section class="filter-panel" aria-label="Filtrovanie letov">
+    <section class="filter-panel collapsible-section" data-collapsible aria-label="Filtrovanie letov">
       <div class="filter-heading">
-        <div>
-          <span class="eyebrow">Rýchly výber</span>
-          <h1>Nájdi si priamy let z Bratislavy</h1>
+        <div class="heading-with-toggle">
+          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="filters-content" aria-label="Skryť filtre" data-section-name="filtre"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div>
+            <span class="eyebrow">Rýchly výber</span>
+            <h1>Nájdi si priamy let z Bratislavy</h1>
+          </div>
         </div>
         <button id="reset-filters" class="button button-ghost" type="button">↺ Zrušiť filtre</button>
       </div>
 
-      <div class="filter-grid">
-        <label class="field">
-          <span>Krajina</span>
-          <select id="country-filter"><option value="">Všetky krajiny</option></select>
-        </label>
-        <label class="field">
-          <span>Destinácia</span>
-          <select id="destination-filter"><option value="">Všetky destinácie</option></select>
-        </label>
-        <label class="field range-field">
-          <span>Max. cena <output id="price-output">—</output></span>
-          <input id="price-filter" type="range" min="0" step="5">
-        </label>
-        <label class="field range-field">
-          <span>Max. dĺžka <output id="duration-output">—</output></span>
-          <input id="duration-filter" type="range" min="0" step="15">
-        </label>
-      </div>
+      <div id="filters-content" class="collapsible-content">
+        <div class="filter-grid">
+          <label class="field">
+            <span>Krajina</span>
+            <select id="country-filter"><option value="">Všetky krajiny</option></select>
+          </label>
+          <label class="field">
+            <span>Destinácia</span>
+            <select id="destination-filter"><option value="">Všetky destinácie</option></select>
+          </label>
+          <label class="field range-field">
+            <span>Max. cena <output id="price-output">—</output></span>
+            <input id="price-filter" type="range" min="0" step="5">
+          </label>
+          <label class="field range-field">
+            <span>Max. dĺžka <output id="duration-output">—</output></span>
+            <input id="duration-filter" type="range" min="0" step="15">
+          </label>
+        </div>
 
-      <div class="weekday-filter">
-        <span>Odlet v deň</span>
-        <div id="weekday-buttons" class="weekday-buttons" role="group" aria-label="Dni odletu"></div>
+        <div class="weekday-filter">
+          <span>Odlet v deň</span>
+          <div id="weekday-buttons" class="weekday-buttons" role="group" aria-label="Dni odletu"></div>
+        </div>
       </div>
     </section>
 
-    <section class="map-card">
+    <section class="map-card collapsible-section" data-collapsible>
       <div class="section-header">
-        <div>
-          <span class="eyebrow">Mapa spojení</span>
-          <h2>Kam sa lieta z BTS</h2>
+        <div class="heading-with-toggle">
+          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="map-content" aria-label="Skryť mapu" data-section-name="mapu"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div>
+            <span class="eyebrow">Mapa spojení</span>
+            <h2>Kam sa lieta z BTS</h2>
+          </div>
         </div>
         <div class="map-actions">
           <span><i class="legend-line ryanair"></i>Ryanair</span>
@@ -92,17 +105,22 @@
           <button id="fit-map" class="button button-ghost" type="button">◎ Zobraziť všetky</button>
         </div>
       </div>
-      <div id="map" aria-label="Mapa leteckých spojení z Bratislavy"></div>
-      <div id="map-fallback" class="map-fallback" hidden>
-        Mapu sa nepodarilo načítať. Skontroluj internetové pripojenie; tabuľka funguje aj offline.
+      <div id="map-content" class="collapsible-content">
+        <div id="map" aria-label="Mapa leteckých spojení z Bratislavy"></div>
+        <div id="map-fallback" class="map-fallback" hidden>
+          Mapu sa nepodarilo načítať. Skontroluj internetové pripojenie; tabuľka funguje aj offline.
+        </div>
       </div>
     </section>
 
-    <section class="results-card">
+    <section class="results-card collapsible-section" data-collapsible>
       <div class="section-header results-heading">
-        <div>
-          <span class="eyebrow">Všetky ponuky</span>
-          <h2><span id="result-count">0</span> letov</h2>
+        <div class="heading-with-toggle">
+          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="results-content" aria-label="Skryť ponuky" data-section-name="ponuky"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div>
+            <span class="eyebrow">Všetky ponuky</span>
+            <h2><span id="result-count">0</span> letov</h2>
+          </div>
         </div>
         <div class="results-range">
           <div class="range-dates">
@@ -114,10 +132,14 @@
             <input id="date-to-filter" type="range" min="0" max="29" value="13" step="1" aria-label="Zobraziť lety do dátumu">
           </div>
         </div>
-        <p>Klikni na riadok pre kompletný rozpis letu.</p>
+        <div class="results-help">
+          <p>Klikni na riadok pre kompletný rozpis letu.</p>
+          <p class="table-note">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
+        </div>
       </div>
-      <div class="table-scroll">
-        <table>
+      <div id="results-content" class="collapsible-content">
+        <div class="table-scroll">
+          <table>
           <thead>
             <tr>
               <th class="column-airline"><button data-sort="airline">Aerolinka <i></i></button></th>
@@ -131,13 +153,13 @@
             </tr>
           </thead>
           <tbody id="flight-rows"></tbody>
-        </table>
-        <div id="empty-state" class="empty-state" hidden>
-          <strong>Žiadne lety nezodpovedajú filtrom</strong>
-          <span>Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.</span>
+          </table>
+          <div id="empty-state" class="empty-state" hidden>
+            <strong>Žiadne lety nezodpovedajú filtrom</strong>
+            <span>Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.</span>
+          </div>
         </div>
       </div>
-      <p class="table-note">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
     </section>
   </main>
 

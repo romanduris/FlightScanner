@@ -21,6 +21,7 @@ class Element {
   constructor() {
     this.classList = new ClassList();
     this.dataset = {};
+    this.attributes = {};
     this.listeners = {};
     this.hidden = false;
     this.innerHTML = "";
@@ -30,8 +31,10 @@ class Element {
   }
   addEventListener(type, callback) { this.listeners[type] = callback; }
   insertAdjacentHTML(_position, html) { this.innerHTML += html; }
+  querySelector() { return null; }
   querySelectorAll() { return []; }
-  setAttribute() {}
+  getAttribute(name) { return this.attributes[name] ?? null; }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
 }
 
 const elements = new Map();
@@ -123,13 +126,29 @@ global.window.FLIGHT_DATA.offers.push({
     currency: "EUR",
   }],
 });
+const collapseToggle = new Element();
+collapseToggle.dataset.sectionName = "filtre";
+collapseToggle.setAttribute("aria-expanded", "true");
+collapseToggle.setAttribute("aria-controls", "filters-content");
+const collapseSection = new Element();
+collapseSection.querySelector = (selector) => selector === ".section-toggle" ? collapseToggle : null;
+
 global.document = {
   body: new Element(),
   querySelector: element,
-  querySelectorAll: () => [],
+  querySelectorAll: (selector) => selector === "[data-collapsible]" ? [collapseSection] : [],
 };
 
 require(path.join(__dirname, "..", "HTML", "dashboard.js"));
+
+collapseToggle.listeners.click();
+assert.equal(element("#filters-content").hidden, true);
+assert.equal(collapseToggle.getAttribute("aria-expanded"), "false");
+assert.equal(collapseToggle.getAttribute("aria-label"), "Zobraziť filtre");
+assert.equal(collapseSection.classList.contains("collapsed"), true);
+collapseToggle.listeners.click();
+assert.equal(element("#filters-content").hidden, false);
+assert.equal(collapseToggle.getAttribute("aria-expanded"), "true");
 
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
@@ -208,6 +227,15 @@ assert.doesNotMatch(html, /data-sort="country">Krajina/);
 assert.match(html, /class="column-destination"><button data-sort="destination_name">Destinácia/);
 assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
+assert.equal((html.match(/data-collapsible/g) || []).length, 4);
+assert.match(html, /aria-controls="overview-content"/);
+assert.match(html, /aria-controls="filters-content"/);
+assert.match(html, /aria-controls="map-content"/);
+assert.match(html, /aria-controls="results-content"/);
+assert.match(html, /class="results-help">[\s\S]+class="table-note"/);
+assert.match(javascript, /function bindCollapsibleSections\(\)/);
+assert.match(javascript, /map\.invalidateSize\(\)/);
+assert.match(css, /\.collapsible-content\[hidden\]\s*\{\s*display:\s*none !important;/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 
