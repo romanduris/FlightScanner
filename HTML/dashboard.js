@@ -363,15 +363,6 @@
     renderTable(visibleOffers);
   }
 
-  function bearing(start, end) {
-    const lat1 = start[0] * Math.PI / 180;
-    const lat2 = end[0] * Math.PI / 180;
-    const deltaLongitude = (end[1] - start[1]) * Math.PI / 180;
-    const y = Math.sin(deltaLongitude) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLongitude);
-    return (Math.atan2(y, x) * 180 / Math.PI + 90 + 360) % 360;
-  }
-
   function initMap() {
     if (typeof window.L === "undefined") {
       document.querySelector("#map").hidden = true;
@@ -400,20 +391,6 @@
       const color = cssClass === "wizz" ? "#c01878" : "#174a9d";
       L.polyline([origin, destination], {
         color, weight: 1.35, opacity: .46, dashArray: cssClass === "wizz" ? "4 4" : null,
-      }).addTo(routeLayer);
-      const arrowPoint = [
-        origin[0] + (destination[0] - origin[0]) * .68,
-        origin[1] + (destination[1] - origin[1]) * .68,
-      ];
-      const angle = bearing(origin, destination);
-      L.marker(arrowPoint, {
-        interactive: false,
-        icon: L.divIcon({
-          className: "",
-          iconSize: [18, 18],
-          iconAnchor: [9, 9],
-          html: `<div class="plane-arrow ${cssClass}" style="transform:rotate(${angle}deg)">➤</div>`,
-        }),
       }).addTo(routeLayer);
       const marker = L.circleMarker(destination, {
         radius: 4.5, color: "#fff", weight: 1.5, fillColor: color, fillOpacity: .95,
@@ -494,12 +471,6 @@
       button.setAttribute("aria-pressed", String(button.classList.contains("active")));
       render();
     });
-    document.querySelectorAll("[data-max-price]").forEach((button) => button.addEventListener("click", () => {
-      state.maxPrice = Number(button.dataset.maxPrice);
-      elements.price.value = state.maxPrice;
-      updateRangeLabels();
-      render();
-    }));
     document.querySelectorAll("th button[data-sort]").forEach((button) => button.addEventListener("click", () => {
       if (state.sortKey === button.dataset.sort) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
       else {
