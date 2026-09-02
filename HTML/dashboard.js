@@ -32,6 +32,7 @@
   });
   const scanDays = Math.max(1, Number(payload.scan_days) || 30);
   const defaultVisibleDays = Math.min(14, scanDays);
+  const totalDestinations = new Set(offers.map((offer) => offer.destination_iata)).size;
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
   const state = {
@@ -231,7 +232,7 @@
 
   function renderStats(items) {
     document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
-    document.querySelector("#stat-routes-total").textContent = `z ${offers.length} ponúk`;
+    document.querySelector("#stat-routes-total").textContent = `z ${totalDestinations} destinácií`;
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country)).size;
     if (!items.length) {
       document.querySelector("#stat-cheapest").textContent = "—";
