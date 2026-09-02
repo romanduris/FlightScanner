@@ -32,6 +32,7 @@
   });
   const scanDays = Math.max(1, Number(payload.scan_days) || 30);
   const defaultVisibleDays = Math.min(14, scanDays);
+  const lastScanDay = scanDays - 1;
   const totalDestinations = new Set(offers.map((offer) => offer.destination_iata)).size;
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
@@ -40,7 +41,8 @@
     destination: "",
     maxPrice,
     maxDuration,
-    visibleDays: defaultVisibleDays,
+    firstVisibleDay: 0,
+    lastVisibleDay: defaultVisibleDays - 1,
     selectedWeekdays: new Set(),
     sortKey: "departure_local",
     sortDirection: "asc",
@@ -57,8 +59,11 @@
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
     durationOutput: document.querySelector("#duration-output"),
-    days: document.querySelector("#days-filter"),
-    daysOutput: document.querySelector("#days-output"),
+    dateFrom: document.querySelector("#date-from-filter"),
+    dateTo: document.querySelector("#date-to-filter"),
+    dateFromOutput: document.querySelector("#date-from-output"),
+    dateToOutput: document.querySelector("#date-to-output"),
+    dateRange: document.querySelector("#date-range"),
     weekdays: document.querySelector("#weekday-buttons"),
     rows: document.querySelector("#flight-rows"),
     resultCount: document.querySelector("#result-count"),
@@ -89,8 +94,9 @@
   }
 
   function flag(countryCode) {
-    if (!countryCode) return "🌐";
-    return [...countryCode.toUpperCase()].map((letter) => String.fromCodePoint(127397 + letter.charCodeAt())).join("");
+    const code = String(countryCode || "").toLowerCase();
+    if (!/^[a-z]{2}$/.test(code)) return '<span class="flag-fallback">🌐</span>';
+    return `<img class="flag" src="https://flagcdn.com/24x18/${code}.png" srcset="https://flagcdn.com/48x36/${code}.png 2x" width="20" height="15" alt="${escapeHtml(code.toUpperCase())}" loading="lazy">`;
   }
 
   function localDate(value, withYear = false) {
@@ -141,10 +147,15 @@
     return parsed ? weekdays[(parsed.getUTCDay() + 6) % 7] : null;
   }
 
-  function dayCountLabel(value) {
-    if (value === 1) return "1 deň";
-    if (value >= 2 && value <= 4) return `${value} dni`;
-    return `${value} dní`;
+  function rangeDateLabel(value) {
+    const parsed = value instanceof Date ? value : isoDate(value);
+    if (!parsed) return "—";
+    return new Intl.DateTimeFormat("sk-SK", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(parsed);
   }
 
   function airlineClass(airline) {
@@ -182,8 +193,10 @@
     elements.price.value = maxPrice;
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
-    elements.days.max = scanDays;
-    elements.days.value = defaultVisibleDays;
+    elements.dateFrom.max = lastScanDay;
+    elements.dateFrom.value = state.firstVisibleDay;
+    elements.dateTo.max = lastScanDay;
+    elements.dateTo.value = state.lastVisibleDay;
     updateRangeLabels();
   }
 
@@ -211,12 +224,16 @@
   function updateRangeLabels() {
     elements.priceOutput.value = `${euro(state.maxPrice)}`;
     elements.durationOutput.value = duration(state.maxDuration);
-    elements.daysOutput.value = dayCountLabel(state.visibleDays);
+    elements.dateFromOutput.value = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
+    elements.dateToOutput.value = rangeDateLabel(addDays(payload.start_date, state.lastVisibleDay));
+    const scale = Math.max(1, lastScanDay);
+    elements.dateRange.style.setProperty("--range-from", `${(state.firstVisibleDay / scale) * 100}%`);
+    elements.dateRange.style.setProperty("--range-to", `${(state.lastVisibleDay / scale) * 100}%`);
   }
 
   function filteredAndSortedOffers() {
-    const firstVisibleDate = isoDate(payload.start_date);
-    const lastVisibleDate = addDays(payload.start_date, state.visibleDays - 1);
+    const firstVisibleDate = addDays(payload.start_date, state.firstVisibleDay);
+    const lastVisibleDate = addDays(payload.start_date, state.lastVisibleDay);
     const filtered = flights.filter((offer) => {
       const departureDate = isoDate(offer.departure_local);
       return (!state.country || offer.country === state.country)
@@ -252,7 +269,7 @@
         <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}|${offer.departure_local}`)}" tabindex="0">
           <td><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
           <td><span class="destination-cell"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></td>
-          <td><span class="country-cell"><span class="flag">${flag(offer.country_code)}</span>${escapeHtml(offer.country)}</span></td>
+          <td><span class="country-cell">${flag(offer.country_code)}${escapeHtml(offer.country)}</span></td>
           <td><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
           <td><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
           <td><strong>${duration(offer.duration_minutes)}</strong></td>
@@ -449,13 +466,15 @@
     state.destination = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
-    state.visibleDays = defaultVisibleDays;
+    state.firstVisibleDay = 0;
+    state.lastVisibleDay = defaultVisibleDays - 1;
     state.selectedWeekdays.clear();
     elements.country.value = "";
     populateDestinations();
     elements.price.value = maxPrice;
     elements.duration.value = maxDuration;
-    elements.days.value = defaultVisibleDays;
+    elements.dateFrom.value = state.firstVisibleDay;
+    elements.dateTo.value = state.lastVisibleDay;
     elements.weekdays.querySelectorAll("button").forEach((button) => {
       button.classList.remove("active");
       button.setAttribute("aria-pressed", "false");
@@ -475,8 +494,22 @@
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
-    elements.days.addEventListener("input", (event) => {
-      state.visibleDays = Number(event.target.value);
+    elements.dateFrom.addEventListener("input", (event) => {
+      state.firstVisibleDay = Number(event.target.value);
+      if (state.firstVisibleDay > state.lastVisibleDay) {
+        state.lastVisibleDay = state.firstVisibleDay;
+        elements.dateTo.value = state.lastVisibleDay;
+      }
+      updateRangeLabels();
+      render();
+      fitVisibleMap();
+    });
+    elements.dateTo.addEventListener("input", (event) => {
+      state.lastVisibleDay = Number(event.target.value);
+      if (state.lastVisibleDay < state.firstVisibleDay) {
+        state.firstVisibleDay = state.lastVisibleDay;
+        elements.dateFrom.value = state.firstVisibleDay;
+      }
       updateRangeLabels();
       render();
       fitVisibleMap();

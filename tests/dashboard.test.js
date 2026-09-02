@@ -26,6 +26,7 @@ class Element {
     this.innerHTML = "";
     this.textContent = "";
     this.value = "";
+    this.style = { values: {}, setProperty: (name, value) => { this.style.values[name] = value; } };
   }
   addEventListener(type, callback) { this.listeners[type] = callback; }
   insertAdjacentHTML(_position, html) { this.innerHTML += html; }
@@ -117,16 +118,23 @@ require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
 assert.doesNotMatch(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
-assert.equal(element("#days-filter").max, 30);
-assert.equal(element("#days-output").value, "14 dní");
+assert.equal(element("#date-from-filter").max, 29);
+assert.equal(element("#date-to-filter").max, 29);
+assert.equal(element("#date-from-output").value, "2. 9. 2026");
+assert.equal(element("#date-to-output").value, "15. 9. 2026");
 assert.equal(element("#stat-routes").textContent, 1);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
 
-element("#days-filter").listeners.input({ target: { value: "30" } });
+element("#date-to-filter").listeners.input({ target: { value: "29" } });
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.ok(rows.innerHTML.indexOf("10.09.2026") < rows.innerHTML.indexOf("18.09.2026"));
 assert.ok(rows.innerHTML.indexOf("18.09.2026") < rows.innerHTML.indexOf("28.09.2026"));
+
+element("#date-from-filter").listeners.input({ target: { value: "9" } });
+assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
+assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
+element("#date-from-filter").listeners.input({ target: { value: "0" } });
 
 element("#country-filter").listeners.change({ target: { value: "Grécko" } });
 assert.match(element("#destination-filter").innerHTML, /ATÉNY \(ATH\)/);
@@ -172,7 +180,9 @@ assert.match(html, /<span class="stat-label">Destinácie<\/span>/);
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
-assert.match(html, /id="days-filter"[^>]+max="30"[^>]+value="14"/);
+assert.match(html, /id="date-from-filter"[^>]+value="0"/);
+assert.match(html, /id="date-to-filter"[^>]+value="13"/);
+assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 

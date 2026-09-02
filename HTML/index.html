@@ -104,10 +104,16 @@
           <span class="eyebrow">Všetky ponuky</span>
           <h2><span id="result-count">0</span> letov</h2>
         </div>
-        <label class="results-range" for="days-filter">
-          <span>Zobraziť najbližších <output id="days-output">14 dní</output></span>
-          <input id="days-filter" type="range" min="1" max="30" value="14" step="1">
-        </label>
+        <div class="results-range">
+          <div class="range-dates">
+            <label for="date-from-filter">Od <output id="date-from-output">—</output></label>
+            <label for="date-to-filter">Do <output id="date-to-output">—</output></label>
+          </div>
+          <div id="date-range" class="dual-range">
+            <input id="date-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Zobraziť lety od dátumu">
+            <input id="date-to-filter" type="range" min="0" max="29" value="13" step="1" aria-label="Zobraziť lety do dátumu">
+          </div>
+        </div>
         <p>Klikni na riadok pre kompletný rozpis letu.</p>
       </div>
       <div class="table-scroll">
