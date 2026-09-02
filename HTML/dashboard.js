@@ -36,9 +36,8 @@
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
   const state = {
-    search: "",
     country: "",
-    airline: "",
+    destination: "",
     maxPrice,
     maxDuration,
     visibleDays: defaultVisibleDays,
@@ -52,9 +51,8 @@
   let visibleOffers = [...flights];
 
   const elements = {
-    search: document.querySelector("#search-input"),
     country: document.querySelector("#country-filter"),
-    airline: document.querySelector("#airline-filter"),
+    destination: document.querySelector("#destination-filter"),
     price: document.querySelector("#price-filter"),
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
@@ -73,10 +71,6 @@
     return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
     })[character]);
-  }
-
-  function normalize(value) {
-    return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("sk");
   }
 
   function euro(value) {
@@ -163,11 +157,26 @@
     return `<img src="${url}" alt="${escapeHtml(airline)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('strong'),{textContent:this.alt}))">`;
   }
 
+  function populateDestinations() {
+    const matchingOffers = state.country
+      ? offers.filter((offer) => offer.country === state.country)
+      : offers;
+    const destinations = new Map();
+    matchingOffers.forEach((offer) => destinations.set(offer.destination_iata, offer.destination_name));
+    const sortedDestinations = [...destinations.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, "sk"));
+
+    if (state.destination && !destinations.has(state.destination)) state.destination = "";
+    elements.destination.innerHTML = [
+      '<option value="">Všetky destinácie</option>',
+      ...sortedDestinations.map(([iata, name]) => `<option value="${escapeHtml(iata)}">${escapeHtml(name)} (${escapeHtml(iata)})</option>`),
+    ].join("");
+    elements.destination.value = state.destination;
+  }
+
   function populateControls() {
     const countries = [...new Set(offers.map((offer) => offer.country))].sort((a, b) => a.localeCompare(b, "sk"));
-    const airlines = [...new Set(offers.map((offer) => offer.airline))].sort((a, b) => a.localeCompare(b, "sk"));
     elements.country.insertAdjacentHTML("beforeend", countries.map((country) => `<option>${escapeHtml(country)}</option>`).join(""));
-    elements.airline.insertAdjacentHTML("beforeend", airlines.map((airline) => `<option>${escapeHtml(airline)}</option>`).join(""));
+    populateDestinations();
     elements.weekdays.innerHTML = weekdays.map((day) => `<button type="button" data-weekday="${day}" aria-pressed="false">${day}</button>`).join("");
     elements.price.max = maxPrice;
     elements.price.value = maxPrice;
@@ -206,15 +215,12 @@
   }
 
   function filteredAndSortedOffers() {
-    const query = normalize(state.search);
     const firstVisibleDate = isoDate(payload.start_date);
     const lastVisibleDate = addDays(payload.start_date, state.visibleDays - 1);
     const filtered = flights.filter((offer) => {
-      const searchable = normalize(`${offer.destination_name} ${offer.destination_iata} ${offer.flight_number} ${offer.country} ${offer.airline}`);
       const departureDate = isoDate(offer.departure_local);
-      return (!query || searchable.includes(query))
-        && (!state.country || offer.country === state.country)
-        && (!state.airline || offer.airline === state.airline)
+      return (!state.country || offer.country === state.country)
+        && (!state.destination || offer.destination_iata === state.destination)
         && (!state.selectedWeekdays.size || state.selectedWeekdays.has(weekdayFor(offer.departure_local)))
         && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
         && offer.price <= state.maxPrice
@@ -234,21 +240,6 @@
     document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
     document.querySelector("#stat-routes-total").textContent = `z ${totalDestinations} destinácií`;
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country)).size;
-    if (!items.length) {
-      document.querySelector("#stat-cheapest").textContent = "—";
-      document.querySelector("#stat-cheapest-route").textContent = "bez výsledkov";
-      document.querySelector("#stat-average").textContent = "—";
-      document.querySelector("#stat-shortest").textContent = "—";
-      document.querySelector("#stat-shortest-route").textContent = "bez výsledkov";
-      return;
-    }
-    const cheapest = items.reduce((best, item) => item.price < best.price ? item : best);
-    const shortest = items.filter((item) => item.duration_minutes).reduce((best, item) => item.duration_minutes < best.duration_minutes ? item : best);
-    document.querySelector("#stat-cheapest").textContent = euro(cheapest.price);
-    document.querySelector("#stat-cheapest-route").textContent = `${cheapest.destination_name} · ${cheapest.airline}`;
-    document.querySelector("#stat-average").textContent = euro(items.reduce((sum, item) => sum + item.price, 0) / items.length);
-    document.querySelector("#stat-shortest").textContent = duration(shortest.duration_minutes);
-    document.querySelector("#stat-shortest-route").textContent = `${shortest.destination_name} (${shortest.destination_iata})`;
   }
 
   function renderTable(items) {
@@ -454,16 +445,14 @@
   }
 
   function resetFilters() {
-    state.search = "";
     state.country = "";
-    state.airline = "";
+    state.destination = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
     state.visibleDays = defaultVisibleDays;
     state.selectedWeekdays.clear();
-    elements.search.value = "";
     elements.country.value = "";
-    elements.airline.value = "";
+    populateDestinations();
     elements.price.value = maxPrice;
     elements.duration.value = maxDuration;
     elements.days.value = defaultVisibleDays;
@@ -477,9 +466,13 @@
   }
 
   function bindEvents() {
-    elements.search.addEventListener("input", (event) => { state.search = event.target.value; render(); });
-    elements.country.addEventListener("change", (event) => { state.country = event.target.value; render(); });
-    elements.airline.addEventListener("change", (event) => { state.airline = event.target.value; render(); });
+    elements.country.addEventListener("change", (event) => {
+      state.country = event.target.value;
+      state.destination = "";
+      populateDestinations();
+      render();
+    });
+    elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
     elements.days.addEventListener("input", (event) => {

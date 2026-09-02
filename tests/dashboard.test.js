@@ -91,6 +91,8 @@ global.window.FLIGHT_DATA.offers.push({
   airline: "RYANAIR",
   destination_name: "SKORŠÍ LET",
   destination_iata: "TST",
+  country: "Testland",
+  country_code: "TS",
   flight_number: "FR0001",
   departure_local: "2026-09-10T08:00",
   arrival_local: "2026-09-10T09:00",
@@ -126,6 +128,15 @@ assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.ok(rows.innerHTML.indexOf("10.09.2026") < rows.innerHTML.indexOf("18.09.2026"));
 assert.ok(rows.innerHTML.indexOf("18.09.2026") < rows.innerHTML.indexOf("28.09.2026"));
 
+element("#country-filter").listeners.change({ target: { value: "Grécko" } });
+assert.match(element("#destination-filter").innerHTML, /ATÉNY \(ATH\)/);
+assert.doesNotMatch(element("#destination-filter").innerHTML, /SKORŠÍ LET/);
+assert.match(rows.innerHTML, /ATÉNY/);
+assert.doesNotMatch(rows.innerHTML, /SKORŠÍ LET/);
+
+element("#destination-filter").listeners.change({ target: { value: "ATH" } });
+assert.match(rows.innerHTML, /ATÉNY/);
+
 const fridayButton = {
   dataset: { weekday: "Pia" },
   classList: new ClassList(),
@@ -158,6 +169,9 @@ const javascript = fs.readFileSync(
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.match(html, /data-sort="departure_local">Odlet/);
 assert.match(html, /<span class="stat-label">Destinácie<\/span>/);
+assert.match(html, /id="destination-filter"/);
+assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
+assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
 assert.match(html, /id="days-filter"[^>]+max="30"[^>]+value="14"/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);

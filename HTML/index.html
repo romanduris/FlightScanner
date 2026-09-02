@@ -30,35 +30,21 @@
   </header>
 
   <main>
-    <section class="summary-grid" aria-label="Súhrn ponúk">
-      <article class="stat-card stat-primary">
-        <span class="stat-label">Destinácie</span>
-        <strong id="stat-routes">—</strong>
-        <small id="stat-routes-total">z — destinácií</small>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Krajiny</span>
-        <strong id="stat-countries">—</strong>
-        <small>priame spojenia</small>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Najnižšia cena</span>
-        <strong id="stat-cheapest">—</strong>
-        <small id="stat-cheapest-route">—</small>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Priemerná cena</span>
-        <strong id="stat-average">—</strong>
-        <small>jednosmerný basic tarif</small>
-      </article>
-      <article class="stat-card">
-        <span class="stat-label">Najkratší let</span>
-        <strong id="stat-shortest">—</strong>
-        <small id="stat-shortest-route">—</small>
-      </article>
+    <section class="overview-grid" aria-label="Súhrn ponúk">
+      <div class="summary-grid">
+        <article class="stat-card stat-primary">
+          <span class="stat-label">Destinácie</span>
+          <strong id="stat-routes">—</strong>
+          <small id="stat-routes-total">z — destinácií</small>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">Krajiny</span>
+          <strong id="stat-countries">—</strong>
+          <small>priame spojenia</small>
+        </article>
+      </div>
+      <div id="airline-summary" class="airline-summary" aria-label="Aerolinky"></div>
     </section>
-
-    <section id="airline-summary" class="airline-summary" aria-label="Aerolinky"></section>
 
     <section class="filter-panel" aria-label="Filtrovanie letov">
       <div class="filter-heading">
@@ -70,17 +56,13 @@
       </div>
 
       <div class="filter-grid">
-        <label class="field field-search">
-          <span>Destinácia alebo let</span>
-          <span class="input-wrap"><b>⌕</b><input id="search-input" type="search" placeholder="Barcelona, BCN, FR5719…" autocomplete="off"></span>
-        </label>
         <label class="field">
           <span>Krajina</span>
           <select id="country-filter"><option value="">Všetky krajiny</option></select>
         </label>
         <label class="field">
-          <span>Aerolinka</span>
-          <select id="airline-filter"><option value="">Všetky aerolinky</option></select>
+          <span>Destinácia</span>
+          <select id="destination-filter"><option value="">Všetky destinácie</option></select>
         </label>
         <label class="field range-field">
           <span>Max. cena <output id="price-output">—</output></span>
