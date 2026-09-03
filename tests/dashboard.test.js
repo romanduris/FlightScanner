@@ -158,8 +158,17 @@ assert.equal(element("#date-from-filter").max, 29);
 assert.equal(element("#date-to-filter").max, 29);
 assert.equal(element("#date-from-output").value, "2. 9. 2026");
 assert.equal(element("#date-to-output").value, "15. 9. 2026");
+assert.equal(element("#planning-window-filter").max, 150);
+assert.equal(element("#planning-window-from").value, "2. 9. 2026");
+assert.equal(element("#planning-window-to").value, "1. 10. 2026");
 assert.equal(element("#stat-routes").textContent, 1);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
+
+const rowsBeforePlanningPreview = rows.innerHTML;
+element("#planning-window-filter").listeners.input({ target: { value: "45" } });
+assert.equal(element("#planning-window-from").value, "17. 10. 2026");
+assert.equal(element("#planning-window-to").value, "15. 11. 2026");
+assert.equal(rows.innerHTML, rowsBeforePlanningPreview);
 
 element("#date-to-filter").listeners.input({ target: { value: "29" } });
 assert.match(rows.innerHTML, /18\.09\.2026/);
@@ -218,6 +227,8 @@ assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
 assert.match(html, /id="date-from-filter"[^>]+value="0"/);
 assert.match(html, /id="date-to-filter"[^>]+value="13"/);
+assert.match(html, /id="planning-window-filter"[^>]+max="150"[^>]+step="15"/);
+assert.match(html, /30-dňové obdobie[\s\S]+Náhľad · 6 mesiacov/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
 assert.match(html, /class="table-note">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);

@@ -33,6 +33,10 @@
   const scanDays = Math.max(1, Number(payload.scan_days) || 30);
   const defaultVisibleDays = Math.min(14, scanDays);
   const lastScanDay = scanDays - 1;
+  const planningHorizonDays = 180;
+  const planningWindowDays = 30;
+  const planningStepDays = 15;
+  const lastPlanningStartDay = Math.floor((planningHorizonDays - planningWindowDays) / planningStepDays) * planningStepDays;
   const totalDestinations = new Set(offers.map((offer) => offer.destination_iata)).size;
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
@@ -43,6 +47,7 @@
     maxDuration,
     firstVisibleDay: 0,
     lastVisibleDay: defaultVisibleDays - 1,
+    planningStartDay: 0,
     selectedWeekdays: new Set(),
     sortKey: "departure_local",
     sortDirection: "asc",
@@ -64,6 +69,9 @@
     dateFromOutput: document.querySelector("#date-from-output"),
     dateToOutput: document.querySelector("#date-to-output"),
     dateRange: document.querySelector("#date-range"),
+    planningWindow: document.querySelector("#planning-window-filter"),
+    planningWindowFrom: document.querySelector("#planning-window-from"),
+    planningWindowTo: document.querySelector("#planning-window-to"),
     weekdays: document.querySelector("#weekday-buttons"),
     rows: document.querySelector("#flight-rows"),
     resultCount: document.querySelector("#result-count"),
@@ -197,6 +205,9 @@
     elements.dateFrom.value = state.firstVisibleDay;
     elements.dateTo.max = lastScanDay;
     elements.dateTo.value = state.lastVisibleDay;
+    elements.planningWindow.max = lastPlanningStartDay;
+    elements.planningWindow.value = state.planningStartDay;
+    updatePlanningWindowLabels();
     updateRangeLabels();
   }
 
@@ -229,6 +240,17 @@
     const scale = Math.max(1, lastScanDay);
     elements.dateRange.style.setProperty("--range-from", `${(state.firstVisibleDay / scale) * 100}%`);
     elements.dateRange.style.setProperty("--range-to", `${(state.lastVisibleDay / scale) * 100}%`);
+  }
+
+  function updatePlanningWindowLabels() {
+    const start = addDays(payload.start_date, state.planningStartDay);
+    const end = addDays(payload.start_date, state.planningStartDay + planningWindowDays - 1);
+    elements.planningWindowFrom.value = rangeDateLabel(start);
+    elements.planningWindowTo.value = rangeDateLabel(end);
+    elements.planningWindow.setAttribute(
+      "aria-valuetext",
+      `${elements.planningWindowFrom.value} – ${elements.planningWindowTo.value}`,
+    );
   }
 
   function filteredAndSortedOffers() {
@@ -538,6 +560,10 @@
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.planningWindow.addEventListener("input", (event) => {
+      state.planningStartDay = Number(event.target.value);
+      updatePlanningWindowLabels();
+    });
     elements.dateFrom.addEventListener("input", (event) => {
       state.firstVisibleDay = Number(event.target.value);
       if (state.firstVisibleDay > state.lastVisibleDay) {
