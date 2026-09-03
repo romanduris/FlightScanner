@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=20260903112446">
+  <link rel="stylesheet" href="dashboard.css?v=20260903113416">
 </head>
 <body>
   <header class="topbar">
@@ -128,13 +128,13 @@
               <small id="planning-range-note">Rozsah podľa načítaných dát</small>
             </div>
             <div class="range-dates">
-              <label for="planning-window-from-filter">Od <output id="planning-window-from">—</output></label>
-              <label for="planning-window-to-filter">Do <output id="planning-window-to">—</output></label>
+              <label for="planning-window-filter">Od <output id="planning-window-from">—</output></label>
+              <label for="planning-window-filter">Do <output id="planning-window-to">—</output></label>
             </div>
-            <div id="planning-window-range" class="dual-range">
+            <div id="planning-window-range" class="planning-slider">
               <div id="planning-weekend-markers" class="weekend-markers" aria-hidden="true"></div>
-              <input id="planning-window-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Posunúť začiatok 30-dňového obdobia" aria-describedby="planning-range-note">
-              <input id="planning-window-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Posunúť koniec 30-dňového obdobia" aria-describedby="planning-range-note">
+              <div id="planning-window-stops" class="planning-stops" aria-hidden="true"></div>
+              <input id="planning-window-filter" type="range" min="0" max="0" value="0" step="1" aria-label="Vybrať 30-dňové obdobie" aria-describedby="planning-range-note">
             </div>
           </div>
           <div class="results-range">
@@ -148,7 +148,7 @@
               <input id="date-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Zobraziť lety do dátumu">
             </div>
           </div>
-          <span class="weekend-legend"><i aria-hidden="true"></i>Zelená označuje víkend</span>
+          <span class="weekend-legend"><i aria-hidden="true"></i>Tmavosivá označuje víkend</span>
         </div>
         <div class="results-help">
           <p>Klikni na riadok pre kompletný rozpis letu.</p>
@@ -191,13 +191,13 @@
     <span>Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · logá sú majetkom aeroliniek</span>
   </footer>
 
-  <script src="flight-data.js?v=20260903112446"></script>
+  <script src="flight-data.js?v=20260903113416"></script>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="dashboard.js?v=20260903112446"></script>
+  <script src="dashboard.js?v=20260903113416"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

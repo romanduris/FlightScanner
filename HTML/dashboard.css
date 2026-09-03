@@ -11,6 +11,7 @@
   --pink: #c01878;
   --purple: #69269a;
   --green: #11966f;
+  --weekend: #586273;
   --shadow: 0 10px 28px rgba(24, 45, 78, .09);
   --radius: 14px;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -139,16 +140,25 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .range-dates label { display: flex; gap: 4px; }
 .planning-range output, .results-range output { color: var(--blue); font-weight: 900; }
 .weekend-legend { display: inline-flex; align-items: center; justify-self: end; gap: 5px; color: var(--muted); font-size: 7px; font-weight: 700; }
-.weekend-legend i { width: 16px; height: 4px; border-radius: 4px; background: var(--green); }
+.weekend-legend i { width: 16px; height: 4px; border-radius: 4px; background: var(--weekend); }
 .dual-range { --range-from: 0%; --range-to: 45%; position: relative; height: 18px; background: linear-gradient(to right, #d5dde9 var(--range-from), var(--blue) var(--range-from), var(--blue) var(--range-to), #d5dde9 var(--range-to)); background-position: center; background-repeat: no-repeat; background-size: 100% 4px; }
 .weekend-markers { position: absolute; z-index: 1; inset: 7px 0; height: 4px; overflow: hidden; pointer-events: none; }
-.weekend-marker { position: absolute; top: 0; left: var(--weekend-left); width: max(3px, var(--weekend-width)); height: 4px; border-radius: 3px; background: var(--green); transform: translateX(-50%); }
+.weekend-marker { position: absolute; top: 0; left: var(--weekend-left); width: max(3px, var(--weekend-width)); height: 4px; border-radius: 3px; background: var(--weekend); transform: translateX(-50%); }
 .dual-range input { position: absolute; z-index: 2; inset: 0; width: 100%; height: 18px; margin: 0; pointer-events: none; appearance: none; background: transparent; }
 .dual-range input::-webkit-slider-thumb { width: 14px; height: 14px; pointer-events: auto; appearance: none; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
 .dual-range input::-moz-range-thumb { width: 11px; height: 11px; pointer-events: auto; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
-.dual-range input.weekend-day::-webkit-slider-thumb { background: var(--green); box-shadow: 0 0 0 1px var(--green); }
-.dual-range input.weekend-day::-moz-range-thumb { background: var(--green); box-shadow: 0 0 0 1px var(--green); }
+.dual-range input.weekend-day::-webkit-slider-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
+.dual-range input.weekend-day::-moz-range-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
 .dual-range input::-moz-range-track { background: transparent; }
+.planning-slider { position: relative; height: 18px; background: #d5dde9; background-position: center; background-repeat: no-repeat; background-size: 100% 4px; }
+.planning-stops { position: absolute; z-index: 2; inset: 6px 0; height: 6px; overflow: hidden; pointer-events: none; }
+.planning-stop { position: absolute; top: 0; left: var(--stop-left); width: 4px; height: 6px; background: white; transform: translateX(-50%); }
+.planning-slider input { position: absolute; z-index: 3; inset: 0; width: 100%; height: 18px; margin: 0; cursor: grab; appearance: none; background: transparent; }
+.planning-slider input::-webkit-slider-thumb { width: 14px; height: 14px; appearance: none; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.planning-slider input::-moz-range-thumb { width: 11px; height: 11px; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
+.planning-slider input.weekend-day::-webkit-slider-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
+.planning-slider input.weekend-day::-moz-range-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
+.planning-slider input::-moz-range-track { background: transparent; }
 .table-note-bottom { margin: 0; padding: 8px 16px 10px; color: var(--muted); border-top: 1px solid #edf1f6; font-size: 7px; line-height: 1.3; text-align: right; }
 .table-scroll { overflow-x: auto; }
 table { width: 100%; min-width: 900px; border-collapse: collapse; table-layout: fixed; }

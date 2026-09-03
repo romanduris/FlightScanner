@@ -74,8 +74,8 @@
     dateRange: document.querySelector("#date-range"),
     dateWeekendMarkers: document.querySelector("#date-weekend-markers"),
     planningRange: document.querySelector("#planning-window-range"),
-    planningFrom: document.querySelector("#planning-window-from-filter"),
-    planningTo: document.querySelector("#planning-window-to-filter"),
+    planningWindow: document.querySelector("#planning-window-filter"),
+    planningStops: document.querySelector("#planning-window-stops"),
     planningWeekendMarkers: document.querySelector("#planning-weekend-markers"),
     planningWindowFrom: document.querySelector("#planning-window-from"),
     planningWindowTo: document.querySelector("#planning-window-to"),
@@ -166,12 +166,14 @@
   function rangeDateLabel(value) {
     const parsed = value instanceof Date ? value : isoDate(value);
     if (!parsed) return "—";
-    return new Intl.DateTimeFormat("sk-SK", {
+    const formattedDate = new Intl.DateTimeFormat("sk-SK", {
       day: "numeric",
       month: "numeric",
       year: "numeric",
       timeZone: "UTC",
     }).format(parsed);
+    const weekday = weekdays[(parsed.getUTCDay() + 6) % 7];
+    return `${formattedDate} (${weekday})`;
   }
 
   function isWeekendDay(dayOffset) {
@@ -187,6 +189,18 @@
       (_, index) => firstDay + index,
     ).filter(isWeekendDay).map((dayOffset) => (
       `<i class="weekend-marker" style="--weekend-left:${((dayOffset - firstDay) / scale) * 100}%;--weekend-width:${markerWidth}%"></i>`
+    )).join("");
+  }
+
+  function renderPlanningStops() {
+    const scale = Math.max(1, planningStartDays.length - 1);
+    elements.planningStops.innerHTML = planningStartDays.map((_, index) => (
+      `<i class="planning-stop" style="--stop-left:${(index / scale) * 100}%"></i>`
+    )).join("");
+    elements.planningWeekendMarkers.innerHTML = planningStartDays.map((dayOffset, index) => (
+      { dayOffset, index }
+    )).filter(({ dayOffset }) => isWeekendDay(dayOffset)).map(({ index }) => (
+      `<i class="weekend-marker" style="--weekend-left:${(index / scale) * 100}%;--weekend-width:${100 / scale / 2}%"></i>`
     )).join("");
   }
 
@@ -225,9 +239,9 @@
     elements.price.value = maxPrice;
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
-    elements.planningFrom.max = lastScanDay;
-    elements.planningTo.max = lastScanDay;
+    elements.planningWindow.max = planningStartDays.length - 1;
     elements.planningRangeNote.textContent = `${scanDays} dní dát · krok ${planningStepDays} dní`;
+    renderPlanningStops();
     syncDetailedDateRange();
     updatePlanningWindowLabels();
     updateRangeLabels();
@@ -274,17 +288,10 @@
     const end = addDays(payload.start_date, planningEndDay);
     elements.planningWindowFrom.value = rangeDateLabel(start);
     elements.planningWindowTo.value = rangeDateLabel(end);
-    elements.planningFrom.value = state.planningStartDay;
-    elements.planningTo.value = planningEndDay;
-    const scale = Math.max(1, lastScanDay);
-    elements.planningRange.style.setProperty("--range-from", `${(state.planningStartDay / scale) * 100}%`);
-    elements.planningRange.style.setProperty("--range-to", `${(planningEndDay / scale) * 100}%`);
-    renderWeekendMarkers(elements.planningWeekendMarkers, 0, lastScanDay);
-    elements.planningFrom.classList.toggle("weekend-day", isWeekendDay(state.planningStartDay));
-    elements.planningTo.classList.toggle("weekend-day", isWeekendDay(planningEndDay));
+    elements.planningWindow.value = planningStartDays.indexOf(state.planningStartDay);
+    elements.planningWindow.classList.toggle("weekend-day", isWeekendDay(state.planningStartDay));
     const ariaValue = `${elements.planningWindowFrom.value} – ${elements.planningWindowTo.value}`;
-    elements.planningFrom.setAttribute("aria-valuetext", ariaValue);
-    elements.planningTo.setAttribute("aria-valuetext", ariaValue);
+    elements.planningWindow.setAttribute("aria-valuetext", ariaValue);
   }
 
   function closestPlanningStart(requestedDay) {
@@ -620,11 +627,8 @@
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
-    elements.planningFrom.addEventListener("input", (event) => {
-      selectPlanningWindow(Number(event.target.value));
-    });
-    elements.planningTo.addEventListener("input", (event) => {
-      selectPlanningWindow(Number(event.target.value) - planningWindowDays + 1);
+    elements.planningWindow.addEventListener("input", (event) => {
+      selectPlanningWindow(planningStartDays[Number(event.target.value)] ?? 0);
     });
     elements.dateFrom.addEventListener("input", (event) => {
       state.firstVisibleDay = Number(event.target.value);
