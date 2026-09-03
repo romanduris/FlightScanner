@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import threading
 import time
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -98,11 +100,21 @@ class ProviderError(RuntimeError):
 
 
 class JsonHttpClient:
-    """Malý JSON HTTP klient s timeoutom a opakovaním dočasných chýb."""
+    """JSON klient s rozostupom požiadaviek a šetrným opakovaním chýb."""
 
-    def __init__(self, timeout_seconds: int = 20, retries: int = 2) -> None:
+    def __init__(
+        self,
+        timeout_seconds: int = 20,
+        retries: int = 3,
+        min_interval_seconds: float = 0.25,
+        backoff_base_seconds: float = 1.5,
+    ) -> None:
         self.timeout_seconds = timeout_seconds
         self.retries = retries
+        self.min_interval_seconds = max(0.0, min_interval_seconds)
+        self.backoff_base_seconds = max(0.0, backoff_base_seconds)
+        self._request_lock = threading.Lock()
+        self._last_request_started_at = 0.0
 
     def get_json(self, url: str) -> dict[str, Any]:
         request = Request(
@@ -146,6 +158,8 @@ class JsonHttpClient:
 
         last_error: Exception | None = None
         for attempt in range(self.retries + 1):
+            self._wait_for_request_slot()
+            retry_after_seconds: float | None = None
             try:
                 with urlopen(request, timeout=self.timeout_seconds) as response:
                     encoding = response.headers.get_content_charset() or "utf-8"
@@ -166,13 +180,48 @@ class JsonHttpClient:
                 last_error = ProviderError(message)
                 if error.code not in {429, 500, 502, 503, 504}:
                     break
+                retry_after_seconds = self._retry_after_seconds(error)
             except (URLError, TimeoutError, OSError, UnicodeError, json.JSONDecodeError) as error:
                 last_error = error
 
             if attempt < self.retries:
-                time.sleep(1.5 * (attempt + 1))
+                delay = retry_after_seconds
+                if delay is None:
+                    delay = self.backoff_base_seconds * (2**attempt)
+                time.sleep(min(60.0, max(0.0, delay)))
 
         raise ProviderError(f"HTTP požiadavka zlyhala: {last_error}") from last_error
+
+    def _wait_for_request_slot(self) -> None:
+        """Obmedzí spoločné tempo aj pri paralelnom skenovaní destinácií."""
+
+        with self._request_lock:
+            elapsed = time.monotonic() - self._last_request_started_at
+            wait_seconds = self.min_interval_seconds - elapsed
+            if wait_seconds > 0:
+                time.sleep(wait_seconds)
+            self._last_request_started_at = time.monotonic()
+
+    @staticmethod
+    def _retry_after_seconds(error: HTTPError) -> float | None:
+        """Prečíta Retry-After v sekundách alebo ako HTTP dátum."""
+
+        value = error.headers.get("Retry-After") if error.headers else None
+        if not value:
+            return None
+        try:
+            return max(0.0, float(value))
+        except ValueError:
+            try:
+                retry_at = parsedate_to_datetime(value)
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=timezone.utc)
+                return max(
+                    0.0,
+                    (retry_at - datetime.now(timezone.utc)).total_seconds(),
+                )
+            except (TypeError, ValueError, OverflowError):
+                return None
 
 
 class BaseAirlineProvider(ABC):

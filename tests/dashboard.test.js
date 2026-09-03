@@ -48,8 +48,8 @@ global.window = {
     year: 2026,
     month: 9,
     start_date: "2026-09-02",
-    end_date: "2026-10-01",
-    scan_days: 30,
+    end_date: "2026-11-30",
+    scan_days: 90,
     scanned_at_utc: "2026-09-02T08:00:00+00:00",
     return_window_days: 10,
     origin: { latitude: 48.17, longitude: 17.21 },
@@ -153,22 +153,36 @@ assert.equal(collapseToggle.getAttribute("aria-expanded"), "true");
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /124,99\s*€\*/);
-assert.doesNotMatch(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
+assert.match(rows.innerHTML, /18\.09\.2026/);
+assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.equal(element("#date-from-filter").max, 29);
 assert.equal(element("#date-to-filter").max, 29);
 assert.equal(element("#date-from-output").value, "2. 9. 2026");
-assert.equal(element("#date-to-output").value, "15. 9. 2026");
-assert.equal(element("#planning-window-filter").max, 150);
+assert.equal(element("#date-to-output").value, "1. 10. 2026");
+assert.equal(element("#planning-window-from-filter").max, 89);
+assert.equal(element("#planning-window-to-filter").max, 89);
 assert.equal(element("#planning-window-from").value, "2. 9. 2026");
 assert.equal(element("#planning-window-to").value, "1. 10. 2026");
-assert.equal(element("#stat-routes").textContent, 1);
+assert.equal(element("#planning-range-note").textContent, "90 dní dát · krok 15 dní");
+assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
 
-const rowsBeforePlanningPreview = rows.innerHTML;
-element("#planning-window-filter").listeners.input({ target: { value: "45" } });
+element("#planning-window-from-filter").listeners.input({ target: { value: "45" } });
 assert.equal(element("#planning-window-from").value, "17. 10. 2026");
 assert.equal(element("#planning-window-to").value, "15. 11. 2026");
-assert.equal(rows.innerHTML, rowsBeforePlanningPreview);
+assert.equal(element("#date-from-output").value, "17. 10. 2026");
+assert.equal(element("#date-to-output").value, "15. 11. 2026");
+assert.equal(element("#date-from-filter").min, 45);
+assert.equal(element("#date-to-filter").max, 74);
+assert.doesNotMatch(rows.innerHTML, /10\.09\.2026|18\.09\.2026|28\.09\.2026/);
+
+element("#planning-window-to-filter").listeners.input({ target: { value: "44" } });
+assert.equal(element("#planning-window-from").value, "17. 9. 2026");
+assert.equal(element("#planning-window-to").value, "16. 10. 2026");
+assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
+assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
+
+element("#planning-window-from-filter").listeners.input({ target: { value: "0" } });
 
 element("#date-to-filter").listeners.input({ target: { value: "29" } });
 assert.match(rows.innerHTML, /18\.09\.2026/);
@@ -203,7 +217,7 @@ assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /42,29/);
 assert.doesNotMatch(rows.innerHTML, /28\.09\.2026/);
 assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
-assert.match(element("#period-label").textContent, /2\. septembra – 1\. októbra 2026/);
+assert.match(element("#period-label").textContent, /2\. septembra – 30\. novembra 2026/);
 
 const css = fs.readFileSync(
   path.join(__dirname, "..", "HTML", "dashboard.css"),
@@ -226,9 +240,9 @@ assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
 assert.match(html, /id="date-from-filter"[^>]+value="0"/);
-assert.match(html, /id="date-to-filter"[^>]+value="13"/);
-assert.match(html, /id="planning-window-filter"[^>]+max="150"[^>]+step="15"/);
-assert.match(html, /30-dňové obdobie[\s\S]+Náhľad · 6 mesiacov/);
+assert.match(html, /id="date-to-filter"[^>]+value="29"/);
+assert.match(html, /id="planning-window-from-filter"[\s\S]+id="planning-window-to-filter"/);
+assert.match(html, /30-dňové obdobie[\s\S]+Rozsah podľa načítaných dát/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
 assert.match(html, /class="table-note">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);

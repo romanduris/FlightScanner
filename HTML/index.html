@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=202609020927463522880000">
+  <link rel="stylesheet" href="dashboard.css?v=202609030905474778650000">
 </head>
 <body>
   <header class="topbar">
@@ -125,13 +125,16 @@
           <div class="planning-range">
             <div class="planning-range-title">
               <span>30-dňové obdobie</span>
-              <small id="planning-range-note">Náhľad · 6 mesiacov</small>
+              <small id="planning-range-note">Rozsah podľa načítaných dát</small>
             </div>
             <div class="range-dates">
-              <label for="planning-window-filter">Od <output id="planning-window-from">—</output></label>
-              <label for="planning-window-filter">Do <output id="planning-window-to">—</output></label>
+              <label for="planning-window-from-filter">Od <output id="planning-window-from">—</output></label>
+              <label for="planning-window-to-filter">Do <output id="planning-window-to">—</output></label>
             </div>
-            <input id="planning-window-filter" type="range" min="0" max="150" value="0" step="15" aria-label="Vybrať 30-dňové obdobie" aria-describedby="planning-range-note">
+            <div id="planning-window-range" class="dual-range">
+              <input id="planning-window-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Posunúť začiatok 30-dňového obdobia" aria-describedby="planning-range-note">
+              <input id="planning-window-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Posunúť koniec 30-dňového obdobia" aria-describedby="planning-range-note">
+            </div>
           </div>
           <div class="results-range">
             <div class="range-dates">
@@ -140,7 +143,7 @@
             </div>
             <div id="date-range" class="dual-range">
               <input id="date-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Zobraziť lety od dátumu">
-              <input id="date-to-filter" type="range" min="0" max="29" value="13" step="1" aria-label="Zobraziť lety do dátumu">
+              <input id="date-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Zobraziť lety do dátumu">
             </div>
           </div>
         </div>
@@ -185,13 +188,13 @@
     <span>Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · logá sú majetkom aeroliniek</span>
   </footer>
 
-  <script src="flight-data.js?v=202609020927463522880000"></script>
+  <script src="flight-data.js?v=202609030905474778650000"></script>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="dashboard.js?v=202609020927463522880000"></script>
+  <script src="dashboard.js?v=202609030905474778650000"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

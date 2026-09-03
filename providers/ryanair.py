@@ -64,7 +64,11 @@ class RyanairProvider(BaseAirlineProvider):
     airline_name = "RYANAIR"
 
     def __init__(self, max_workers: int = 4) -> None:
-        self.client = JsonHttpClient(timeout_seconds=20, retries=2)
+        self.client = JsonHttpClient(
+            timeout_seconds=20,
+            retries=3,
+            min_interval_seconds=0.25,
+        )
         self.max_workers = max(1, min(max_workers, 8))
 
     def scan_month(

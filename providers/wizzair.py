@@ -52,7 +52,11 @@ class WizzAirProvider(BaseAirlineProvider):
     airline_name = "Wizz Air"
 
     def __init__(self, max_workers: int = 4) -> None:
-        self.client = JsonHttpClient(timeout_seconds=30, retries=2)
+        self.client = JsonHttpClient(
+            timeout_seconds=30,
+            retries=3,
+            min_interval_seconds=0.5,
+        )
         # Parameter zachováva spoločné rozhranie providerov. Wizz požiadavky
         # posielame po dávkach, aby sme zbytočne nezaťažovali server.
         self.max_workers = max(1, min(max_workers, 8))
