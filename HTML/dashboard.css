@@ -268,6 +268,9 @@ footer a { color: inherit; }
   .map-card .section-header { align-items: flex-start; flex-direction: column; }
   .map-actions { width: 100%; flex-wrap: wrap; }
   .map-actions .button { margin-left: auto; }
+  .map-card.collapsed .section-header { align-items: center; flex-direction: row; }
+  .map-card.collapsed .heading-with-toggle { flex: 1 1 auto; }
+  .map-card.collapsed .map-actions { width: auto; flex: 0 0 auto; align-items: flex-start; flex-direction: column; gap: 3px; }
   #map { height: 350px; }
   .results-heading p { display: none; }
   .results-heading { align-items: flex-start; flex-direction: column; }

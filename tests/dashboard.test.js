@@ -236,6 +236,8 @@ assert.match(html, /class="results-help">[\s\S]+class="table-note"/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(css, /\.collapsible-content\[hidden\]\s*\{\s*display:\s*none !important;/);
+assert.match(css, /\.map-card\.collapsed \.section-header\s*\{[^}]*flex-direction:\s*row/);
+assert.match(css, /\.map-card\.collapsed \.map-actions\s*\{[^}]*width:\s*auto;[^}]*flex-direction:\s*column/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 
