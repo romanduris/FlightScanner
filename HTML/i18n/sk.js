@@ -90,7 +90,6 @@
       "detail.arrival": "Prílet",
       "detail.schedule": "Všetky dni a časy odletov v mesiaci",
       "detail.noSchedule": "Časy nie sú dostupné",
-      "detail.openAirline": "Otvoriť stránku {airline} ↗",
       "return.eyebrow": "Cesta späť",
       "return.title": "Spiatočné lety do Bratislavy",
       "return.period": "{period} · ceny za 1 dospelého",

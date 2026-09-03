@@ -20,10 +20,6 @@
     "RYANAIR": "https://assets.ryanair.com/resources/ui/ryanair3.0/favicons/apple-touch-icon-152x152.png",
     "Wizz Air": "https://commons.wikimedia.org/wiki/Special:FilePath/Wizz_Air_logo_2015.svg?width=120",
   };
-  const airlineSites = {
-    "RYANAIR": "https://www.ryanair.com/",
-    "Wizz Air": "https://www.wizzair.com/",
-  };
   const flights = offers.flatMap((offer) => {
     const outboundOffers = Array.isArray(offer.outbound_offers) && offer.outbound_offers.length
       ? offer.outbound_offers
@@ -549,7 +545,6 @@
         <h3 class="schedule-title">${t("detail.schedule")}</h3>
         <div class="schedule-list">${schedule || t("detail.noSchedule")}</div>
         ${renderReturnOffers(offer)}
-        <a class="booking-link ${cssClass}" href="${airlineSites[offer.airline] || "#"}" target="_blank" rel="noopener">${t("detail.openAirline", { airline: escapeHtml(offer.airline) })}</a>
       </div>`;
     if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();
     focusRouteOnMap(offer);

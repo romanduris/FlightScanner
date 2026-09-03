@@ -262,9 +262,6 @@ td strong { color: var(--ink); }
 .return-price strong { margin-top: 2px; font-size: 12px; }
 .return-total strong { margin-top: 2px; color: var(--blue); font-size: 14px; }
 .return-empty { padding: 14px; color: var(--muted); border: 1px dashed #cbd6e4; border-radius: 8px; background: #f8fafc; text-align: center; }
-.booking-link { display: block; margin-top: 17px; padding: 10px; color: white; border-radius: 7px; background: var(--blue); font-weight: 850; text-align: center; text-decoration: none; }
-.booking-link.wizz { background: var(--pink); }
-
 footer { display: flex; justify-content: space-between; gap: 20px; max-width: 1540px; margin: 0 auto; padding: 0 22px 24px; color: #77869a; font-size: 9px; }
 footer a { color: inherit; }
 

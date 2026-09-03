@@ -102,7 +102,6 @@
       "detail.arrival": "Arrival",
       "detail.schedule": "All departure days and times in the month",
       "detail.noSchedule": "Times are not available",
-      "detail.openAirline": "Open {airline} website ↗",
       "return.eyebrow": "Return journey",
       "return.title": "Return flights to Bratislava",
       "return.period": "{period} · prices for 1 adult",
