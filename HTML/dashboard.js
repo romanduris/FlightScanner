@@ -1,15 +1,17 @@
 (() => {
   "use strict";
 
+  const i18n = window.FlightI18n;
+  const { t } = i18n;
   const payload = window.FLIGHT_DATA;
   if (!payload || !Array.isArray(payload.offers)) {
-    document.body.innerHTML = '<main class="empty-state"><strong>Chýbajú dáta dashboardu</strong><span>Spusti: python3 3.GenerateDashboard.py</span></main>';
+    document.body.innerHTML = `<main class="empty-state"><strong>${t("data.missingTitle")}</strong><span>${t("data.missingBody")}</span></main>`;
     return;
   }
 
   const offers = payload.offers;
-  const weekdays = ["Pon", "Uto", "Str", "Štv", "Pia", "Sob", "Ned"];
-  const monthNames = ["január", "február", "marec", "apríl", "máj", "jún", "júl", "august", "september", "október", "november", "december"];
+  const weekdays = i18n.weekdays;
+  const monthNames = i18n.months;
   const logoUrls = {
     "RYANAIR": "https://commons.wikimedia.org/wiki/Special:FilePath/Ryanair_logo.svg?width=260",
     "Wizz Air": "https://commons.wikimedia.org/wiki/Special:FilePath/Wizz_Air_logo_2015.svg?width=260",
@@ -94,18 +96,18 @@
   }
 
   function euro(value) {
-    return new Intl.NumberFormat("sk-SK", { style: "currency", currency: "EUR" }).format(value);
+    return new Intl.NumberFormat(i18n.locale, { style: "currency", currency: "EUR" }).format(value);
   }
 
   function integer(value) {
-    return new Intl.NumberFormat("sk-SK").format(value);
+    return new Intl.NumberFormat(i18n.locale).format(value);
   }
 
   function duration(minutes) {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
     const rest = minutes % 60;
-    return `${hours} h ${String(rest).padStart(2, "0")} min`;
+    return t("duration.value", { hours, minutes: String(rest).padStart(2, "0") });
   }
 
   function flag(countryCode) {
@@ -118,14 +120,20 @@
     if (!value) return "—";
     const [date, time = ""] = value.split("T");
     const [year, month, day] = date.split("-").map(Number);
-    return `${day}. ${monthNames[month - 1]}${withYear ? ` ${year}` : ""}${time ? ` · ${time}` : ""}`;
+    const formatted = t("date.long", {
+      day,
+      month: monthNames[month - 1],
+      year: withYear ? ` ${year}` : "",
+    });
+    return `${formatted}${time ? ` · ${time}` : ""}`;
   }
 
   function shortDate(value) {
     if (!value) return ["—", "—"];
     const [date, time] = value.split("T");
     const [year, month, day] = date.split("-");
-    return [`${day}.${month}.${year}`, time || "—"];
+    const formatted = i18n.language === "en" ? `${day}/${month}/${year}` : `${day}.${month}.${year}`;
+    return [formatted, time || "—"];
   }
 
   function isoDate(value) {
@@ -143,7 +151,7 @@
   function calendarDate(value) {
     const parsed = value instanceof Date ? value : isoDate(value);
     if (!parsed) return "—";
-    return new Intl.DateTimeFormat("sk-SK", {
+    return new Intl.DateTimeFormat(i18n.locale, {
       day: "numeric",
       month: "long",
       timeZone: "UTC",
@@ -165,7 +173,7 @@
   function rangeDateLabel(value) {
     const parsed = value instanceof Date ? value : isoDate(value);
     if (!parsed) return "—";
-    const formattedDate = new Intl.DateTimeFormat("sk-SK", {
+    const formattedDate = new Intl.DateTimeFormat(i18n.locale, {
       day: "numeric",
       month: "numeric",
       year: "numeric",
@@ -208,25 +216,44 @@
     return `<img src="${url}" alt="${escapeHtml(airline)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('strong'),{textContent:this.alt}))">`;
   }
 
+  function displayDestination(offer) {
+    return i18n.destinationName(offer.destination_iata, offer.destination_name);
+  }
+
+  function displayCountry(offer) {
+    return i18n.countryName(offer.country_code, offer.country);
+  }
+
+  function translatedSchedule(value) {
+    const [day, ...rest] = String(value || "").split(" ");
+    const index = ["Pon", "Uto", "Str", "Štv", "Pia", "Sob", "Ned"].indexOf(day);
+    return `${index >= 0 ? weekdays[index] : day}${rest.length ? ` ${rest.join(" ")}` : ""}`;
+  }
+
   function populateDestinations() {
     const matchingOffers = state.country
-      ? offers.filter((offer) => offer.country === state.country)
+      ? offers.filter((offer) => offer.country_code === state.country)
       : offers;
     const destinations = new Map();
-    matchingOffers.forEach((offer) => destinations.set(offer.destination_iata, offer.destination_name));
-    const sortedDestinations = [...destinations.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, "sk"));
+    matchingOffers.forEach((offer) => destinations.set(offer.destination_iata, displayDestination(offer)));
+    const sortedDestinations = [...destinations.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, i18n.locale));
 
     if (state.destination && !destinations.has(state.destination)) state.destination = "";
     elements.destination.innerHTML = [
-      '<option value="">Všetky destinácie</option>',
+      `<option value="">${t("filters.allDestinations")}</option>`,
       ...sortedDestinations.map(([iata, name]) => `<option value="${escapeHtml(iata)}">${escapeHtml(name)} (${escapeHtml(iata)})</option>`),
     ].join("");
     elements.destination.value = state.destination;
   }
 
   function populateControls() {
-    const countries = [...new Set(offers.map((offer) => offer.country))].sort((a, b) => a.localeCompare(b, "sk"));
-    elements.country.insertAdjacentHTML("beforeend", countries.map((country) => `<option>${escapeHtml(country)}</option>`).join(""));
+    const countries = new Map();
+    offers.forEach((offer) => countries.set(offer.country_code, displayCountry(offer)));
+    const sortedCountries = [...countries.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, i18n.locale));
+    elements.country.innerHTML = [
+      `<option value="">${t("filters.allCountries")}</option>`,
+      ...sortedCountries.map(([code, name]) => `<option value="${escapeHtml(code)}">${escapeHtml(name)}</option>`),
+    ].join("");
     populateDestinations();
     elements.weekdays.innerHTML = weekdays.map((day) => `<button type="button" data-weekday="${day}" aria-pressed="false">${day}</button>`).join("");
     elements.price.max = maxPrice;
@@ -234,7 +261,7 @@
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
     elements.planningWindow.max = planningStartDays.length - 1;
-    elements.planningRangeNote.textContent = `${scanDays} dní dát · krok ${planningStepDays} dní`;
+    elements.planningRangeNote.textContent = t("results.rangeNote", { days: scanDays, step: planningStepDays });
     renderPlanningStops();
     syncDetailedDateRange();
     updatePlanningWindowLabels();
@@ -253,11 +280,11 @@
         <article class="airline-card">
           <div class="airline-logo">${airlineLogo(airline)}</div>
           <div class="airline-meta">
-            <span>Trasy<strong>${airlineOffers.length}</strong></span>
-            <span>Krajiny<strong>${countries}</strong></span>
-            <span>Priemer<strong>${euro(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length)}</strong></span>
+            <span>${t("summary.routes")}<strong>${airlineOffers.length}</strong></span>
+            <span>${t("summary.countries")}<strong>${countries}</strong></span>
+            <span>${t("summary.average")}<strong>${euro(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length)}</strong></span>
           </div>
-          <div class="airline-best"><span>od</span><strong>${euro(best)}</strong></div>
+          <div class="airline-best"><span>${t("summary.from")}</span><strong>${euro(best)}</strong></div>
         </article>`;
     }).join("");
   }
@@ -319,7 +346,7 @@
     const lastVisibleDate = addDays(payload.start_date, state.lastVisibleDay);
     const filtered = flights.filter((offer) => {
       const departureDate = isoDate(offer.departure_local);
-      return (!state.country || offer.country === state.country)
+      return (!state.country || offer.country_code === state.country)
         && (!state.destination || offer.destination_iata === state.destination)
         && (!state.selectedWeekdays.size || state.selectedWeekdays.has(weekdayFor(offer.departure_local)))
         && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
@@ -332,14 +359,14 @@
       const valueA = a[state.sortKey] ?? "";
       const valueB = b[state.sortKey] ?? "";
       if (typeof valueA === "number" && typeof valueB === "number") return (valueA - valueB) * direction;
-      return String(valueA).localeCompare(String(valueB), "sk", { numeric: true }) * direction;
+      return String(valueA).localeCompare(String(valueB), i18n.locale, { numeric: true }) * direction;
     });
   }
 
   function renderStats(items) {
     document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
-    document.querySelector("#stat-routes-total").textContent = `z ${totalDestinations} destinácií`;
-    document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country)).size;
+    document.querySelector("#stat-routes-total").textContent = t("overview.destinationCount", { count: totalDestinations });
+    document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country_code)).size;
   }
 
   function availableReturnOffers(offer) {
@@ -371,12 +398,12 @@
       return `
         <tr class="${selected}" data-offer-id="${escapeHtml(`${offer.airline}|${offer.destination_iata}|${offer.departure_local}`)}" tabindex="0">
           <td class="column-airline"><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
-          <td class="column-destination"><span class="destination-cell">${flag(offer.country_code)}<span class="destination-copy"><strong>${escapeHtml(offer.destination_name)}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></span></td>
+          <td class="column-destination"><span class="destination-cell">${flag(offer.country_code)}<span class="destination-copy"><strong>${escapeHtml(displayDestination(offer))}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></span></td>
           <td class="column-flight"><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
-          <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} miestny čas</small></span></td>
+          <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} ${t("results.localTime")}</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? "spolu —" : `${euro(offer.price + returnPrice)}*`}</small></td>
+          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? t("results.totalUnavailable") : `${euro(offer.price + returnPrice)}*`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");
@@ -405,17 +432,17 @@
     const windowDays = Number(payload.return_window_days) || 10;
     const firstDay = addDays(offer.departure_local, 1);
     const lastDay = addDays(offer.departure_local, windowDays);
-    const period = firstDay && lastDay ? `${calendarDate(firstDay)} – ${calendarDate(lastDay)}` : "nasledujúcich 10 dní";
+    const period = firstDay && lastDay ? `${calendarDate(firstDay)} – ${calendarDate(lastDay)}` : t("return.nextDays");
     let content = "";
 
     if (!Array.isArray(offer.return_offers)) {
-      content = '<div class="return-empty">Spiatočné lety ešte nie sú v dátach. Spusti scanner znova.</div>';
+      content = `<div class="return-empty">${t("return.noData")}</div>`;
     } else if (offer.return_search_error) {
-      content = '<div class="return-empty">Spiatočné lety sa pri poslednom skene nepodarilo načítať.</div>';
+      content = `<div class="return-empty">${t("return.error")}</div>`;
     } else {
       const availableReturns = availableReturnOffers(offer);
       if (!availableReturns.length) {
-        content = '<div class="return-empty">V tomto období sa nenašiel žiadny priamy let späť do Bratislavy.</div>';
+        content = `<div class="return-empty">${t("return.none")}</div>`;
       } else {
         const lowestReturnPrice = Math.min(...availableReturns.map((item) => item.price));
         content = `<div class="return-list">${availableReturns.map((item) => {
@@ -426,9 +453,9 @@
                 <strong>${returnDate(item.departure_local)}</strong>
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
               </div>
-              <span class="return-badge">${cheapest ? "Najlacnejší návrat" : ""}</span>
-              <div class="return-price"><span>Cesta späť</span><strong>${euro(item.price)}</strong></div>
-              <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>`;
+              <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>
+              <div class="return-price"><span>${t("return.journey")}</span><strong>${euro(item.price)}</strong></div>
+              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(offer.price + item.price)}</strong></div>`;
           return window.FlightBookingButtons.createReturnButton({
             airline: offer.airline,
             trip: {
@@ -439,7 +466,13 @@
               adults: 1,
             },
             className: `return-option${cheapest ? " cheapest" : ""}`,
-            label: `Otvoriť ${offer.airline}: ${offer.origin_iata || "BTS"} – ${offer.destination_iata}, ${String(offer.departure_local).slice(0, 10)} – ${String(item.departure_local).slice(0, 10)}`,
+            label: t("return.bookingLabel", {
+              airline: offer.airline,
+              origin: offer.origin_iata || "BTS",
+              destination: offer.destination_iata,
+              outbound: String(offer.departure_local).slice(0, 10),
+              returnDate: String(item.departure_local).slice(0, 10),
+            }),
             content: optionContent,
           });
         }).join("")}</div>`;
@@ -449,8 +482,8 @@
     return `
       <section class="return-section">
         <div class="return-heading">
-          <div><span class="eyebrow">Cesta späť</span><h3>Spiatočné lety do Bratislavy</h3></div>
-          <small>${period} · ceny za 1 dospelého</small>
+          <div><span class="eyebrow">${t("return.eyebrow")}</span><h3>${t("return.title")}</h3></div>
+          <small>${t("return.period", { period })}</small>
         </div>
         ${content}
       </section>`;
@@ -458,7 +491,7 @@
 
   function showOffer(offer) {
     state.selectedOffer = offer;
-    const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(item)}</span>`).join("");
+    const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(translatedSchedule(item))}</span>`).join("");
     const cssClass = airlineClass(offer.airline);
     const returnPrice = cheapestReturnPrice(offer);
     const roundTripPrice = returnPrice == null ? null : Number(offer.price) + returnPrice;
@@ -472,24 +505,24 @@
             <span class="detail-plane">✈</span>
             <small>${duration(offer.duration_minutes)}</small>
           </div>
-          <div><b>${escapeHtml(offer.destination_iata)}</b><small>${escapeHtml(offer.destination_name)}, ${escapeHtml(offer.country)}</small></div>
+          <div><b>${escapeHtml(offer.destination_iata)}</b><small>${escapeHtml(displayDestination(offer))}, ${escapeHtml(displayCountry(offer))}</small></div>
         </div>
       </div>
       <div class="detail-body">
         <div class="detail-price">
-          <div><span>Cena vybraného odletu</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
-          <div><span>Najlacnejšia obojsmerná letenka</span><strong>${roundTripPrice == null ? "—" : euro(roundTripPrice)}</strong><small>tam + späť</small></div>
+          <div><span>${t("detail.selectedPrice")}</span><strong>${euro(offer.price)}</strong><small>${t("detail.oneWayFare")}</small></div>
+          <div><span>${t("detail.cheapestRoundTrip")}</span><strong>${roundTripPrice == null ? "—" : euro(roundTripPrice)}</strong><small>${t("detail.roundTrip")}</small></div>
         </div>
         <div class="detail-grid">
-          <div class="detail-item"><span>Krajina</span><strong>${flag(offer.country_code)} ${escapeHtml(offer.country)}</strong></div>
-          <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
-          <div class="detail-item"><span>Odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
-          <div class="detail-item"><span>Prílet</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
+          <div class="detail-item"><span>${t("detail.country")}</span><strong>${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))}</strong></div>
+          <div class="detail-item"><span>${t("detail.distance")}</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
+          <div class="detail-item"><span>${t("detail.departure")}</span><strong>${localDate(offer.departure_local, true)}</strong></div>
+          <div class="detail-item"><span>${t("detail.arrival")}</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
         </div>
-        <h3 class="schedule-title">Všetky dni a časy odletov v mesiaci</h3>
-        <div class="schedule-list">${schedule || "Časy nie sú dostupné"}</div>
+        <h3 class="schedule-title">${t("detail.schedule")}</h3>
+        <div class="schedule-list">${schedule || t("detail.noSchedule")}</div>
         ${renderReturnOffers(offer)}
-        <a class="booking-link ${cssClass}" href="${airlineSites[offer.airline] || "#"}" target="_blank" rel="noopener">Otvoriť stránku ${escapeHtml(offer.airline)} ↗</a>
+        <a class="booking-link ${cssClass}" href="${airlineSites[offer.airline] || "#"}" target="_blank" rel="noopener">${t("detail.openAirline", { airline: escapeHtml(offer.airline) })}</a>
       </div>`;
     if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();
     focusRouteOnMap(offer);
@@ -511,7 +544,7 @@
     const origin = payload.origin;
     L.circleMarker([origin.latitude, origin.longitude], {
       radius: 8, color: "#fff", weight: 3, fillColor: "#f4ce24", fillOpacity: 1,
-    }).bindPopup("<strong>Bratislava (BTS)</strong><br>Všetky lety odlietajú odtiaľto.").addTo(map);
+    }).bindPopup(`<strong>Bratislava (BTS)</strong><br>${t("map.originPopup")}`).addTo(map);
   }
 
   function renderMap(items) {
@@ -536,11 +569,11 @@
       }).addTo(routeLayer);
       marker.bindPopup(`
         <div class="map-popup">
-          <strong>${escapeHtml(offer.destination_name)} (${escapeHtml(offer.destination_iata)})</strong>
-          <div class="popup-route">${flag(offer.country_code)} ${escapeHtml(offer.country)} · ${escapeHtml(offer.airline)}</div>
-          <div class="popup-line"><span>Cena od</span><b>${euro(offer.price)}</b></div>
-          <div class="popup-line"><span>Dĺžka</span><b>${duration(offer.duration_minutes)}</b></div>
-          <button type="button" data-map-offer="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}">Detail letu</button>
+          <strong>${escapeHtml(displayDestination(offer))} (${escapeHtml(offer.destination_iata)})</strong>
+          <div class="popup-route">${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))} · ${escapeHtml(offer.airline)}</div>
+          <div class="popup-line"><span>${t("map.priceFrom")}</span><b>${euro(offer.price)}</b></div>
+          <div class="popup-line"><span>${t("map.duration")}</span><b>${duration(offer.duration_minutes)}</b></div>
+          <button type="button" data-map-offer="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}">${t("map.flightDetail")}</button>
         </div>`);
       marker.on("popupopen", (event) => {
         const button = event.popup.getElement()?.querySelector("[data-map-offer]");
@@ -606,7 +639,9 @@
       toggle.addEventListener("click", () => {
         const collapsed = toggle.getAttribute("aria-expanded") === "true";
         toggle.setAttribute("aria-expanded", String(!collapsed));
-        toggle.setAttribute("aria-label", `${collapsed ? "Zobraziť" : "Skryť"} ${toggle.dataset.sectionName}`);
+        toggle.setAttribute("aria-label", t(collapsed ? "collapse.show" : "collapse.hide", {
+          section: t(toggle.dataset.sectionKey),
+        }));
         section.classList.toggle("collapsed", collapsed);
         content.hidden = collapsed;
 
@@ -691,7 +726,7 @@
       ? rangeLabel
       : `${monthNames[payload.month - 1]} ${payload.year}`;
     const scanned = new Date(payload.scanned_at_utc);
-    document.querySelector("#scan-time").innerHTML = `<span class="scan-label">Dáta aktualizované</span><span class="scan-date">${scanned.toLocaleString("sk-SK", { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC</span>`;
+    document.querySelector("#scan-time").innerHTML = `<span class="scan-label">${t("header.updated")}</span><span class="scan-date">${scanned.toLocaleString(i18n.locale, { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC</span>`;
   }
 
   populateControls();

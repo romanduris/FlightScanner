@@ -127,7 +127,7 @@ global.window.FLIGHT_DATA.offers.push({
   }],
 });
 const collapseToggle = new Element();
-collapseToggle.dataset.sectionName = "filtre";
+collapseToggle.dataset.sectionKey = "filters.sectionName";
 collapseToggle.setAttribute("aria-expanded", "true");
 collapseToggle.setAttribute("aria-controls", "filters-content");
 const collapseSection = new Element();
@@ -138,6 +138,14 @@ global.document = {
   querySelector: element,
   querySelectorAll: (selector) => selector === "[data-collapsible]" ? [collapseSection] : [],
 };
+
+require(path.join(__dirname, "..", "HTML", "i18n", "sk.js"));
+require(path.join(__dirname, "..", "HTML", "i18n", "en.js"));
+require(path.join(__dirname, "..", "HTML", "i18n", "i18n.js"));
+assert.equal(window.FlightI18n.language, "sk");
+assert.equal(window.FlightI18n.t("filters.title"), "Lety z Bratislavy");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["filters.title"], "Flights from Bratislava");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.destinations.ATH, "Athens");
 
 require(path.join(__dirname, "..", "HTML", "booking", "booking-buttons.js"));
 require(path.join(__dirname, "..", "HTML", "booking", "ryanair.js"));
@@ -242,7 +250,7 @@ assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
 element("#date-from-filter").listeners.input({ target: { value: "0" } });
 
-element("#country-filter").listeners.change({ target: { value: "Grécko" } });
+element("#country-filter").listeners.change({ target: { value: "GR" } });
 assert.match(element("#destination-filter").innerHTML, /ATÉNY \(ATH\)/);
 assert.doesNotMatch(element("#destination-filter").innerHTML, /SKORŠÍ LET/);
 assert.match(rows.innerHTML, /ATÉNY/);
@@ -281,8 +289,8 @@ const javascript = fs.readFileSync(
   "utf8",
 );
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
-assert.match(html, /data-sort="departure_local">Odlet/);
-assert.match(html, /<span class="stat-label">Destinácie<\/span>/);
+assert.match(html, /data-sort="departure_local"[^>]*>[\s\S]{0,100}Odlet/);
+assert.match(html, /class="stat-label"[^>]*>Destinácie<\/span>/);
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
@@ -293,16 +301,16 @@ assert.doesNotMatch(html, /id="planning-window-(?:from|to)-filter"/);
 assert.match(html, /30-dňové obdobie[\s\S]+Rozsah podľa načítaných dát/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
-assert.match(html, /class="table-note table-note-bottom">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
+assert.match(html, /class="table-note table-note-bottom"[^>]*>\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
 const resultsHelp = html.match(/class="results-help">([\s\S]*?)<\/div>/)?.[1] || "";
 assert.doesNotMatch(resultsHelp, /Cena spolu:/);
-assert.match(html, /id="results-content"[\s\S]+class="table-note table-note-bottom">\* Cena spolu:/);
+assert.match(html, /id="results-content"[\s\S]+class="table-note table-note-bottom"[^>]*>\* Cena spolu:/);
 assert.match(html, /class="weekend-legend"[\s\S]+Svetlosivá označuje víkend/);
 assert.doesNotMatch(html, /id="planning-weekend-markers"/);
-assert.match(javascript, /class="scan-label">Dáta aktualizované/);
+assert.match(javascript, /class="scan-label">\$\{t\("header\.updated"\)\}/);
 assert.doesNotMatch(css, /\.scan-status span\s*\{\s*display:\s*none/);
 assert.doesNotMatch(html, /data-sort="country">Krajina/);
-assert.match(html, /class="column-destination"><button data-sort="destination_name">Destinácia/);
+assert.match(html, /class="column-destination"><button data-sort="destination_name">[\s\S]{0,100}Destinácia/);
 assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
 assert.equal((html.match(/data-collapsible/g) || []).length, 4);
@@ -318,11 +326,11 @@ assert.match(css, /\.table-note-bottom\s*\{[^}]*text-align:\s*right/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]+class="detail-plane"[\s\S]+duration\(offer\.duration_minutes\)/);
-assert.match(javascript, /Najlacnejšia obojsmerná letenka[\s\S]+roundTripPrice/);
+assert.match(javascript, /t\("detail\.cheapestRoundTrip"\)[\s\S]+roundTripPrice/);
 assert.match(javascript, /FlightBookingButtons\.createReturnButton/);
 assert.match(css, /\.detail-price > div:last-child\s*\{[^}]*text-align:\s*right/);
 assert.match(html, /booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
-assert.match(javascript, /<span>Krajina<\/span>[\s\S]+<span>Vzdialenosť<\/span>[\s\S]+<span>Odlet<\/span>[\s\S]+<span>Prílet<\/span>/);
+assert.match(javascript, /t\("detail\.country"\)[\s\S]+t\("detail\.distance"\)[\s\S]+t\("detail\.departure"\)[\s\S]+t\("detail\.arrival"\)/);
 assert.doesNotMatch(javascript, /Cena za hodinu|<span>Číslo letu<\/span>|<span>Dĺžka letu<\/span>|<span>Typ ceny<\/span>|<span>Časy<\/span>/);
 assert.match(css, /\.detail-flight\s*\{[^}]*flex-direction:\s*column/);
 assert.match(css, /\.collapsible-content\[hidden\]\s*\{\s*display:\s*none !important;/);
@@ -330,5 +338,8 @@ assert.match(css, /\.map-card\.collapsed \.section-header\s*\{[^}]*flex-directio
 assert.match(css, /\.map-card\.collapsed \.map-actions\s*\{[^}]*width:\s*auto;[^}]*flex-direction:\s*column/);
 assert.doesNotMatch(html, /data-max-price/);
 assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
+assert.match(html, /class="language-switcher"[\s\S]+data-language="sk"[\s\S]+data-language="en"/);
+assert.match(html, /i18n\/sk\.js[\s\S]+i18n\/en\.js[\s\S]+i18n\/i18n\.js[\s\S]+dashboard\.js/);
+assert.match(css, /\.language-switcher button\.active\s*\{[^}]*background:\s*var\(--yellow\)/);
 
 console.log("Dashboard filters, branding and map routes: OK");

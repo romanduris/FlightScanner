@@ -48,7 +48,13 @@ button { color: inherit; }
 .airport-code { padding: 5px 8px; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; font-weight: 900; letter-spacing: .7px; background: rgba(255,255,255,.08); }
 .route-arrow { color: var(--yellow); font-size: 17px; }
 .period-label { margin-left: 4px; color: #b8cae8; }
-.scan-status { justify-self: end; display: flex; align-items: center; gap: 7px; color: #bdcbe2; font-size: 10px; }
+.topbar-actions { display: flex; align-items: center; justify-self: end; gap: 12px; }
+.language-switcher { display: inline-flex; padding: 2px; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; background: rgba(255,255,255,.08); }
+.language-switcher button { min-width: 28px; height: 22px; padding: 0 5px; cursor: pointer; color: #bdcbe2; border: 0; border-radius: 4px; background: transparent; font-size: 9px; font-weight: 850; }
+.language-switcher button:hover { color: white; }
+.language-switcher button.active { color: var(--blue-dark); background: var(--yellow); }
+.language-switcher button:focus-visible { outline: 2px solid white; outline-offset: 2px; }
+.scan-status { display: flex; align-items: center; gap: 7px; color: #bdcbe2; font-size: 10px; }
 .scan-status i { width: 7px; height: 7px; border-radius: 50%; background: #45dda7; box-shadow: 0 0 0 4px rgba(69, 221, 167, .12); }
 #scan-time { display: flex; gap: 3px; }
 
@@ -276,6 +282,9 @@ footer a { color: inherit; }
 
 @media (max-width: 680px) {
   .topbar { height: 52px; padding: 0 14px; }
+  .topbar-actions { align-items: flex-end; flex-direction: column; gap: 2px; }
+  .language-switcher { padding: 1px; }
+  .language-switcher button { min-width: 25px; height: 16px; font-size: 8px; }
   .scan-status { max-width: 115px; gap: 6px; font-size: 8px; line-height: 1.15; text-align: right; }
   .scan-status i { flex: 0 0 auto; }
   #scan-time { align-items: flex-end; flex-direction: column; gap: 1px; }

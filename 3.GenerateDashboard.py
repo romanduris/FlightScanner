@@ -20,6 +20,9 @@ HTML_DIR = PROJECT_DIR / "HTML"
 LOCAL_ASSETS = (
     "dashboard.css",
     "flight-data.js",
+    "i18n/sk.js",
+    "i18n/en.js",
+    "i18n/i18n.js",
     "booking/booking-buttons.js",
     "booking/ryanair.js",
     "booking/wizzair.js",
