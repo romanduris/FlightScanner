@@ -368,12 +368,16 @@ assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]
 assert.match(javascript, /t\("detail\.cheapestRoundTrip"\)[\s\S]+roundTripPrice/);
 assert.match(javascript, /FlightBookingButtons\.createReturnButton/);
 assert.match(javascript, /BookingComLinks\.createButton/);
+assert.match(javascript, /roundLogoUrls[\s\S]+assets\.ryanair\.com[\s\S]+Wizz_Air_logo_2015\.svg/);
+assert.match(javascript, /roundAirlineLogo\(offer\.airline\)/);
 assert.match(css, /\.detail-price > div:last-child\s*\{[^}]*text-align:\s*right/);
 assert.match(html, /booking\/booking-com-config\.js[\s\S]+booking\/booking-com\.js[\s\S]+booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
 assert.match(css, /\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 112px/);
 assert.match(css, /\.hotel-booking-link\s*\{[^}]*background:\s*#064b9e/);
 assert.match(css, /\.return-option\s*\{[^}]*gap:\s*8px/);
 assert.match(css, /\.return-flight-link\s*\{[^}]*border:\s*1px solid var\(--line\)[^}]*border-radius:\s*8px/);
+assert.match(css, /\.return-airline-logo\s*\{[^}]*width:\s*30px[^}]*height:\s*30px[^}]*border-radius:\s*50%/);
+assert.match(css, /\.return-airline-logo\.wizz\s*\{[^}]*linear-gradient/);
 assert.match(css, /\.hotel-booking-link\s*\{[^}]*border-radius:\s*8px/);
 assert.match(css, /\.return-option\.cheapest \.return-flight-link\s*\{[^}]*background:\s*#f0fbf7/);
 assert.match(javascript, /t\("detail\.country"\)[\s\S]+t\("detail\.distance"\)[\s\S]+t\("detail\.departure"\)[\s\S]+t\("detail\.arrival"\)/);

@@ -239,7 +239,12 @@ td strong { color: var(--ink); }
 .return-list { display: grid; gap: 6px; }
 .return-option { display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: stretch; gap: 8px; min-height: 53px; }
 .return-option.no-hotel-link { grid-template-columns: 1fr; }
-.return-flight-link { position: relative; display: grid; grid-template-columns: minmax(135px, 1.2fr) minmax(90px, .8fr) minmax(70px, .65fr) minmax(95px, .85fr); align-items: center; gap: 8px; min-width: 0; padding: 8px 15px 8px 10px; color: inherit; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
+.return-flight-link { position: relative; display: grid; grid-template-columns: 30px minmax(125px, 1.2fr) minmax(82px, .8fr) minmax(66px, .65fr) minmax(90px, .85fr); align-items: center; gap: 8px; min-width: 0; padding: 8px 15px 8px 10px; color: inherit; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
+.return-airline-logo { position: relative; display: flex; width: 30px; height: 30px; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; }
+.return-airline-logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.return-airline-logo.wizz { background: linear-gradient(145deg, #72218e, #d20a7d); }
+.return-airline-logo.wizz::after { position: absolute; inset: 2px; border: 1px solid rgba(255, 255, 255, .9); border-radius: 50%; content: ""; }
+.return-airline-logo.wizz img { width: 25px; height: auto; filter: brightness(0) invert(1); object-fit: contain; }
 .return-flight-link::after { position: absolute; right: 3px; color: #718198; content: "↗"; font-size: 10px; opacity: .65; }
 .return-flight-link:hover { background: #edf3fb; }
 .return-flight-link:focus-visible, .hotel-booking-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
@@ -270,7 +275,7 @@ footer a { color: inherit; }
   .airline-summary { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
   .filter-grid { grid-template-columns: repeat(2, 1fr); }
   .detail-grid { grid-template-columns: repeat(2, 1fr); }
-  .return-flight-link { grid-template-columns: minmax(140px, 1fr) auto auto; }
+  .return-flight-link { grid-template-columns: 30px minmax(130px, 1fr) auto auto; }
   .return-badge { display: none; }
   table { min-width: 760px; }
   table .column-flight { display: none; }
@@ -327,10 +332,11 @@ footer a { color: inherit; }
   .return-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
   .return-heading small { text-align: left; }
   .return-option { grid-template-columns: minmax(0, 1fr) 98px; }
-  .return-flight-link { grid-template-columns: 1fr 1fr; gap: 7px 10px; padding-left: 6px; }
+  .return-flight-link { grid-template-columns: 30px 1fr 1fr; gap: 7px 8px; padding-left: 6px; }
   .hotel-booking-link { padding: 5px; }
   .hotel-booking-link strong { font-size: 12px; }
-  .return-when { grid-column: 1 / -1; }
+  .return-airline-logo { grid-row: 1 / span 2; }
+  .return-when { grid-column: 2 / -1; }
   .return-price { text-align: left; }
   footer { flex-direction: column; padding: 0 11px 18px; }
 }

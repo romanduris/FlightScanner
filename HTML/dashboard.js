@@ -16,6 +16,10 @@
     "RYANAIR": "https://commons.wikimedia.org/wiki/Special:FilePath/Ryanair_logo.svg?width=260",
     "Wizz Air": "https://commons.wikimedia.org/wiki/Special:FilePath/Wizz_Air_logo_2015.svg?width=260",
   };
+  const roundLogoUrls = {
+    "RYANAIR": "https://assets.ryanair.com/resources/ui/ryanair3.0/favicons/apple-touch-icon-152x152.png",
+    "Wizz Air": "https://commons.wikimedia.org/wiki/Special:FilePath/Wizz_Air_logo_2015.svg?width=120",
+  };
   const airlineSites = {
     "RYANAIR": "https://www.ryanair.com/",
     "Wizz Air": "https://www.wizzair.com/",
@@ -214,6 +218,12 @@
     const url = logoUrls[airline];
     if (!url) return `<strong>${escapeHtml(airline)}</strong>`;
     return `<img src="${url}" alt="${escapeHtml(airline)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('strong'),{textContent:this.alt}))">`;
+  }
+
+  function roundAirlineLogo(airline) {
+    const url = roundLogoUrls[airline];
+    if (!url) return "";
+    return `<span class="return-airline-logo ${airlineClass(airline)}" role="img" aria-label="${escapeHtml(airline)}"><img src="${url}" alt="" loading="lazy"></span>`;
   }
 
   function displayDestination(offer) {
@@ -449,6 +459,7 @@
           const time = String(item.departure_local || "").split("T")[1] || "—";
           const cheapest = item.price === lowestReturnPrice;
           const optionContent = `
+              ${roundAirlineLogo(offer.airline)}
               <div class="return-when">
                 <strong>${returnDate(item.departure_local)}</strong>
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
