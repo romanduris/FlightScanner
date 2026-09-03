@@ -237,6 +237,7 @@ assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]+class="detail-plane"[\s\S]+duration\(offer\.duration_minutes\)/);
 assert.match(javascript, /Najlacnejšia obojsmerná letenka[\s\S]+roundTripPrice/);
+assert.match(javascript, /<span>Krajina<\/span>[\s\S]+<span>Vzdialenosť<\/span>[\s\S]+<span>Odlet<\/span>[\s\S]+<span>Prílet<\/span>/);
 assert.doesNotMatch(javascript, /Cena za hodinu|<span>Číslo letu<\/span>|<span>Dĺžka letu<\/span>|<span>Typ ceny<\/span>|<span>Časy<\/span>/);
 assert.match(css, /\.detail-flight\s*\{[^}]*flex-direction:\s*column/);
 assert.match(css, /\.collapsible-content\[hidden\]\s*\{\s*display:\s*none !important;/);

@@ -387,8 +387,8 @@
           <div><span>Najlacnejšia obojsmerná letenka</span><strong>${roundTripPrice == null ? "—" : euro(roundTripPrice)}</strong><small>tam + späť</small></div>
         </div>
         <div class="detail-grid">
-          <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
           <div class="detail-item"><span>Krajina</span><strong>${flag(offer.country_code)} ${escapeHtml(offer.country)}</strong></div>
+          <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
           <div class="detail-item"><span>Odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
           <div class="detail-item"><span>Prílet</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
         </div>
