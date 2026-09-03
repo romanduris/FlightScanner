@@ -72,9 +72,11 @@
     dateFromOutput: document.querySelector("#date-from-output"),
     dateToOutput: document.querySelector("#date-to-output"),
     dateRange: document.querySelector("#date-range"),
+    dateWeekendMarkers: document.querySelector("#date-weekend-markers"),
     planningRange: document.querySelector("#planning-window-range"),
     planningFrom: document.querySelector("#planning-window-from-filter"),
     planningTo: document.querySelector("#planning-window-to-filter"),
+    planningWeekendMarkers: document.querySelector("#planning-weekend-markers"),
     planningWindowFrom: document.querySelector("#planning-window-from"),
     planningWindowTo: document.querySelector("#planning-window-to"),
     planningRangeNote: document.querySelector("#planning-range-note"),
@@ -172,6 +174,22 @@
     }).format(parsed);
   }
 
+  function isWeekendDay(dayOffset) {
+    const value = addDays(payload.start_date, dayOffset);
+    return value ? value.getUTCDay() === 0 || value.getUTCDay() === 6 : false;
+  }
+
+  function renderWeekendMarkers(element, firstDay, lastDay) {
+    const scale = Math.max(1, lastDay - firstDay);
+    const markerWidth = 100 / scale;
+    element.innerHTML = Array.from(
+      { length: lastDay - firstDay + 1 },
+      (_, index) => firstDay + index,
+    ).filter(isWeekendDay).map((dayOffset) => (
+      `<i class="weekend-marker" style="--weekend-left:${((dayOffset - firstDay) / scale) * 100}%;--weekend-width:${markerWidth}%"></i>`
+    )).join("");
+  }
+
   function airlineClass(airline) {
     return airline === "Wizz Air" ? "wizz" : "ryanair";
   }
@@ -245,6 +263,9 @@
     const scale = Math.max(1, planningEndDay - state.planningStartDay);
     elements.dateRange.style.setProperty("--range-from", `${((state.firstVisibleDay - state.planningStartDay) / scale) * 100}%`);
     elements.dateRange.style.setProperty("--range-to", `${((state.lastVisibleDay - state.planningStartDay) / scale) * 100}%`);
+    renderWeekendMarkers(elements.dateWeekendMarkers, state.planningStartDay, planningEndDay);
+    elements.dateFrom.classList.toggle("weekend-day", isWeekendDay(state.firstVisibleDay));
+    elements.dateTo.classList.toggle("weekend-day", isWeekendDay(state.lastVisibleDay));
   }
 
   function updatePlanningWindowLabels() {
@@ -258,6 +279,9 @@
     const scale = Math.max(1, lastScanDay);
     elements.planningRange.style.setProperty("--range-from", `${(state.planningStartDay / scale) * 100}%`);
     elements.planningRange.style.setProperty("--range-to", `${(planningEndDay / scale) * 100}%`);
+    renderWeekendMarkers(elements.planningWeekendMarkers, 0, lastScanDay);
+    elements.planningFrom.classList.toggle("weekend-day", isWeekendDay(state.planningStartDay));
+    elements.planningTo.classList.toggle("weekend-day", isWeekendDay(planningEndDay));
     const ariaValue = `${elements.planningWindowFrom.value} – ${elements.planningWindowTo.value}`;
     elements.planningFrom.setAttribute("aria-valuetext", ariaValue);
     elements.planningTo.setAttribute("aria-valuetext", ariaValue);

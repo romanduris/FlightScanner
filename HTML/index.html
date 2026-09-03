@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=202609030905474778650000">
+  <link rel="stylesheet" href="dashboard.css?v=20260903112446">
 </head>
 <body>
   <header class="topbar">
@@ -132,6 +132,7 @@
               <label for="planning-window-to-filter">Do <output id="planning-window-to">—</output></label>
             </div>
             <div id="planning-window-range" class="dual-range">
+              <div id="planning-weekend-markers" class="weekend-markers" aria-hidden="true"></div>
               <input id="planning-window-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Posunúť začiatok 30-dňového obdobia" aria-describedby="planning-range-note">
               <input id="planning-window-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Posunúť koniec 30-dňového obdobia" aria-describedby="planning-range-note">
             </div>
@@ -142,14 +143,15 @@
               <label for="date-to-filter">Do <output id="date-to-output">—</output></label>
             </div>
             <div id="date-range" class="dual-range">
+              <div id="date-weekend-markers" class="weekend-markers" aria-hidden="true"></div>
               <input id="date-from-filter" type="range" min="0" max="29" value="0" step="1" aria-label="Zobraziť lety od dátumu">
               <input id="date-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Zobraziť lety do dátumu">
             </div>
           </div>
+          <span class="weekend-legend"><i aria-hidden="true"></i>Zelená označuje víkend</span>
         </div>
         <div class="results-help">
           <p>Klikni na riadok pre kompletný rozpis letu.</p>
-          <p class="table-note">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
         </div>
       </div>
       <div id="results-content" class="collapsible-content">
@@ -174,6 +176,7 @@
             <span>Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.</span>
           </div>
         </div>
+        <p class="table-note table-note-bottom">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
       </div>
     </section>
   </main>
@@ -188,13 +191,13 @@
     <span>Mapa © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · logá sú majetkom aeroliniek</span>
   </footer>
 
-  <script src="flight-data.js?v=202609030905474778650000"></script>
+  <script src="flight-data.js?v=20260903112446"></script>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="dashboard.js?v=202609030905474778650000"></script>
+  <script src="dashboard.js?v=20260903112446"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

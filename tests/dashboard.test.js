@@ -164,8 +164,14 @@ assert.equal(element("#planning-window-to-filter").max, 89);
 assert.equal(element("#planning-window-from").value, "2. 9. 2026");
 assert.equal(element("#planning-window-to").value, "1. 10. 2026");
 assert.equal(element("#planning-range-note").textContent, "90 dní dát · krok 15 dní");
+assert.match(element("#planning-weekend-markers").innerHTML, /weekend-marker/);
+assert.match(element("#date-weekend-markers").innerHTML, /weekend-marker/);
 assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
+
+element("#date-from-filter").listeners.input({ target: { value: "3" } });
+assert.equal(element("#date-from-filter").classList.contains("weekend-day"), true);
+element("#date-from-filter").listeners.input({ target: { value: "0" } });
 
 element("#planning-window-from-filter").listeners.input({ target: { value: "45" } });
 assert.equal(element("#planning-window-from").value, "17. 10. 2026");
@@ -174,6 +180,8 @@ assert.equal(element("#date-from-output").value, "17. 10. 2026");
 assert.equal(element("#date-to-output").value, "15. 11. 2026");
 assert.equal(element("#date-from-filter").min, 45);
 assert.equal(element("#date-to-filter").max, 74);
+assert.equal(element("#planning-window-from-filter").classList.contains("weekend-day"), true);
+assert.equal(element("#planning-window-to-filter").classList.contains("weekend-day"), true);
 assert.doesNotMatch(rows.innerHTML, /10\.09\.2026|18\.09\.2026|28\.09\.2026/);
 
 element("#planning-window-to-filter").listeners.input({ target: { value: "44" } });
@@ -245,7 +253,11 @@ assert.match(html, /id="planning-window-from-filter"[\s\S]+id="planning-window-t
 assert.match(html, /30-dňové obdobie[\s\S]+Rozsah podľa načítaných dát/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
-assert.match(html, /class="table-note">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
+assert.match(html, /class="table-note table-note-bottom">\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
+const resultsHelp = html.match(/class="results-help">([\s\S]*?)<\/div>/)?.[1] || "";
+assert.doesNotMatch(resultsHelp, /Cena spolu:/);
+assert.match(html, /id="results-content"[\s\S]+class="table-note table-note-bottom">\* Cena spolu:/);
+assert.match(html, /class="weekend-legend"[\s\S]+Zelená označuje víkend/);
 assert.match(javascript, /class="scan-label">Dáta aktualizované/);
 assert.doesNotMatch(css, /\.scan-status span\s*\{\s*display:\s*none/);
 assert.doesNotMatch(html, /data-sort="country">Krajina/);
@@ -257,7 +269,9 @@ assert.match(html, /aria-controls="overview-content"/);
 assert.match(html, /aria-controls="filters-content"/);
 assert.match(html, /aria-controls="map-content"/);
 assert.match(html, /aria-controls="results-content"/);
-assert.match(html, /class="results-help">[\s\S]+class="table-note"/);
+assert.match(css, /input\.weekend-day::-(?:webkit-slider-thumb|moz-range-thumb)[^}]+background:\s*var\(--green\)/);
+assert.match(css, /\.results-help\s*\{[^}]*align-self:\s*flex-end;[^}]*text-align:\s*right/);
+assert.match(css, /\.table-note-bottom\s*\{[^}]*text-align:\s*right/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]+class="detail-plane"[\s\S]+duration\(offer\.duration_minutes\)/);
