@@ -31,10 +31,19 @@ aerolínií, naskenuje ceny a vygeneruje dáta stránky. Dáta stránky sú v
 
 Mapa a logá potrebujú internetové pripojenie. Tabuľka a filtre fungujú lokálne.
 
+## Booking.com affiliate odkazy
+
+Každý spiatočný let ponúka samostatný odkaz na Booking.com s predvolenou
+destináciou, dátumom príletu ako check-inom a dátumom spiatočného letu ako
+checkoutom. Po prijatí do affiliate programu stačí doplniť pridelené `aid` do
+`HTML/booking/booking-com-config.js`. Voliteľný `label` rozlišuje toto
+umiestnenie odkazu v affiliate reportoch. Do repozitára sa nevkladá žiadne API
+heslo ani secret.
+
 ## Automatická aktualizácia verejnej stránky
 
 Workflow `.github/workflows/refresh-dashboard.yml` spúšťa `Main.py` každý deň
-o 09:00, 12:00, 15:00 a 18:00 v časovom pásme `Europe/Bratislava`. Po úspešnom
+o 08:11 a 18:11 v časovom pásme `Europe/Bratislava`. Po úspešnom
 skene odošle obsah `HTML/` priamo na GitHub Pages toho istého verejného
 repozitára. Stránka je dostupná na adrese
 `https://romanduris.github.io/FlightScanner/` a nie je potrebný žiadny osobný

@@ -147,6 +147,44 @@ assert.equal(window.FlightI18n.t("filters.title"), "Lety z Bratislavy");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["filters.title"], "Flights from Bratislava");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.destinations.ATH, "Athens");
 
+require(path.join(__dirname, "..", "HTML", "booking", "booking-com-config.js"));
+require(path.join(__dirname, "..", "HTML", "booking", "booking-com.js"));
+const hotelUrl = new URL(window.BookingComLinks.buildUrl({
+  destinationIata: "NAP",
+  destinationName: "NEAPOL",
+  checkinDate: "2026-09-03T16:05",
+  checkoutDate: "2026-09-08T16:40",
+  adults: 1,
+}));
+assert.equal(hotelUrl.origin, "https://www.booking.com");
+assert.equal(hotelUrl.searchParams.get("ss"), "Naples");
+assert.equal(hotelUrl.searchParams.get("checkin"), "2026-09-03");
+assert.equal(hotelUrl.searchParams.get("checkout"), "2026-09-08");
+assert.equal(hotelUrl.searchParams.get("group_adults"), "1");
+assert.equal(hotelUrl.searchParams.get("no_rooms"), "1");
+assert.equal(hotelUrl.searchParams.has("aid"), false);
+window.BOOKING_COM_CONFIG.affiliateId = "123456";
+const affiliateHotelUrl = new URL(window.BookingComLinks.buildUrl({
+  destinationIata: "STN",
+  checkinDate: "2026-10-01",
+  checkoutDate: "2026-10-05",
+}));
+assert.equal(affiliateHotelUrl.searchParams.get("ss"), "London");
+assert.equal(affiliateHotelUrl.searchParams.get("aid"), "123456");
+assert.equal(affiliateHotelUrl.searchParams.get("label"), "flightscanner-return-stay");
+window.BOOKING_COM_CONFIG.affiliateId = "";
+const hotelButton = window.BookingComLinks.createButton({
+  stay: {
+    destinationIata: "NAP",
+    checkinDate: "2026-09-03",
+    checkoutDate: "2026-09-08",
+  },
+  label: "Hľadať ubytovanie",
+});
+assert.match(hotelButton, /class="hotel-booking-link"/);
+assert.match(hotelButton, /rel="noopener sponsored"/);
+assert.match(hotelButton, /Booking\.com/);
+
 require(path.join(__dirname, "..", "HTML", "booking", "booking-buttons.js"));
 require(path.join(__dirname, "..", "HTML", "booking", "ryanair.js"));
 require(path.join(__dirname, "..", "HTML", "booking", "wizzair.js"));
@@ -328,8 +366,11 @@ assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]+class="detail-plane"[\s\S]+duration\(offer\.duration_minutes\)/);
 assert.match(javascript, /t\("detail\.cheapestRoundTrip"\)[\s\S]+roundTripPrice/);
 assert.match(javascript, /FlightBookingButtons\.createReturnButton/);
+assert.match(javascript, /BookingComLinks\.createButton/);
 assert.match(css, /\.detail-price > div:last-child\s*\{[^}]*text-align:\s*right/);
-assert.match(html, /booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
+assert.match(html, /booking\/booking-com-config\.js[\s\S]+booking\/booking-com\.js[\s\S]+booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
+assert.match(css, /\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 112px/);
+assert.match(css, /\.hotel-booking-link\s*\{[^}]*background:\s*#064b9e/);
 assert.match(javascript, /t\("detail\.country"\)[\s\S]+t\("detail\.distance"\)[\s\S]+t\("detail\.departure"\)[\s\S]+t\("detail\.arrival"\)/);
 assert.doesNotMatch(javascript, /Cena za hodinu|<span>Číslo letu<\/span>|<span>Dĺžka letu<\/span>|<span>Typ ceny<\/span>|<span>Časy<\/span>/);
 assert.match(css, /\.detail-flight\s*\{[^}]*flex-direction:\s*column/);

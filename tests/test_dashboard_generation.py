@@ -23,6 +23,8 @@ class DashboardGenerationTest(unittest.TestCase):
                 '<script src="i18n/sk.js?v=old"></script>'
                 '<script src="i18n/en.js?v=old"></script>'
                 '<script src="i18n/i18n.js?v=old"></script>'
+                '<script src="booking/booking-com-config.js?v=old"></script>'
+                '<script src="booking/booking-com.js?v=old"></script>'
                 '<script src="booking/booking-buttons.js?v=old"></script>'
                 '<script src="booking/ryanair.js?v=old"></script>'
                 '<script src="booking/wizzair.js?v=old"></script>'
@@ -41,6 +43,12 @@ class DashboardGenerationTest(unittest.TestCase):
             self.assertIn("i18n/sk.js?v=202609021015301234560000", html)
             self.assertIn("i18n/en.js?v=202609021015301234560000", html)
             self.assertIn("i18n/i18n.js?v=202609021015301234560000", html)
+            self.assertIn(
+                "booking/booking-com-config.js?v=202609021015301234560000", html
+            )
+            self.assertIn(
+                "booking/booking-com.js?v=202609021015301234560000", html
+            )
             self.assertIn(
                 "booking/booking-buttons.js?v=202609021015301234560000", html
             )

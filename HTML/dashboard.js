@@ -456,7 +456,7 @@
               <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>
               <div class="return-price"><span>${t("return.journey")}</span><strong>${euro(item.price)}</strong></div>
               <div class="return-total"><span>${t("return.total")}</span><strong>${euro(offer.price + item.price)}</strong></div>`;
-          return window.FlightBookingButtons.createReturnButton({
+          const flightButton = window.FlightBookingButtons.createReturnButton({
             airline: offer.airline,
             trip: {
               originIata: offer.origin_iata || "BTS",
@@ -465,7 +465,7 @@
               returnDate: item.departure_local,
               adults: 1,
             },
-            className: `return-option${cheapest ? " cheapest" : ""}`,
+            className: "return-flight-link",
             label: t("return.bookingLabel", {
               airline: offer.airline,
               origin: offer.origin_iata || "BTS",
@@ -475,6 +475,22 @@
             }),
             content: optionContent,
           });
+          const hotelStay = {
+            destinationIata: offer.destination_iata,
+            destinationName: window.FLIGHT_TRANSLATIONS.en.destinations[offer.destination_iata] || displayDestination(offer),
+            checkinDate: offer.arrival_local || offer.departure_local,
+            checkoutDate: item.departure_local,
+            adults: 1,
+          };
+          const hotelButton = window.BookingComLinks.createButton({
+            stay: hotelStay,
+            label: t("hotel.bookingLabel", {
+              destination: displayDestination(offer),
+              checkin: String(hotelStay.checkinDate).slice(0, 10),
+              checkout: String(hotelStay.checkoutDate).slice(0, 10),
+            }),
+          });
+          return `<article class="return-option${cheapest ? " cheapest" : ""}${hotelButton ? "" : " no-hotel-link"}">${flightButton}${hotelButton}</article>`;
         }).join("")}</div>`;
       }
     }

@@ -102,6 +102,8 @@
       "return.journey": "Cesta späť",
       "return.total": "Spolu tam + späť",
       "return.bookingLabel": "Otvoriť {airline}: {origin} – {destination}, {outbound} – {returnDate}",
+      "hotel.cta": "Ubytovanie",
+      "hotel.bookingLabel": "Hľadať ubytovanie v destinácii {destination} od {checkin} do {checkout} na Booking.com",
       "collapse.show": "Zobraziť {section}",
       "collapse.hide": "Skryť {section}",
       "date.long": "{day}. {month}{year}",

@@ -23,6 +23,8 @@ LOCAL_ASSETS = (
     "i18n/sk.js",
     "i18n/en.js",
     "i18n/i18n.js",
+    "booking/booking-com-config.js",
+    "booking/booking-com.js",
     "booking/booking-buttons.js",
     "booking/ryanair.js",
     "booking/wizzair.js",

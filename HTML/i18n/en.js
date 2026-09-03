@@ -114,6 +114,8 @@
       "return.journey": "Return flight",
       "return.total": "Outbound + return",
       "return.bookingLabel": "Open {airline}: {origin} – {destination}, {outbound} – {returnDate}",
+      "hotel.cta": "Find a stay",
+      "hotel.bookingLabel": "Find accommodation in {destination} from {checkin} to {checkout} on Booking.com",
       "collapse.show": "Show {section}",
       "collapse.hide": "Hide {section}",
       "date.long": "{day} {month}{year}",

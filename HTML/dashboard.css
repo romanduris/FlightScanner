@@ -237,10 +237,17 @@ td strong { color: var(--ink); }
 .return-heading h3 { margin: 2px 0 0; font-size: 14px; }
 .return-heading small { color: var(--muted); font-size: 9px; text-align: right; }
 .return-list { display: grid; gap: 6px; }
-.return-option { position: relative; display: grid; grid-template-columns: minmax(150px, 1.2fr) minmax(105px, .9fr) minmax(82px, .7fr) minmax(110px, .9fr); align-items: center; gap: 10px; min-height: 53px; padding: 8px 24px 8px 10px; color: inherit; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
-.return-option::after { position: absolute; right: 8px; color: #718198; content: "↗"; font-size: 11px; opacity: .65; }
-.return-option:hover { border-color: #8ca8d1; box-shadow: 0 4px 12px rgba(20, 61, 127, .1); transform: translateY(-1px); }
-.return-option:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.return-option { display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: stretch; gap: 5px; min-height: 53px; padding: 4px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; transition: border-color .15s ease, box-shadow .15s ease; }
+.return-option.no-hotel-link { grid-template-columns: 1fr; }
+.return-flight-link { position: relative; display: grid; grid-template-columns: minmax(135px, 1.2fr) minmax(90px, .8fr) minmax(70px, .65fr) minmax(95px, .85fr); align-items: center; gap: 8px; min-width: 0; padding: 4px 15px 4px 6px; color: inherit; border-radius: 6px; text-decoration: none; }
+.return-flight-link::after { position: absolute; right: 3px; color: #718198; content: "↗"; font-size: 10px; opacity: .65; }
+.return-flight-link:hover { background: #edf3fb; }
+.return-flight-link:focus-visible, .hotel-booking-link:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.hotel-booking-link { position: relative; display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; padding: 5px 14px 5px 6px; overflow: hidden; color: white; border-radius: 6px; background: #064b9e; line-height: 1.05; text-align: center; text-decoration: none; transition: background .15s ease, transform .15s ease; }
+.hotel-booking-link:hover { background: #003b7d; transform: translateY(-1px); }
+.hotel-booking-link span { font-size: 7px; font-weight: 750; opacity: .82; }
+.hotel-booking-link strong { margin-top: 3px; color: white; font-size: 11px; white-space: nowrap; }
+.hotel-booking-link i { position: absolute; right: 5px; font-size: 9px; font-style: normal; opacity: .8; }
 .return-option.cheapest { border-color: #84c9b4; background: #f0fbf7; box-shadow: inset 3px 0 var(--green); }
 .return-when strong, .return-when span, .return-price span, .return-price strong, .return-total span, .return-total strong { display: block; }
 .return-when strong { font-size: 11px; }
@@ -264,7 +271,7 @@ footer a { color: inherit; }
   .airline-summary { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
   .filter-grid { grid-template-columns: repeat(2, 1fr); }
   .detail-grid { grid-template-columns: repeat(2, 1fr); }
-  .return-option { grid-template-columns: minmax(140px, 1fr) auto auto; }
+  .return-flight-link { grid-template-columns: minmax(140px, 1fr) auto auto; }
   .return-badge { display: none; }
   table { min-width: 760px; }
   table .column-flight { display: none; }
@@ -320,7 +327,10 @@ footer a { color: inherit; }
   .detail-body, .detail-hero { padding-left: 17px; padding-right: 17px; }
   .return-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
   .return-heading small { text-align: left; }
-  .return-option { grid-template-columns: 1fr 1fr; gap: 7px 12px; }
+  .return-option { grid-template-columns: minmax(0, 1fr) 98px; gap: 5px; }
+  .return-flight-link { grid-template-columns: 1fr 1fr; gap: 7px 10px; padding-left: 6px; }
+  .hotel-booking-link { padding-left: 4px; padding-right: 12px; }
+  .hotel-booking-link strong { font-size: 10px; }
   .return-when { grid-column: 1 / -1; }
   .return-price { text-align: left; }
   footer { flex-direction: column; padding: 0 11px 18px; }
