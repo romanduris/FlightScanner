@@ -191,7 +191,10 @@ td strong { color: var(--ink); }
 .detail-route > div:last-child { text-align: right; }
 .detail-route b { display: block; font-size: 31px; line-height: 1; }
 .detail-route small { color: #c8d7ef; }
-.detail-plane { color: var(--yellow); font-size: 23px; }
+.detail-flight { display: flex; align-items: center; flex-direction: column; gap: 2px; }
+.detail-flight strong { color: white; font-size: 11px; line-height: 1; }
+.detail-flight small { font-size: 9px; white-space: nowrap; }
+.detail-plane { color: var(--yellow); font-size: 23px; line-height: 1; }
 .detail-body { padding: 18px 26px 24px; }
 .detail-price { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
 .detail-price span { color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase; }

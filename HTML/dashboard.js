@@ -366,29 +366,31 @@
     state.selectedOffer = offer;
     const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(item)}</span>`).join("");
     const cssClass = airlineClass(offer.airline);
+    const returnPrice = cheapestReturnPrice(offer);
+    const roundTripPrice = returnPrice == null ? null : Number(offer.price) + returnPrice;
     elements.detail.innerHTML = `
       <div class="detail-hero ${cssClass}">
         <div class="detail-airline">${airlineLogo(offer.airline)}</div>
         <div class="detail-route">
           <div><b>BTS</b><small>Bratislava</small></div>
-          <span class="detail-plane">✈</span>
+          <div class="detail-flight">
+            <strong>${escapeHtml(offer.flight_number || "—")}</strong>
+            <span class="detail-plane">✈</span>
+            <small>${duration(offer.duration_minutes)}</small>
+          </div>
           <div><b>${escapeHtml(offer.destination_iata)}</b><small>${escapeHtml(offer.destination_name)}, ${escapeHtml(offer.country)}</small></div>
         </div>
       </div>
       <div class="detail-body">
         <div class="detail-price">
           <div><span>Cena vybraného odletu</span><strong>${euro(offer.price)}</strong><small>jednosmerný basic tarif</small></div>
-          <div><span>Cena za hodinu</span><strong>${offer.price_per_hour ? euro(offer.price_per_hour) : "—"}</strong></div>
+          <div><span>Najlacnejšia obojsmerná letenka</span><strong>${roundTripPrice == null ? "—" : euro(roundTripPrice)}</strong><small>tam + späť</small></div>
         </div>
         <div class="detail-grid">
-          <div class="detail-item"><span>Číslo letu</span><strong>${escapeHtml(offer.flight_number || "—")}</strong></div>
-          <div class="detail-item"><span>Dĺžka letu</span><strong>${duration(offer.duration_minutes)}</strong></div>
           <div class="detail-item"><span>Vzdialenosť</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
           <div class="detail-item"><span>Krajina</span><strong>${flag(offer.country_code)} ${escapeHtml(offer.country)}</strong></div>
           <div class="detail-item"><span>Odlet</span><strong>${localDate(offer.departure_local, true)}</strong></div>
           <div class="detail-item"><span>Prílet</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
-          <div class="detail-item"><span>Typ ceny</span><strong>Basic · jednosmerná</strong></div>
-          <div class="detail-item"><span>Časy</span><strong>Miestne časy letísk</strong></div>
         </div>
         <h3 class="schedule-title">Všetky dni a časy odletov v mesiaci</h3>
         <div class="schedule-list">${schedule || "Časy nie sú dostupné"}</div>
