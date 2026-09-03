@@ -575,7 +575,6 @@
       render();
     }));
     document.querySelector("#reset-filters").addEventListener("click", resetFilters);
-    document.querySelector("#fit-map").addEventListener("click", fitVisibleMap);
     document.querySelector("#close-detail").addEventListener("click", () => elements.dialog.close());
     elements.dialog.addEventListener("click", (event) => {
       if (event.target === elements.dialog) elements.dialog.close();
