@@ -237,7 +237,7 @@ td strong { color: var(--ink); }
 .return-heading h3 { margin: 2px 0 0; font-size: 14px; }
 .return-heading small { color: var(--muted); font-size: 9px; text-align: right; }
 .return-list { display: grid; gap: 6px; }
-.return-option { display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: stretch; gap: 4px; min-height: 53px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; transition: border-color .15s ease, box-shadow .15s ease; }
+.return-option { display: grid; grid-template-columns: minmax(0, 1fr) 112px; align-items: stretch; gap: 8px; min-height: 53px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; transition: border-color .15s ease, box-shadow .15s ease; }
 .return-option.no-hotel-link { grid-template-columns: 1fr; }
 .return-flight-link { position: relative; display: grid; grid-template-columns: minmax(135px, 1.2fr) minmax(90px, .8fr) minmax(70px, .65fr) minmax(95px, .85fr); align-items: center; gap: 8px; min-width: 0; padding: 8px 15px 8px 10px; color: inherit; text-decoration: none; }
 .return-flight-link::after { position: absolute; right: 3px; color: #718198; content: "↗"; font-size: 10px; opacity: .65; }

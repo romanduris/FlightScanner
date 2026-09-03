@@ -373,7 +373,7 @@ assert.match(html, /booking\/booking-com-config\.js[\s\S]+booking\/booking-com\.
 assert.match(css, /\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 112px/);
 assert.match(css, /\.hotel-booking-link\s*\{[^}]*background:\s*#064b9e/);
 assert.match(css, /\.return-option\s*\{[^}]*overflow:\s*hidden/);
-assert.match(css, /\.return-option\s*\{[^}]*gap:\s*4px/);
+assert.match(css, /\.return-option\s*\{[^}]*gap:\s*8px/);
 assert.match(javascript, /t\("detail\.country"\)[\s\S]+t\("detail\.distance"\)[\s\S]+t\("detail\.departure"\)[\s\S]+t\("detail\.arrival"\)/);
 assert.doesNotMatch(javascript, /Cena za hodinu|<span>Číslo letu<\/span>|<span>Dĺžka letu<\/span>|<span>Typ ceny<\/span>|<span>Časy<\/span>/);
 assert.match(css, /\.detail-flight\s*\{[^}]*flex-direction:\s*column/);
