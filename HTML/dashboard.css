@@ -11,7 +11,7 @@
   --pink: #c01878;
   --purple: #69269a;
   --green: #11966f;
-  --weekend: #586273;
+  --weekend: #aeb7c4;
   --shadow: 0 10px 28px rgba(24, 45, 78, .09);
   --radius: 14px;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -150,14 +150,12 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .dual-range input.weekend-day::-webkit-slider-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
 .dual-range input.weekend-day::-moz-range-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
 .dual-range input::-moz-range-track { background: transparent; }
-.planning-slider { position: relative; height: 18px; background: #d5dde9; background-position: center; background-repeat: no-repeat; background-size: 100% 4px; }
-.planning-stops { position: absolute; z-index: 2; inset: 6px 0; height: 6px; overflow: hidden; pointer-events: none; }
-.planning-stop { position: absolute; top: 0; left: var(--stop-left); width: 4px; height: 6px; background: white; transform: translateX(-50%); }
+.planning-slider { position: relative; height: 18px; background: linear-gradient(#d5dde9, #d5dde9) center / 100% 4px no-repeat; }
+.planning-stops { position: absolute; z-index: 2; inset: 7px 0; height: 4px; overflow: hidden; pointer-events: none; }
+.planning-stop { position: absolute; top: 0; left: var(--stop-left); width: 4px; height: 4px; background: white; transform: translateX(-50%); }
 .planning-slider input { position: absolute; z-index: 3; inset: 0; width: 100%; height: 18px; margin: 0; cursor: grab; appearance: none; background: transparent; }
 .planning-slider input::-webkit-slider-thumb { width: 14px; height: 14px; appearance: none; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
 .planning-slider input::-moz-range-thumb { width: 11px; height: 11px; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
-.planning-slider input.weekend-day::-webkit-slider-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
-.planning-slider input.weekend-day::-moz-range-thumb { background: var(--weekend); box-shadow: 0 0 0 1px var(--weekend); }
 .planning-slider input::-moz-range-track { background: transparent; }
 .table-note-bottom { margin: 0; padding: 8px 16px 10px; color: var(--muted); border-top: 1px solid #edf1f6; font-size: 7px; line-height: 1.3; text-align: right; }
 .table-scroll { overflow-x: auto; }

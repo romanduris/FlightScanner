@@ -76,7 +76,6 @@
     planningRange: document.querySelector("#planning-window-range"),
     planningWindow: document.querySelector("#planning-window-filter"),
     planningStops: document.querySelector("#planning-window-stops"),
-    planningWeekendMarkers: document.querySelector("#planning-weekend-markers"),
     planningWindowFrom: document.querySelector("#planning-window-from"),
     planningWindowTo: document.querySelector("#planning-window-to"),
     planningRangeNote: document.querySelector("#planning-range-note"),
@@ -197,11 +196,6 @@
     elements.planningStops.innerHTML = planningStartDays.map((_, index) => (
       `<i class="planning-stop" style="--stop-left:${(index / scale) * 100}%"></i>`
     )).join("");
-    elements.planningWeekendMarkers.innerHTML = planningStartDays.map((dayOffset, index) => (
-      { dayOffset, index }
-    )).filter(({ dayOffset }) => isWeekendDay(dayOffset)).map(({ index }) => (
-      `<i class="weekend-marker" style="--weekend-left:${(index / scale) * 100}%;--weekend-width:${100 / scale / 2}%"></i>`
-    )).join("");
   }
 
   function airlineClass(airline) {
@@ -289,7 +283,6 @@
     elements.planningWindowFrom.value = rangeDateLabel(start);
     elements.planningWindowTo.value = rangeDateLabel(end);
     elements.planningWindow.value = planningStartDays.indexOf(state.planningStartDay);
-    elements.planningWindow.classList.toggle("weekend-day", isWeekendDay(state.planningStartDay));
     const ariaValue = `${elements.planningWindowFrom.value} – ${elements.planningWindowTo.value}`;
     elements.planningWindow.setAttribute("aria-valuetext", ariaValue);
   }
