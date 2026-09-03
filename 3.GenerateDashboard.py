@@ -17,7 +17,14 @@ from services.airport_data import get_airport_info
 PROJECT_DIR = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_DIR / "Data"
 HTML_DIR = PROJECT_DIR / "HTML"
-LOCAL_ASSETS = ("dashboard.css", "flight-data.js", "dashboard.js")
+LOCAL_ASSETS = (
+    "dashboard.css",
+    "flight-data.js",
+    "booking/booking-buttons.js",
+    "booking/ryanair.js",
+    "booking/wizzair.js",
+    "dashboard.js",
+)
 
 
 def find_latest_data_file() -> Path:

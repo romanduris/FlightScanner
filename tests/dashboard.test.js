@@ -139,6 +139,48 @@ global.document = {
   querySelectorAll: (selector) => selector === "[data-collapsible]" ? [collapseSection] : [],
 };
 
+require(path.join(__dirname, "..", "HTML", "booking", "booking-buttons.js"));
+require(path.join(__dirname, "..", "HTML", "booking", "ryanair.js"));
+require(path.join(__dirname, "..", "HTML", "booking", "wizzair.js"));
+
+const ryanairBookingUrl = new URL(window.FlightBookingButtons.buildUrl("RYANAIR", {
+  originIata: "BTS",
+  destinationIata: "PMO",
+  outboundDate: "2026-09-02T13:45",
+  returnDate: "2026-09-08T10:55",
+  adults: 1,
+}));
+assert.equal(ryanairBookingUrl.origin, "https://www.ryanair.com");
+assert.equal(ryanairBookingUrl.searchParams.get("originIata"), "BTS");
+assert.equal(ryanairBookingUrl.searchParams.get("destinationIata"), "PMO");
+assert.equal(ryanairBookingUrl.searchParams.get("dateOut"), "2026-09-02");
+assert.equal(ryanairBookingUrl.searchParams.get("dateIn"), "2026-09-08");
+assert.equal(ryanairBookingUrl.searchParams.get("isReturn"), "true");
+
+const wizzBookingUrl = window.FlightBookingButtons.buildUrl("Wizz Air", {
+  originIata: "BTS",
+  destinationIata: "ALC",
+  outboundDate: "2026-10-23T05:40",
+  returnDate: "2026-10-28T09:30",
+  adults: 1,
+});
+assert.equal(wizzBookingUrl, "https://www.wizzair.com/en-gb/booking/select-flight/BTS/ALC/2026-10-23/2026-10-28/1/0/0/null");
+const returnButton = window.FlightBookingButtons.createReturnButton({
+  airline: "Wizz Air",
+  trip: {
+    originIata: "BTS",
+    destinationIata: "ALC",
+    outboundDate: "2026-10-23T05:40",
+    returnDate: "2026-10-28T09:30",
+  },
+  className: "return-option cheapest",
+  label: "Rezervovať spiatočný let",
+  content: "Obsah letu",
+});
+assert.match(returnButton, /^<a class="return-option cheapest"/);
+assert.match(returnButton, /target="_blank" rel="noopener"/);
+assert.match(returnButton, /BTS\/ALC\/2026-10-23\/2026-10-28/);
+
 require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 
 collapseToggle.listeners.click();
@@ -277,6 +319,9 @@ assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);
 assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]+class="detail-plane"[\s\S]+duration\(offer\.duration_minutes\)/);
 assert.match(javascript, /Najlacnejšia obojsmerná letenka[\s\S]+roundTripPrice/);
+assert.match(javascript, /FlightBookingButtons\.createReturnButton/);
+assert.match(css, /\.detail-price > div:last-child\s*\{[^}]*text-align:\s*right/);
+assert.match(html, /booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
 assert.match(javascript, /<span>Krajina<\/span>[\s\S]+<span>Vzdialenosť<\/span>[\s\S]+<span>Odlet<\/span>[\s\S]+<span>Prílet<\/span>/);
 assert.doesNotMatch(javascript, /Cena za hodinu|<span>Číslo letu<\/span>|<span>Dĺžka letu<\/span>|<span>Typ ceny<\/span>|<span>Časy<\/span>/);
 assert.match(css, /\.detail-flight\s*\{[^}]*flex-direction:\s*column/);

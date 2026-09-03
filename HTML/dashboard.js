@@ -421,16 +421,27 @@
         content = `<div class="return-list">${availableReturns.map((item) => {
           const time = String(item.departure_local || "").split("T")[1] || "—";
           const cheapest = item.price === lowestReturnPrice;
-          return `
-            <article class="return-option${cheapest ? " cheapest" : ""}">
+          const optionContent = `
               <div class="return-when">
                 <strong>${returnDate(item.departure_local)}</strong>
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
               </div>
               <span class="return-badge">${cheapest ? "Najlacnejší návrat" : ""}</span>
               <div class="return-price"><span>Cesta späť</span><strong>${euro(item.price)}</strong></div>
-              <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>
-            </article>`;
+              <div class="return-total"><span>Spolu tam + späť</span><strong>${euro(offer.price + item.price)}</strong></div>`;
+          return window.FlightBookingButtons.createReturnButton({
+            airline: offer.airline,
+            trip: {
+              originIata: offer.origin_iata || "BTS",
+              destinationIata: offer.destination_iata,
+              outboundDate: offer.departure_local,
+              returnDate: item.departure_local,
+              adults: 1,
+            },
+            className: `return-option${cheapest ? " cheapest" : ""}`,
+            label: `Otvoriť ${offer.airline}: ${offer.origin_iata || "BTS"} – ${offer.destination_iata}, ${String(offer.departure_local).slice(0, 10)} – ${String(item.departure_local).slice(0, 10)}`,
+            content: optionContent,
+          });
         }).join("")}</div>`;
       }
     }

@@ -20,6 +20,9 @@ class DashboardGenerationTest(unittest.TestCase):
             index_path.write_text(
                 '<link href="dashboard.css?v=old">'
                 '<script src="flight-data.js"></script>'
+                '<script src="booking/booking-buttons.js?v=old"></script>'
+                '<script src="booking/ryanair.js?v=old"></script>'
+                '<script src="booking/wizzair.js?v=old"></script>'
                 '<script src="dashboard.js?v=old"></script>',
                 encoding="utf-8",
             )
@@ -32,6 +35,11 @@ class DashboardGenerationTest(unittest.TestCase):
             html = index_path.read_text(encoding="utf-8")
             self.assertIn("dashboard.css?v=202609021015301234560000", html)
             self.assertIn("flight-data.js?v=202609021015301234560000", html)
+            self.assertIn(
+                "booking/booking-buttons.js?v=202609021015301234560000", html
+            )
+            self.assertIn("booking/ryanair.js?v=202609021015301234560000", html)
+            self.assertIn("booking/wizzair.js?v=202609021015301234560000", html)
             self.assertIn("dashboard.js?v=202609021015301234560000", html)
 
 
