@@ -158,8 +158,9 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .results-heading { display: grid; grid-template-areas: "heading range travellers"; grid-template-columns: minmax(120px, 1fr) minmax(300px, 500px) minmax(90px, 1fr); align-items: end; }
 .results-heading > .heading-with-toggle { grid-area: heading; }
 .results-date-controls { display: grid; grid-area: range; width: 100%; }
-.results-card.collapsed .results-heading { grid-template-areas: "heading travellers"; grid-template-columns: 1fr auto; }
+.results-card.collapsed .results-heading { display: flex; }
 .results-card.collapsed .results-date-controls { display: none; }
+.results-card.collapsed .traveller-picker { display: none; }
 .traveller-picker { display: grid; grid-area: travellers; justify-self: end; gap: 5px; color: var(--muted); font-size: 8px; font-weight: 800; }
 .traveller-stepper { display: grid; grid-template-columns: 25px 28px 25px; align-items: center; overflow: hidden; border: 1px solid #d7e1ee; border-radius: 7px; background: #f7f9fc; }
 .traveller-stepper button { height: 25px; padding: 0; cursor: pointer; color: var(--blue); border: 0; background: transparent; font-size: 14px; font-weight: 900; }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=5">
+  <link rel="stylesheet" href="statistics.css?v=6">
 </head>
 <body>
   <header class="topbar">
@@ -49,7 +49,7 @@
             <h2 id="traffic-title" data-text="trafficTitle">Ľudia na stránke</h2>
           </div>
         </div>
-        <span id="traffic-state" class="freshness loading" data-text="loading">Načítavam…</span>
+        <span id="traffic-state" class="freshness section-updated loading" data-text="loading">Načítavam…</span>
       </div>
       <div id="traffic-content" class="collapsible-content">
       <div id="traffic-cards" class="metric-grid metric-grid-five" aria-live="polite">
@@ -84,7 +84,7 @@
           <button class="section-toggle" type="button" aria-expanded="true" aria-controls="clicks-content" data-section-text="clicksTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow" data-text="clicksEyebrow">Interactions</span><h2 id="clicks-title" data-text="clicksTitle">What visitors click</h2></div>
         </div>
-        <span class="muted" data-text="clicksNote">anonymous totals for the selected period</span>
+        <div class="header-side"><span class="muted" data-text="clicksNote">anonymous totals for the selected period</span><span id="clicks-freshness" class="freshness section-updated">—</span></div>
       </div>
       <div id="clicks-content" class="collapsible-content">
       <div class="metric-grid metric-grid-four section-metrics">
@@ -102,7 +102,7 @@
           <button class="section-toggle" type="button" aria-expanded="true" aria-controls="performance-content" data-section-text="performanceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow" data-text="performanceEyebrow">Výkon</span><h2 id="performance-title" data-text="performanceTitle">Rýchlosť a stabilita stránky</h2></div>
         </div>
-        <span class="muted" data-text="realVisitors">merané u skutočných návštevníkov</span>
+        <div class="header-side"><span class="muted" data-text="realVisitors">merané u skutočných návštevníkov</span><span id="performance-freshness" class="freshness section-updated">—</span></div>
       </div>
       <div id="performance-content" class="collapsible-content">
       <div class="metric-grid metric-grid-five performance-grid">
@@ -121,7 +121,7 @@
           <button class="section-toggle" type="button" aria-expanded="true" aria-controls="scanner-content" data-section-text="scannerTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow" data-text="scannerEyebrow">Letové dáta</span><h2 id="scanner-title" data-text="scannerTitle">Aktuálny zber</h2></div>
         </div>
-        <span id="scan-freshness" class="freshness">—</span>
+        <span id="scan-freshness" class="freshness section-updated">—</span>
       </div>
       <div id="scanner-content" class="collapsible-content">
       <div class="metric-grid metric-grid-six">
@@ -142,7 +142,7 @@
           <button class="section-toggle" type="button" aria-expanded="true" aria-controls="runs-content" data-section-text="runsTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow">GitHub Actions</span><h2 id="runs-title" data-text="runsTitle">Posledné behy automatizácie</h2></div>
         </div>
-        <div class="run-summary"><span><b id="success-rate">—</b> <span data-text="successRate">úspešnosť</span></span><span><b id="average-duration">—</b> <span data-text="averageDuration">priemerné trvanie zberu</span></span></div>
+        <div class="header-side"><div class="run-summary"><span><b id="success-rate">—</b> <span data-text="successRate">úspešnosť</span></span><span><b id="average-duration">—</b> <span data-text="averageDuration">priemerné trvanie zberu</span></span></div><span id="runs-freshness" class="freshness section-updated">—</span></div>
       </div>
       <div id="runs-content" class="collapsible-content">
       <div class="table-wrap">
@@ -161,7 +161,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=5"></script>
+  <script src="statistics.js?v=6"></script>
   <script src="engagement.js?v=4"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>

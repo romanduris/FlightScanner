@@ -194,11 +194,11 @@
     const available = traffic?.available === true;
     byId("traffic-unavailable").hidden = available;
     const refreshedAt = liveData?.generated_at_utc;
-    byId("traffic-state").textContent = available
-      ? `${text("live")} · ${text("updatedAt")} ${exactDateTime(refreshedAt)}`
-      : text("noData");
+    byId("traffic-state").textContent = `${available ? text("live") : text("noData")} · ${updatedStamp(refreshedAt)}`;
     byId("traffic-state").classList.toggle("loading", !available);
     byId("page-refreshed").textContent = `${text("lastRefreshed")}: ${exactDateTime(refreshedAt || staticData?.generated_at_utc)}`;
+    byId("clicks-freshness").textContent = updatedStamp(refreshedAt);
+    byId("performance-freshness").textContent = updatedStamp(refreshedAt);
     const summary = traffic?.summary || {};
     setMetric("metric-visits", available ? number(summary.visits) : "—");
     setMetric("metric-pageviews", available ? number(summary.pageviews) : "—");
@@ -233,6 +233,10 @@
     return language === "sk" ? `Aktualizované pred ${hours} h` : `Updated ${hours} h ago`;
   }
 
+  function updatedStamp(value) {
+    return value ? `${scanAge(value)} · ${exactDateTime(value)}` : "—";
+  }
+
   function renderScanner() {
     const current = staticData?.current || {};
     setMetric("scan-flights", number(current.flights));
@@ -243,7 +247,7 @@
     setMetric("scan-through", date(current.period_end));
     setMetric("scan-days", current.scan_days ? `${current.scan_days} ${text("days")}` : "—");
     setMetric("scan-period", `${date(current.period_start)} – ${date(current.period_end)}`);
-    byId("scan-freshness").textContent = `${scanAge(current.scanned_at_utc)} · ${exactDateTime(current.scanned_at_utc)}`;
+    byId("scan-freshness").textContent = updatedStamp(current.scanned_at_utc);
     const target = byId("airline-grid");
     target.replaceChildren();
     (current.airlines || []).forEach((airline) => {
@@ -275,6 +279,7 @@
     const completed = runs.filter((run) => run.status === "completed");
     const successful = completed.filter((run) => run.conclusion === "success");
     const scans = completed.filter((run) => ["schedule", "workflow_dispatch"].includes(run.event) && run.duration_seconds != null);
+    byId("runs-freshness").textContent = updatedStamp(liveData?.generated_at_utc);
     setMetric("success-rate", completed.length ? `${number(successful.length / completed.length * 100)} %` : "—");
     setMetric("average-duration", scans.length ? duration(scans.reduce((sum, run) => sum + run.duration_seconds, 0) / scans.length) : "—");
     const body = byId("runs-table");
