@@ -59,6 +59,8 @@ assert.equal(translatedText.textContent, "Flights from Bratislava");
 assert.equal(translatedAria.attributes["aria-label"], "Page language");
 assert.equal(window.FlightI18n.destinationName("ATH", "ATÉNY"), "Athens");
 assert.equal(window.FlightI18n.countryName("GR", "Grécko"), "Greece");
+assert.equal(window.FLIGHT_TRANSLATIONS.sk.text["contact.title"], "Napíšte nám");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["contact.title"], "Write to us");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "HTML", "index.html"), "utf8");
 const dashboard = fs.readFileSync(path.join(__dirname, "..", "HTML", "dashboard.js"), "utf8");
