@@ -47,6 +47,15 @@ jobs:
         if: github.event_name != 'push'
         run: python3 Main.py --days "$SCAN_DAYS"
 
+      - name: Preserve latest scan on code-only deploy
+        if: github.event_name == 'push'
+        run: python3 scripts/preserve_production_data.py
+
+      - name: Build public statistics data
+        run: python3 scripts/build_statistics.py
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 

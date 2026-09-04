@@ -7,6 +7,10 @@
     {
       "pattern": "btsflightscaner.rodulab.com/api/contact*",
       "zone_name": "rodulab.com"
+    },
+    {
+      "pattern": "btsflightscaner.rodulab.com/api/statistics*",
+      "zone_name": "rodulab.com"
     }
   ],
   "send_email": [
@@ -17,6 +21,7 @@
   "vars": {
     "ALLOWED_ORIGIN": "https://btsflightscaner.rodulab.com",
     "EXPECTED_HOSTNAME": "btsflightscaner.rodulab.com",
+    "CLOUDFLARE_ACCOUNT_ID": "033ec39e1948bd5785d92d1993a8036f",
     "CONTACT_FROM_EMAIL": "contact@notify.rodulab.com"
   },
   "secrets": {

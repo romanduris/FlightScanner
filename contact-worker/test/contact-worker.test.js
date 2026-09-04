@@ -104,3 +104,76 @@ test("an invalid Turnstile result prevents delivery", async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test("statistics combine GitHub runs with anonymous Cloudflare aggregates", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).includes("api.github.com")) {
+      return Response.json({ workflow_runs: [{
+        id: 42,
+        event: "schedule",
+        status: "completed",
+        conclusion: "success",
+        run_started_at: "2026-09-04T08:00:00Z",
+        updated_at: "2026-09-04T08:05:30Z",
+        html_url: "https://github.com/example/run/42",
+        head_sha: "abcdef123456",
+      }] });
+    }
+    if (String(url).includes("/analytics_engine/sql")) {
+      return Response.json({ data: [{ seconds: 240, sessions: 2 }] });
+    }
+    const body = JSON.parse(options.body);
+    if (body.query.includes("query Traffic")) {
+      return Response.json({ data: { viewer: { accounts: [{
+        totals: [{ count: 12, sum: { visits: 8 } }],
+        trend: [{ count: 12, sum: { visits: 8 }, dimensions: { date: "2026-09-04" } }],
+        countries: [{ count: 7, dimensions: { countryName: "SK" } }],
+        devices: [{ count: 6, dimensions: { deviceType: "mobile" } }],
+        browsers: [{ count: 8, dimensions: { userAgentBrowser: "Chrome" } }],
+        operatingSystems: [{ count: 5, dimensions: { userAgentOS: "Android" } }],
+        pages: [{ count: 12, dimensions: { requestPath: "/" } }],
+        referrers: [{ count: 4, dimensions: { refererHost: "" } }],
+      }] } } });
+    }
+    return Response.json({ data: { viewer: { accounts: [{
+      performance: [{ avg: { pageLoadTime: 900, firstContentfulPaint: 300 } }],
+      vitals: [{ avg: { largestContentfulPaint: 800, interactionToNextPaint: 70, cumulativeLayoutShift: 0.02, firstContentfulPaint: 280 } }],
+    }] } } });
+  };
+  try {
+    const env = {
+      ...environment(async () => {}),
+      CLOUDFLARE_ACCOUNT_ID: "account-id",
+      CLOUDFLARE_ANALYTICS_TOKEN: "analytics-token",
+    };
+    const response = await worker.fetch(new Request(`${ORIGIN}/api/statistics?days=7`), env);
+    const result = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(result.github.runs[0].duration_seconds, 330);
+    assert.equal(result.traffic.summary.visits, 8);
+    assert.equal(result.traffic.summary.average_engagement_seconds, 120);
+    assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("engagement stores only an ephemeral session, page, device, country and seconds", async () => {
+  let point = null;
+  const env = {
+    ...environment(async () => {}),
+    ENGAGEMENT: { writeDataPoint(value) { point = value; } },
+  };
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/statistics/engagement`, {
+    method: "POST",
+    headers: { Origin: ORIGIN, "Content-Type": "application/json", "Sec-CH-UA-Mobile": "?1" },
+    body: JSON.stringify({ session: "temporary-session", seconds: 30, path: "/statistics/" }),
+  }), env);
+  assert.equal(response.status, 202);
+  assert.deepEqual(point, {
+    blobs: ["/statistics/", "mobile", "XX"],
+    doubles: [30],
+    indexes: ["temporary-session"],
+  });
+});

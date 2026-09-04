@@ -38,3 +38,20 @@ npm test
 ```
 
 The public form intentionally stays disabled when the Worker or Turnstile configuration is unavailable.
+
+## Statistics API
+
+The same Worker serves `/api/statistics`. GitHub Actions metadata is public. Cloudflare traffic data requires a secret named `CLOUDFLARE_ANALYTICS_TOKEN` with **Account Analytics: Read** permission.
+
+To enable anonymous active-time measurement, first enable **Workers > Analytics Engine** in Cloudflare, then add this binding to `wrangler.jsonc` and redeploy:
+
+```json
+"analytics_engine_datasets": [
+  {
+    "binding": "ENGAGEMENT",
+    "dataset": "flightscanner_engagement"
+  }
+]
+```
+
+No IP address, cookie, email address, or browser fingerprint is written to this dataset.

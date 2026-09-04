@@ -138,6 +138,7 @@
       "data.missingTitle": "Chýbajú dáta dashboardu",
       "data.missingBody": "Spusti: python3 3.GenerateDashboard.py",
       "footer.prices": "BTSFLIGHTSCANER · ceny sú dynamické a môžu sa pri rezervácii zmeniť",
+      "footer.statistics": "Štatistiky",
       "footer.mapPrefix": "Mapa ©",
       "footer.logos": "logá sú majetkom aeroliniek"
     }

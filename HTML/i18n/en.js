@@ -150,6 +150,7 @@
       "data.missingTitle": "Dashboard data is missing",
       "data.missingBody": "Run: python3 3.GenerateDashboard.py",
       "footer.prices": "BTSFLIGHTSCANER · prices are dynamic and may change during booking",
+      "footer.statistics": "Statistics",
       "footer.mapPrefix": "Map ©",
       "footer.logos": "airline logos belong to their respective owners"
     }

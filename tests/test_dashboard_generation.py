@@ -29,7 +29,8 @@ class DashboardGenerationTest(unittest.TestCase):
                 '<script src="booking/ryanair.js?v=old"></script>'
                 '<script src="booking/wizzair.js?v=old"></script>'
                 '<script src="dashboard.js?v=old"></script>'
-                '<script src="contact/contact.js?v=old"></script>',
+                '<script src="contact/contact.js?v=old"></script>'
+                '<script src="statistics/engagement.js?v=old"></script>',
                 encoding="utf-8",
             )
 
@@ -57,6 +58,9 @@ class DashboardGenerationTest(unittest.TestCase):
             self.assertIn("booking/wizzair.js?v=202609021015301234560000", html)
             self.assertIn("dashboard.js?v=202609021015301234560000", html)
             self.assertIn("contact/contact.js?v=202609021015301234560000", html)
+            self.assertIn(
+                "statistics/engagement.js?v=202609021015301234560000", html
+            )
 
 
 if __name__ == "__main__":
