@@ -6,7 +6,7 @@ const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sit
 const MAX_REQUEST_BYTES = 16_384;
 const GITHUB_RUNS_URL = "https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs?per_page=40";
 const GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
-const STATISTICS_CACHE_VERSION = "2";
+const STATISTICS_CACHE_VERSION = "3";
 
 function jsonResponse(body, status = 200, origin = "") {
   const headers = {
@@ -140,7 +140,7 @@ function microsecondsToMilliseconds(value) {
 async function fetchEngagement(env, days) {
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return null;
   const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
-  const query = `SELECT SUM(double1) AS seconds, COUNT(DISTINCT index1) AS sessions FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY`;
+  const query = `SELECT SUM(double1) AS seconds, COUNT(DISTINCT index1) AS sessions FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double1 > 0`;
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },
@@ -154,16 +154,42 @@ async function fetchEngagement(env, days) {
   return Number(row.seconds || 0) / Number(row.sessions);
 }
 
+async function fetchClicks(env, days) {
+  const empty = { available: false, offer_opens: 0, ryanair: 0, wizz_air: 0, booking_com: 0 };
+  if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return empty;
+  const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
+  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double2 > 0 GROUP BY blob4, blob5`;
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },
+    body: query,
+    signal: AbortSignal.timeout(8_000),
+  });
+  if (!response.ok) return empty;
+  const result = await response.json();
+  const rows = result.data || result.result?.data || result.result || [];
+  const totals = { ...empty, available: true };
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const clicks = Number(row.clicks || 0);
+    if (row.click_event === "offer_open") totals.offer_opens += clicks;
+    if (row.click_event === "airline_booking" && row.provider === "RYANAIR") totals.ryanair += clicks;
+    if (row.click_event === "airline_booking" && row.provider === "Wizz Air") totals.wizz_air += clicks;
+    if (row.click_event === "booking_com") totals.booking_com += clicks;
+  }
+  return totals;
+}
+
 async function fetchTraffic(env, days) {
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.EXPECTED_HOSTNAME) {
     return { available: false, reason: "not_configured" };
   }
   const start = new Date(Date.now() - days * 86_400_000).toISOString();
   const variables = { accountTag: env.CLOUDFLARE_ACCOUNT_ID, start, host: env.EXPECTED_HOSTNAME };
-  const [page, performance, engagement] = await Promise.all([
+  const [page, performance, engagement, clicks] = await Promise.all([
     graphql(env, PAGELOAD_QUERY, variables),
     graphql(env, PERFORMANCE_QUERY, variables),
     fetchEngagement(env, days),
+    fetchClicks(env, days),
   ]);
   const total = page.totals?.[0] || {};
   const timings = performance.performance?.[0]?.avg || {};
@@ -187,6 +213,7 @@ async function fetchTraffic(env, days) {
     operating_systems: aggregateGroups(page.operatingSystems, "userAgentOS"),
     pages: aggregateGroups(page.pages, "requestPath"),
     referrers: aggregateGroups(page.referrers, "refererHost"),
+    clicks,
   };
 }
 
@@ -212,6 +239,24 @@ async function recordEngagement(request, env, origin) {
     const seconds = Math.round(Number(input.seconds));
     const session = cleanText(input.session, 64);
     const path = cleanText(input.path, 120);
+    const event = cleanText(input.event, 32);
+    const provider = cleanText(input.provider, 32);
+    const allowedEvents = new Set(["offer_open", "airline_booking", "booking_com"]);
+    if (event) {
+      const validProvider = event === "booking_com"
+        ? provider === "Booking.com"
+        : ["RYANAIR", "Wizz Air"].includes(provider);
+      if (!session || !path.startsWith("/") || !allowedEvents.has(event) || !validProvider) {
+        return jsonResponse({ ok: false, error: "invalid_request" }, 400, origin);
+      }
+      const mobile = request.headers.get("Sec-CH-UA-Mobile") === "?1" ? "mobile" : "desktop";
+      env.ENGAGEMENT.writeDataPoint({
+        blobs: [path, mobile, request.cf?.country || "XX", event, provider],
+        doubles: [0, 1],
+        indexes: [session],
+      });
+      return jsonResponse({ ok: true }, 202, origin);
+    }
     if (!session || !path.startsWith("/") || !Number.isFinite(seconds) || seconds < 1 || seconds > 120) {
       return jsonResponse({ ok: false, error: "invalid_request" }, 400, origin);
     }

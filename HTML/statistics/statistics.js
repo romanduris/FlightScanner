@@ -21,6 +21,9 @@
       privacy: "súkromie bez cookies a sledovania jednotlivcov", live: "Aktuálne dáta", noData: "Zatiaľ bez dát", direct: "Priamy vstup", scan: "Zber dát", deploy: "Nasadenie", manual: "Ručný zber",
       success: "Úspešný", failure: "Chyba", cancelled: "Zrušený", in_progress: "Prebieha", queued: "Čaká", open: "Otvoriť", days: "dní", ago: "dozadu",
       lastRefreshed: "Naposledy obnovené", updatedAt: "údaje z",
+      clicksEyebrow: "Interakcie", clicksTitle: "Na čo návštevníci klikajú", clicksNote: "anonymné súčty za vybrané obdobie",
+      offersOpened: "Otvorené ponuky", flightDetails: "zobrazené detaily letov", ryanairClicks: "Kliknutia na Ryanair", wizzClicks: "Kliknutia na Wizz Air",
+      bookingClicks: "Kliknutia na Booking.com", airlineBooking: "odkaz na rezerváciu letu", accommodationLink: "odkaz na ubytovanie",
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
     en: {
@@ -42,6 +45,9 @@
       privacy: "privacy without cookies or individual tracking", live: "Live data", noData: "No data yet", direct: "Direct", scan: "Data scan", deploy: "Deployment", manual: "Manual scan",
       success: "Successful", failure: "Failed", cancelled: "Cancelled", in_progress: "Running", queued: "Queued", open: "Open", days: "days", ago: "ago",
       lastRefreshed: "Last refreshed", updatedAt: "data from",
+      clicksEyebrow: "Interactions", clicksTitle: "What visitors click", clicksNote: "anonymous totals for the selected period",
+      offersOpened: "Offers opened", flightDetails: "flight details displayed", ryanairClicks: "Ryanair clicks", wizzClicks: "Wizz Air clicks",
+      bookingClicks: "Booking.com clicks", airlineBooking: "airline booking link", accommodationLink: "accommodation link",
       newRoutes: "new", removedRoutes: "removed", noChanges: "No change since the previous scan", flights: "flights", returns: "returns", errors: "errors",
     },
   };
@@ -188,6 +194,11 @@
     barList("os-list", traffic?.operating_systems);
     barList("page-list", traffic?.pages);
     barList("referrer-list", traffic?.referrers);
+    const clicks = traffic?.clicks;
+    setMetric("click-offers", clicks?.available ? number(clicks.offer_opens) : "—");
+    setMetric("click-ryanair", clicks?.available ? number(clicks.ryanair) : "—");
+    setMetric("click-wizz", clicks?.available ? number(clicks.wizz_air) : "—");
+    setMetric("click-booking", clicks?.available ? number(clicks.booking_com) : "—");
   }
 
   function scanAge(value) {

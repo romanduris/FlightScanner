@@ -43,7 +43,7 @@ The public form intentionally stays disabled when the Worker or Turnstile config
 
 The same Worker serves `/api/statistics`. GitHub Actions metadata is public. Cloudflare traffic data requires a secret named `CLOUDFLARE_ANALYTICS_TOKEN` with **Account Analytics: Read** permission.
 
-Anonymous active-time measurement uses the following Analytics Engine binding:
+Anonymous active-time measurement and aggregate clicks on flight details, airline booking links, and Booking.com use the following Analytics Engine binding:
 
 ```json
 "analytics_engine_datasets": [
@@ -54,4 +54,4 @@ Anonymous active-time measurement uses the following Analytics Engine binding:
 ]
 ```
 
-The Cloudflare account must have Workers Analytics Engine enabled before deployment. No IP address, cookie, email address, or browser fingerprint is written to this dataset.
+The Cloudflare account must have Workers Analytics Engine enabled before deployment. No IP address, cookie, email address, or browser fingerprint is written to this dataset. Click statistics follow the selected 24-hour, 7-day, 30-day, or 90-day period and may be delayed by the five-minute statistics cache.

@@ -196,6 +196,7 @@ const hotelButton = window.BookingComLinks.createButton({
   label: "Hľadať ubytovanie",
 });
 assert.match(hotelButton, /class="hotel-booking-link"/);
+assert.match(hotelButton, /data-stat-click="booking_com" data-stat-provider="Booking\.com"/);
 assert.match(hotelButton, /rel="noopener sponsored"/);
 assert.match(hotelButton, /<strong><span>Booking<\/span><span>\.com<\/span><\/strong>/);
 assert.doesNotMatch(hotelButton, /Ubytovanie|Find a stay|↗/);
@@ -240,6 +241,7 @@ const returnButton = window.FlightBookingButtons.createReturnButton({
 });
 assert.match(returnButton, /^<a class="return-option cheapest"/);
 assert.match(returnButton, /target="_blank" rel="noopener"/);
+assert.match(returnButton, /data-stat-click="airline_booking" data-stat-provider="Wizz Air"/);
 assert.match(returnButton, /BTS\/ALC\/2026-10-23\/2026-10-28/);
 
 const renderedRows = [];

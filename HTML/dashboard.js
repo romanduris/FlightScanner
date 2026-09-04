@@ -585,6 +585,7 @@
   }
 
   function showOffer(offer) {
+    window.FlightStatistics?.trackClick("offer_open", offer.airline);
     state.selectedOffer = offer;
     const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(translatedSchedule(item))}</span>`).join("");
     const cssClass = airlineClass(offer.airline);

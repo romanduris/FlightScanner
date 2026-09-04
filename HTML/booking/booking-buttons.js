@@ -40,7 +40,7 @@
   function createReturnButton({ airline, trip, className = "", label, content }) {
     const href = buildUrl(airline, trip);
     if (!href) return `<div class="${escapeAttribute(className)}">${content}</div>`;
-    return `<a class="${escapeAttribute(className)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener" aria-label="${escapeAttribute(label)}" title="${escapeAttribute(label)}">${content}</a>`;
+    return `<a class="${escapeAttribute(className)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener" data-stat-click="airline_booking" data-stat-provider="${escapeAttribute(airline)}" aria-label="${escapeAttribute(label)}" title="${escapeAttribute(label)}">${content}</a>`;
   }
 
   window.FlightBookingButtons = { register, buildUrl, createReturnButton };

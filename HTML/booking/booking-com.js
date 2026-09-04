@@ -65,7 +65,7 @@
   function createButton({ stay, label }) {
     const href = buildUrl(stay);
     if (!href) return "";
-    return `<a class="hotel-booking-link" href="${escapeAttribute(href)}" target="_blank" rel="noopener sponsored" aria-label="${escapeAttribute(label)}" title="${escapeAttribute(label)}"><strong><span>Booking</span><span>.com</span></strong></a>`;
+    return `<a class="hotel-booking-link" href="${escapeAttribute(href)}" target="_blank" rel="noopener sponsored" data-stat-click="booking_com" data-stat-provider="Booking.com" aria-label="${escapeAttribute(label)}" title="${escapeAttribute(label)}"><strong><span>Booking</span><span>.com</span></strong></a>`;
   }
 
   window.BookingComLinks = { buildUrl, createButton };

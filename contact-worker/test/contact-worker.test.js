@@ -120,6 +120,15 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
         head_sha: "abcdef123456",
       }] });
     }
+    if (String(url).includes("/analytics_engine/sql") && String(options.body).includes("GROUP BY blob4")) {
+      return Response.json({ data: [
+        { click_event: "offer_open", provider: "RYANAIR", clicks: 9 },
+        { click_event: "offer_open", provider: "Wizz Air", clicks: 4 },
+        { click_event: "airline_booking", provider: "RYANAIR", clicks: 3 },
+        { click_event: "airline_booking", provider: "Wizz Air", clicks: 2 },
+        { click_event: "booking_com", provider: "Booking.com", clicks: 5 },
+      ] });
+    }
     if (String(url).includes("/analytics_engine/sql")) {
       return Response.json({ data: [{ seconds: 240, sessions: 2 }] });
     }
@@ -155,6 +164,13 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     assert.equal(result.traffic.summary.average_engagement_seconds, 120);
     assert.equal(result.traffic.summary.page_load_ms, 900);
     assert.equal(result.traffic.summary.lcp_ms, 800);
+    assert.deepEqual(result.traffic.clicks, {
+      available: true,
+      offer_opens: 13,
+      ryanair: 3,
+      wizz_air: 2,
+      booking_com: 5,
+    });
     assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
   } finally {
     globalThis.fetch = originalFetch;
@@ -176,6 +192,30 @@ test("engagement stores only an ephemeral session, page, device, country and sec
   assert.deepEqual(point, {
     blobs: ["/statistics/", "mobile", "XX"],
     doubles: [30],
+    indexes: ["temporary-session"],
+  });
+});
+
+test("click events store anonymous event and provider counters", async () => {
+  let point = null;
+  const env = {
+    ...environment(async () => {}),
+    ENGAGEMENT: { writeDataPoint(value) { point = value; } },
+  };
+  const response = await worker.fetch(new Request(`${ORIGIN}/api/statistics/engagement`, {
+    method: "POST",
+    headers: { Origin: ORIGIN, "Content-Type": "application/json", "Sec-CH-UA-Mobile": "?1" },
+    body: JSON.stringify({
+      session: "temporary-session",
+      path: "/",
+      event: "airline_booking",
+      provider: "Wizz Air",
+    }),
+  }), env);
+  assert.equal(response.status, 202);
+  assert.deepEqual(point, {
+    blobs: ["/", "mobile", "XX", "airline_booking", "Wizz Air"],
+    doubles: [0, 1],
     indexes: ["temporary-session"],
   });
 });
