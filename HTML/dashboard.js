@@ -101,6 +101,13 @@
     return new Intl.NumberFormat(i18n.locale).format(value);
   }
 
+  function decimal(value) {
+    return new Intl.NumberFormat(i18n.locale, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(value);
+  }
+
   function duration(minutes) {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
@@ -312,17 +319,17 @@
       return result;
     }, {});
     document.querySelector("#airline-summary").innerHTML = Object.entries(groups).map(([airline, airlineOffers]) => {
-      const best = Math.min(...airlineOffers.map((offer) => offer.price));
       const countries = new Set(airlineOffers.map((offer) => offer.country)).size;
+      const dailyFlights = flights.filter((offer) => offer.airline === airline).length / scanDays;
       return `
         <article class="airline-card">
           <div class="airline-logo">${airlineLogo(airline)}</div>
           <div class="airline-meta">
             <span>${t("summary.routes")}<strong>${airlineOffers.length}</strong></span>
             <span>${t("summary.countries")}<strong>${countries}</strong></span>
-            <span>${t("summary.average")}<strong>${euro(groupPrice(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length))}</strong></span>
+            <span>${t("summary.flightsPerDay")}<strong>${decimal(dailyFlights)}</strong></span>
           </div>
-          <div class="airline-best"><span>${t("summary.from")}</span><strong>${euro(groupPrice(best))}</strong></div>
+          <div class="airline-best"><span>${t("summary.dataUntil")}</span><strong>${numericDateWithWeekday(payload.end_date)}</strong></div>
         </article>`;
     }).join("");
   }
@@ -424,6 +431,7 @@
     document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
     document.querySelector("#stat-routes-total").textContent = t("overview.destinationCount", { count: totalDestinations });
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country_code)).size;
+    document.querySelector("#stat-flights").textContent = integer(items.length);
   }
 
   function availableReturnOffers(offer) {
