@@ -137,8 +137,8 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
       }] } } });
     }
     return Response.json({ data: { viewer: { accounts: [{
-      performance: [{ avg: { pageLoadTime: 900, firstContentfulPaint: 300 } }],
-      vitals: [{ avg: { largestContentfulPaint: 800, interactionToNextPaint: 70, cumulativeLayoutShift: 0.02, firstContentfulPaint: 280 } }],
+      performance: [{ avg: { pageLoadTime: 900000, firstContentfulPaint: 300000 } }],
+      vitals: [{ avg: { largestContentfulPaint: 800000, interactionToNextPaint: 70000, cumulativeLayoutShift: 0.02, firstContentfulPaint: 280000 } }],
     }] } } });
   };
   try {
@@ -153,6 +153,8 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     assert.equal(result.github.runs[0].duration_seconds, 330);
     assert.equal(result.traffic.summary.visits, 8);
     assert.equal(result.traffic.summary.average_engagement_seconds, 120);
+    assert.equal(result.traffic.summary.page_load_ms, 900);
+    assert.equal(result.traffic.summary.lcp_ms, 800);
     assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
   } finally {
     globalThis.fetch = originalFetch;

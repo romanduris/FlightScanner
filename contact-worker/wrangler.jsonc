@@ -13,6 +13,12 @@
       "zone_name": "rodulab.com"
     }
   ],
+  "analytics_engine_datasets": [
+    {
+      "binding": "ENGAGEMENT",
+      "dataset": "flightscanner_engagement"
+    }
+  ],
   "send_email": [
     {
       "name": "EMAIL"
@@ -28,7 +34,8 @@
     "required": [
       "CONTACT_EMAIL",
       "TURNSTILE_SECRET",
-      "TURNSTILE_SITE_KEY"
+      "TURNSTILE_SITE_KEY",
+      "CLOUDFLARE_ANALYTICS_TOKEN"
     ]
   },
   "observability": {

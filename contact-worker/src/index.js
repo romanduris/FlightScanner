@@ -6,6 +6,7 @@ const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sit
 const MAX_REQUEST_BYTES = 16_384;
 const GITHUB_RUNS_URL = "https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs?per_page=40";
 const GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
+const STATISTICS_CACHE_VERSION = "2";
 
 function jsonResponse(body, status = 200, origin = "") {
   const headers = {
@@ -132,6 +133,10 @@ function aggregateTrend(groups) {
   return [...totals.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
 
+function microsecondsToMilliseconds(value) {
+  return value == null ? null : Number(value) / 1000;
+}
+
 async function fetchEngagement(env, days) {
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return null;
   const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
@@ -169,10 +174,10 @@ async function fetchTraffic(env, days) {
       visits: Number(total.sum?.visits || 0),
       pageviews: Number(total.count || 0),
       average_engagement_seconds: engagement,
-      page_load_ms: timings.pageLoadTime ?? null,
-      fcp_ms: vitals.firstContentfulPaint ?? timings.firstContentfulPaint ?? null,
-      lcp_ms: vitals.largestContentfulPaint ?? null,
-      inp_ms: vitals.interactionToNextPaint ?? null,
+      page_load_ms: microsecondsToMilliseconds(timings.pageLoadTime),
+      fcp_ms: microsecondsToMilliseconds(vitals.firstContentfulPaint ?? timings.firstContentfulPaint),
+      lcp_ms: microsecondsToMilliseconds(vitals.largestContentfulPaint),
+      inp_ms: microsecondsToMilliseconds(vitals.interactionToNextPaint),
       cls: vitals.cumulativeLayoutShift ?? null,
     },
     trend: aggregateTrend(page.trend),
@@ -367,7 +372,7 @@ export default {
     if (url.pathname === STATISTICS_PATH && request.method === "GET") {
       const days = [1, 7, 30, 90].includes(Number(url.searchParams.get("days"))) ? Number(url.searchParams.get("days")) : 30;
       const cache = globalThis.caches?.default;
-      const cacheKey = new Request(`${url.origin}${STATISTICS_PATH}?days=${days}`, request);
+      const cacheKey = new Request(`${url.origin}${STATISTICS_PATH}?days=${days}&v=${STATISTICS_CACHE_VERSION}`, request);
       const cached = cache ? await cache.match(cacheKey) : null;
       if (cached) return cached;
       const response = jsonResponse(await handleStatistics(env, days));
