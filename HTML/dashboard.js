@@ -34,14 +34,8 @@
   });
   const scanDays = Math.max(1, Number(payload.scan_days) || 30);
   const lastScanDay = scanDays - 1;
-  const planningWindowDays = Math.min(30, scanDays);
-  const planningStepDays = 15;
-  const lastPlanningStartDay = Math.max(0, scanDays - planningWindowDays);
-  const planningStartDays = Array.from(
-    { length: Math.floor(lastPlanningStartDay / planningStepDays) + 1 },
-    (_, index) => index * planningStepDays,
-  );
-  if (planningStartDays.at(-1) !== lastPlanningStartDay) planningStartDays.push(lastPlanningStartDay);
+  const visibleWindowDays = Math.min(30, scanDays);
+  const initialVisibleDay = defaultVisibleDay();
   const totalDestinations = new Set(offers.map((offer) => offer.destination_iata)).size;
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
@@ -50,9 +44,8 @@
     destination: "",
     maxPrice,
     maxDuration,
-    firstVisibleDay: 0,
-    lastVisibleDay: planningWindowDays - 1,
-    planningStartDay: 0,
+    firstVisibleDay: initialVisibleDay,
+    lastVisibleDay: Math.min(lastScanDay, initialVisibleDay + visibleWindowDays - 1),
     selectedWeekdays: new Set(),
     sortKey: "departure_local",
     sortDirection: "asc",
@@ -61,6 +54,7 @@
   let map = null;
   let routeLayer = null;
   let visibleOffers = [...flights];
+  let calendarCursor = startOfMonth(addDays(payload.start_date, initialVisibleDay));
 
   const elements = {
     country: document.querySelector("#country-filter"),
@@ -69,18 +63,15 @@
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
     durationOutput: document.querySelector("#duration-output"),
-    dateFrom: document.querySelector("#date-from-filter"),
     dateTo: document.querySelector("#date-to-filter"),
     dateFromOutput: document.querySelector("#date-from-output"),
     dateToOutput: document.querySelector("#date-to-output"),
     dateRange: document.querySelector("#date-range"),
     dateWeekendMarkers: document.querySelector("#date-weekend-markers"),
-    planningRange: document.querySelector("#planning-window-range"),
-    planningWindow: document.querySelector("#planning-window-filter"),
-    planningStops: document.querySelector("#planning-window-stops"),
-    planningWindowFrom: document.querySelector("#planning-window-from"),
-    planningWindowTo: document.querySelector("#planning-window-to"),
-    planningRangeNote: document.querySelector("#planning-range-note"),
+    calendarMonths: document.querySelector("#calendar-months"),
+    calendarSelectedDate: document.querySelector("#calendar-selected-date"),
+    calendarPrevious: document.querySelector("#calendar-prev"),
+    calendarNext: document.querySelector("#calendar-next"),
     weekdays: document.querySelector("#weekday-buttons"),
     rows: document.querySelector("#flight-rows"),
     resultCount: document.querySelector("#result-count"),
@@ -148,6 +139,43 @@
     return result;
   }
 
+  function startOfMonth(value) {
+    const parsed = value instanceof Date ? new Date(value.getTime()) : isoDate(value);
+    return parsed ? new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth(), 1)) : null;
+  }
+
+  function addMonths(value, months) {
+    const parsed = value instanceof Date ? value : isoDate(value);
+    return parsed ? new Date(Date.UTC(parsed.getUTCFullYear(), parsed.getUTCMonth() + months, 1)) : null;
+  }
+
+  function bratislavaToday() {
+    const override = window.FLIGHTSCANNER_TODAY;
+    if (override) return isoDate(override);
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Bratislava",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+    return new Date(Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day)));
+  }
+
+  function dayOffset(value) {
+    const parsed = value instanceof Date ? value : isoDate(value);
+    const start = isoDate(payload.start_date);
+    return parsed && start ? Math.round((parsed.getTime() - start.getTime()) / 86400000) : 0;
+  }
+
+  function clampVisibleDay(day) {
+    return Math.max(0, Math.min(lastScanDay, Number(day) || 0));
+  }
+
+  function defaultVisibleDay() {
+    return clampVisibleDay(dayOffset(bratislavaToday()));
+  }
+
   function calendarDate(value) {
     const parsed = value instanceof Date ? value : isoDate(value);
     if (!parsed) return "—";
@@ -196,13 +224,6 @@
       (_, index) => firstDay + index,
     ).filter(isWeekendDay).map((dayOffset) => (
       `<i class="weekend-marker" style="--weekend-left:${((dayOffset - firstDay) / scale) * 100}%;--weekend-width:${markerWidth}%"></i>`
-    )).join("");
-  }
-
-  function renderPlanningStops() {
-    const scale = Math.max(1, planningStartDays.length - 1);
-    elements.planningStops.innerHTML = planningStartDays.map((_, index) => (
-      `<i class="planning-stop" style="--stop-left:${(index / scale) * 100}%"></i>`
     )).join("");
   }
 
@@ -266,11 +287,8 @@
     elements.price.value = maxPrice;
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
-    elements.planningWindow.max = planningStartDays.length - 1;
-    elements.planningRangeNote.textContent = t("results.rangeNote", { days: scanDays, step: planningStepDays });
-    renderPlanningStops();
-    syncDetailedDateRange();
-    updatePlanningWindowLabels();
+    syncDateRange();
+    renderCalendar();
     updateRangeLabels();
   }
 
@@ -300,48 +318,69 @@
     elements.durationOutput.value = duration(state.maxDuration);
     elements.dateFromOutput.value = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
     elements.dateToOutput.value = rangeDateLabel(addDays(payload.start_date, state.lastVisibleDay));
-    const planningEndDay = Math.min(lastScanDay, state.planningStartDay + planningWindowDays - 1);
-    const scale = Math.max(1, planningEndDay - state.planningStartDay);
-    elements.dateRange.style.setProperty("--range-from", `${((state.firstVisibleDay - state.planningStartDay) / scale) * 100}%`);
-    elements.dateRange.style.setProperty("--range-to", `${((state.lastVisibleDay - state.planningStartDay) / scale) * 100}%`);
-    renderWeekendMarkers(elements.dateWeekendMarkers, state.planningStartDay, planningEndDay);
-    elements.dateFrom.classList.toggle("weekend-day", isWeekendDay(state.firstVisibleDay));
+    const windowEndDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
+    const scale = Math.max(1, windowEndDay - state.firstVisibleDay);
+    elements.dateRange.style.setProperty("--range-to", `${((state.lastVisibleDay - state.firstVisibleDay) / scale) * 100}%`);
+    renderWeekendMarkers(elements.dateWeekendMarkers, state.firstVisibleDay, windowEndDay);
     elements.dateTo.classList.toggle("weekend-day", isWeekendDay(state.lastVisibleDay));
   }
 
-  function updatePlanningWindowLabels() {
-    const planningEndDay = Math.min(lastScanDay, state.planningStartDay + planningWindowDays - 1);
-    const start = addDays(payload.start_date, state.planningStartDay);
-    const end = addDays(payload.start_date, planningEndDay);
-    elements.planningWindowFrom.value = rangeDateLabel(start);
-    elements.planningWindowTo.value = rangeDateLabel(end);
-    elements.planningWindow.value = planningStartDays.indexOf(state.planningStartDay);
-    const ariaValue = `${elements.planningWindowFrom.value} – ${elements.planningWindowTo.value}`;
-    elements.planningWindow.setAttribute("aria-valuetext", ariaValue);
-  }
-
-  function closestPlanningStart(requestedDay) {
-    return planningStartDays.reduce((closest, candidate) => (
-      Math.abs(candidate - requestedDay) < Math.abs(closest - requestedDay) ? candidate : closest
-    ), planningStartDays[0]);
-  }
-
-  function syncDetailedDateRange() {
-    const planningEndDay = Math.min(lastScanDay, state.planningStartDay + planningWindowDays - 1);
-    state.firstVisibleDay = state.planningStartDay;
-    state.lastVisibleDay = planningEndDay;
-    elements.dateFrom.min = state.planningStartDay;
-    elements.dateFrom.max = planningEndDay;
-    elements.dateFrom.value = state.firstVisibleDay;
-    elements.dateTo.min = state.planningStartDay;
-    elements.dateTo.max = planningEndDay;
+  function syncDateRange() {
+    const windowEndDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
+    state.lastVisibleDay = Math.max(state.firstVisibleDay, Math.min(state.lastVisibleDay, windowEndDay));
+    elements.dateTo.min = state.firstVisibleDay;
+    elements.dateTo.max = windowEndDay;
     elements.dateTo.value = state.lastVisibleDay;
   }
 
-  function selectPlanningWindow(requestedStartDay) {
-    state.planningStartDay = closestPlanningStart(requestedStartDay);
-    syncDetailedDateRange();
-    updatePlanningWindowLabels();
+  function calendarMonthTitle(value) {
+    return new Intl.DateTimeFormat(i18n.locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(value);
+  }
+
+  function calendarDayLabel(value) {
+    return new Intl.DateTimeFormat(i18n.locale, {
+      weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+    }).format(value);
+  }
+
+  function renderCalendarMonth(monthStart) {
+    const year = monthStart.getUTCFullYear();
+    const month = monthStart.getUTCMonth();
+    const firstWeekday = (monthStart.getUTCDay() + 6) % 7;
+    const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    const todayOffset = dayOffset(bratislavaToday());
+    const cells = Array.from({ length: firstWeekday }, () => '<span class="calendar-blank"></span>');
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(Date.UTC(year, month, day));
+      const offset = dayOffset(date);
+      const unavailable = offset < 0 || offset > lastScanDay;
+      const classes = [
+        offset === state.firstVisibleDay ? "selected" : "",
+        offset === todayOffset ? "today" : "",
+        date.getUTCDay() === 0 || date.getUTCDay() === 6 ? "weekend" : "",
+      ].filter(Boolean).join(" ");
+      cells.push(`<button type="button" class="${classes}" data-calendar-day="${offset}" ${unavailable ? "disabled" : ""} aria-label="${escapeHtml(t("calendar.selectDay", { date: calendarDayLabel(date) }))}" aria-pressed="${offset === state.firstVisibleDay}">${day}</button>`);
+    }
+    return `<section class="calendar-month"><h3>${escapeHtml(calendarMonthTitle(monthStart))}</h3><div class="calendar-weekdays">${weekdays.map((day) => `<span>${escapeHtml(day)}</span>`).join("")}</div><div class="calendar-days">${cells.join("")}</div></section>`;
+  }
+
+  function renderCalendar() {
+    const firstMonth = startOfMonth(payload.start_date);
+    const lastMonth = startOfMonth(addDays(payload.start_date, lastScanDay));
+    const latestCursor = lastMonth > firstMonth ? addMonths(lastMonth, -1) : firstMonth;
+    if (calendarCursor < firstMonth) calendarCursor = firstMonth;
+    if (calendarCursor > latestCursor) calendarCursor = latestCursor;
+    elements.calendarSelectedDate.textContent = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
+    elements.calendarMonths.innerHTML = [calendarCursor, addMonths(calendarCursor, 1)].map(renderCalendarMonth).join("");
+    elements.calendarPrevious.disabled = calendarCursor <= firstMonth;
+    elements.calendarNext.disabled = calendarCursor >= latestCursor;
+  }
+
+  function selectCalendarDay(requestedDay) {
+    state.firstVisibleDay = clampVisibleDay(requestedDay);
+    state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
+    syncDateRange();
+    renderCalendar();
     updateRangeLabels();
     render();
     fitVisibleMap();
@@ -633,18 +672,20 @@
     state.destination = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
-    state.planningStartDay = 0;
+    state.firstVisibleDay = defaultVisibleDay();
+    state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
+    calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
     state.selectedWeekdays.clear();
     elements.country.value = "";
     populateDestinations();
     elements.price.value = maxPrice;
     elements.duration.value = maxDuration;
-    syncDetailedDateRange();
+    syncDateRange();
     elements.weekdays.querySelectorAll("button").forEach((button) => {
       button.classList.remove("active");
       button.setAttribute("aria-pressed", "false");
     });
-    updatePlanningWindowLabels();
+    renderCalendar();
     updateRangeLabels();
     render();
     fitVisibleMap();
@@ -688,28 +729,24 @@
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
-    elements.planningWindow.addEventListener("input", (event) => {
-      selectPlanningWindow(planningStartDays[Number(event.target.value)] ?? 0);
-    });
-    elements.dateFrom.addEventListener("input", (event) => {
-      state.firstVisibleDay = Number(event.target.value);
-      if (state.firstVisibleDay > state.lastVisibleDay) {
-        state.lastVisibleDay = state.firstVisibleDay;
-        elements.dateTo.value = state.lastVisibleDay;
-      }
-      updateRangeLabels();
-      render();
-      fitVisibleMap();
-    });
     elements.dateTo.addEventListener("input", (event) => {
       state.lastVisibleDay = Number(event.target.value);
-      if (state.lastVisibleDay < state.firstVisibleDay) {
-        state.firstVisibleDay = state.lastVisibleDay;
-        elements.dateFrom.value = state.firstVisibleDay;
-      }
       updateRangeLabels();
       render();
       fitVisibleMap();
+    });
+    elements.calendarMonths.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-calendar-day]");
+      if (!button || button.disabled) return;
+      selectCalendarDay(Number(button.dataset.calendarDay));
+    });
+    elements.calendarPrevious.addEventListener("click", () => {
+      calendarCursor = addMonths(calendarCursor, -1);
+      renderCalendar();
+    });
+    elements.calendarNext.addEventListener("click", () => {
+      calendarCursor = addMonths(calendarCursor, 1);
+      renderCalendar();
     });
     elements.weekdays.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-weekday]");

@@ -44,6 +44,7 @@ const element = (selector) => {
 };
 
 global.window = {
+  FLIGHTSCANNER_TODAY: "2026-09-04",
   FLIGHT_DATA: {
     year: 2026,
     month: 9,
@@ -244,50 +245,40 @@ assert.match(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /124,99\s*€\*/);
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
-assert.equal(element("#date-from-filter").max, 29);
-assert.equal(element("#date-to-filter").max, 29);
-assert.equal(element("#date-from-output").value, "2. 9. 2026 (Str)");
-assert.equal(element("#date-to-output").value, "1. 10. 2026 (Štv)");
-assert.equal(element("#planning-window-filter").max, 4);
-assert.equal(element("#planning-window-from").value, "2. 9. 2026 (Str)");
-assert.equal(element("#planning-window-to").value, "1. 10. 2026 (Štv)");
-assert.equal(element("#planning-range-note").textContent, "90 dní dát · krok 15 dní");
-assert.equal((element("#planning-window-stops").innerHTML.match(/planning-stop/g) || []).length, 5);
+assert.equal(element("#date-to-filter").min, 2);
+assert.equal(element("#date-to-filter").max, 31);
+assert.equal(element("#date-from-output").value, "4. 9. 2026 (Pia)");
+assert.equal(element("#date-to-output").value, "3. 10. 2026 (Sob)");
+assert.equal(element("#calendar-selected-date").textContent, "4. 9. 2026 (Pia)");
+assert.match(element("#calendar-months").innerHTML, /september 2026/i);
+assert.match(element("#calendar-months").innerHTML, /október 2026/i);
+assert.match(element("#calendar-months").innerHTML, /data-calendar-day="2"[^>]*aria-pressed="true"/);
 assert.match(element("#date-weekend-markers").innerHTML, /weekend-marker/);
 assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
 
-element("#date-from-filter").listeners.input({ target: { value: "3" } });
-assert.equal(element("#date-from-filter").classList.contains("weekend-day"), true);
-element("#date-from-filter").listeners.input({ target: { value: "0" } });
-
-element("#planning-window-filter").listeners.input({ target: { value: "3" } });
-assert.equal(element("#planning-window-from").value, "17. 10. 2026 (Sob)");
-assert.equal(element("#planning-window-to").value, "15. 11. 2026 (Ned)");
-assert.equal(element("#date-from-output").value, "17. 10. 2026 (Sob)");
-assert.equal(element("#date-to-output").value, "15. 11. 2026 (Ned)");
-assert.equal(element("#date-from-filter").min, 45);
-assert.equal(element("#date-to-filter").max, 74);
-assert.doesNotMatch(rows.innerHTML, /10\.09\.2026|18\.09\.2026|28\.09\.2026/);
-
-element("#planning-window-filter").listeners.input({ target: { value: "1" } });
-assert.equal(element("#planning-window-from").value, "17. 9. 2026 (Štv)");
-assert.equal(element("#planning-window-to").value, "16. 10. 2026 (Pia)");
+const selectedSeptember18 = { dataset: { calendarDay: "16" }, disabled: false };
+element("#calendar-months").listeners.click({ target: { closest: () => selectedSeptember18 } });
+assert.equal(element("#calendar-selected-date").textContent, "18. 9. 2026 (Pia)");
+assert.equal(element("#date-from-output").value, "18. 9. 2026 (Pia)");
+assert.equal(element("#date-to-output").value, "17. 10. 2026 (Sob)");
+assert.equal(element("#date-to-filter").min, 16);
+assert.equal(element("#date-to-filter").max, 45);
 assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
 
-element("#planning-window-filter").listeners.input({ target: { value: "0" } });
+element("#date-to-filter").listeners.input({ target: { value: "26" } });
+assert.equal(element("#date-to-output").value, "28. 9. 2026 (Pon)");
+assert.match(rows.innerHTML, /18\.09\.2026/);
+assert.match(rows.innerHTML, /28\.09\.2026/);
 
-element("#date-to-filter").listeners.input({ target: { value: "29" } });
+const selectedToday = { dataset: { calendarDay: "2" }, disabled: false };
+element("#calendar-months").listeners.click({ target: { closest: () => selectedToday } });
+assert.match(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.ok(rows.innerHTML.indexOf("10.09.2026") < rows.innerHTML.indexOf("18.09.2026"));
 assert.ok(rows.innerHTML.indexOf("18.09.2026") < rows.innerHTML.indexOf("28.09.2026"));
-
-element("#date-from-filter").listeners.input({ target: { value: "9" } });
-assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
-assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
-element("#date-from-filter").listeners.input({ target: { value: "0" } });
 
 element("#country-filter").listeners.change({ target: { value: "GR" } });
 assert.match(element("#destination-filter").innerHTML, /ATÉNY \(ATH\)/);
@@ -333,11 +324,10 @@ assert.match(html, /class="stat-label"[^>]*>Destinácie<\/span>/);
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
-assert.match(html, /id="date-from-filter"[^>]+value="0"/);
 assert.match(html, /id="date-to-filter"[^>]+value="29"/);
-assert.match(html, /id="planning-window-filter"/);
-assert.doesNotMatch(html, /id="planning-window-(?:from|to)-filter"/);
-assert.match(html, /30-dňové obdobie[\s\S]+Rozsah podľa načítaných dát/);
+assert.doesNotMatch(html, /id="date-from-filter"|id="planning-window-filter"/);
+assert.match(html, /id="calendar-selected-date"/);
+assert.match(html, /id="calendar-prev"[\s\S]+id="calendar-next"[\s\S]+id="calendar-months"/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
 assert.match(html, /class="table-note table-note-bottom"[^>]*>\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);
@@ -352,14 +342,21 @@ assert.doesNotMatch(html, /data-sort="country">Krajina/);
 assert.match(html, /class="column-destination"><button data-sort="destination_name">[\s\S]{0,100}Destinácia/);
 assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
-assert.equal((html.match(/data-collapsible/g) || []).length, 4);
+assert.equal((html.match(/data-collapsible/g) || []).length, 5);
 assert.match(html, /aria-controls="overview-content"/);
 assert.match(html, /aria-controls="filters-content"/);
 assert.match(html, /aria-controls="map-content"/);
+assert.match(html, /aria-controls="calendar-content"/);
 assert.match(html, /aria-controls="results-content"/);
+assert.ok(html.indexOf('class="map-card') < html.indexOf('class="filter-panel'));
+assert.ok(html.indexOf('class="filter-panel') < html.indexOf('class="calendar-card'));
+assert.ok(html.indexOf('class="calendar-card') < html.indexOf('class="results-card'));
 assert.match(css, /input\.weekend-day::-(?:webkit-slider-thumb|moz-range-thumb)[^}]+background:\s*var\(--weekend\)/);
 assert.match(css, /--weekend:\s*#aeb7c4/);
-assert.match(css, /\.planning-slider\s*\{[^}]*background:\s*linear-gradient\(#d5dde9, #d5dde9\)[^}]*100% 4px/);
+assert.match(css, /\.single-range\s*\{[^}]*--range-to:\s*100%/);
+assert.doesNotMatch(css, /\.planning-slider|\.dual-range/);
+assert.match(css, /\.calendar-months\s*\{[^}]*grid-template-columns:\s*repeat\(2/);
+assert.match(css, /max-width:\s*680px[\s\S]+\.calendar-months\s*\{[^}]*grid-template-columns:\s*1fr/);
 assert.match(css, /\.results-help\s*\{[^}]*align-self:\s*flex-end;[^}]*text-align:\s*right/);
 assert.match(css, /\.table-note-bottom\s*\{[^}]*text-align:\s*right/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);
