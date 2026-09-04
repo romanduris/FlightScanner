@@ -44,6 +44,7 @@
     destination: "",
     maxPrice,
     maxDuration,
+    travellers: 1,
     firstVisibleDay: initialVisibleDay,
     lastVisibleDay: Math.min(lastScanDay, initialVisibleDay + visibleWindowDays - 1),
     selectedWeekdays: new Set(),
@@ -67,7 +68,9 @@
     dateFromOutput: document.querySelector("#date-from-output"),
     dateToOutput: document.querySelector("#date-to-output"),
     dateRange: document.querySelector("#date-range"),
-    dateWeekendMarkers: document.querySelector("#date-weekend-markers"),
+    travellerMinus: document.querySelector("#traveller-minus"),
+    travellerCount: document.querySelector("#traveller-count"),
+    travellerPlus: document.querySelector("#traveller-plus"),
     calendarMonths: document.querySelector("#calendar-months"),
     calendarSelectedDate: document.querySelector("#calendar-selected-date"),
     calendarPrevious: document.querySelector("#calendar-prev"),
@@ -88,6 +91,10 @@
 
   function euro(value) {
     return new Intl.NumberFormat(i18n.locale, { style: "currency", currency: "EUR" }).format(value);
+  }
+
+  function groupPrice(value) {
+    return Number(value) * state.travellers;
   }
 
   function integer(value) {
@@ -211,22 +218,6 @@
     return `${formattedDate} (${weekday})`;
   }
 
-  function isWeekendDay(dayOffset) {
-    const value = addDays(payload.start_date, dayOffset);
-    return value ? value.getUTCDay() === 0 || value.getUTCDay() === 6 : false;
-  }
-
-  function renderWeekendMarkers(element, firstDay, lastDay) {
-    const scale = Math.max(1, lastDay - firstDay);
-    const markerWidth = 100 / scale;
-    element.innerHTML = Array.from(
-      { length: lastDay - firstDay + 1 },
-      (_, index) => firstDay + index,
-    ).filter(isWeekendDay).map((dayOffset) => (
-      `<i class="weekend-marker" style="--weekend-left:${((dayOffset - firstDay) / scale) * 100}%;--weekend-width:${markerWidth}%"></i>`
-    )).join("");
-  }
-
   function airlineClass(airline) {
     return airline === "Wizz Air" ? "wizz" : "ryanair";
   }
@@ -273,6 +264,28 @@
     elements.destination.value = state.destination;
   }
 
+  function syncPriceControl() {
+    elements.price.max = maxPrice * state.travellers;
+    elements.price.step = 5 * state.travellers;
+    elements.price.value = state.maxPrice * state.travellers;
+  }
+
+  function updateTravellerControl() {
+    elements.travellerCount.value = state.travellers;
+    elements.travellerCount.textContent = state.travellers;
+    elements.travellerMinus.disabled = state.travellers === 1;
+    elements.travellerPlus.disabled = state.travellers === 9;
+  }
+
+  function setTravellers(value) {
+    state.travellers = Math.max(1, Math.min(9, Number(value) || 1));
+    syncPriceControl();
+    updateTravellerControl();
+    renderAirlineSummary();
+    updateRangeLabels();
+    render();
+  }
+
   function populateControls() {
     const countries = new Map();
     offers.forEach((offer) => countries.set(offer.country_code, displayCountry(offer)));
@@ -283,8 +296,8 @@
     ].join("");
     populateDestinations();
     elements.weekdays.innerHTML = weekdays.map((day) => `<button type="button" data-weekday="${day}" aria-pressed="false">${day}</button>`).join("");
-    elements.price.max = maxPrice;
-    elements.price.value = maxPrice;
+    syncPriceControl();
+    updateTravellerControl();
     elements.duration.max = maxDuration;
     elements.duration.value = maxDuration;
     syncDateRange();
@@ -306,23 +319,21 @@
           <div class="airline-meta">
             <span>${t("summary.routes")}<strong>${airlineOffers.length}</strong></span>
             <span>${t("summary.countries")}<strong>${countries}</strong></span>
-            <span>${t("summary.average")}<strong>${euro(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length)}</strong></span>
+            <span>${t("summary.average")}<strong>${euro(groupPrice(airlineOffers.reduce((sum, item) => sum + item.price, 0) / airlineOffers.length))}</strong></span>
           </div>
-          <div class="airline-best"><span>${t("summary.from")}</span><strong>${euro(best)}</strong></div>
+          <div class="airline-best"><span>${t("summary.from")}</span><strong>${euro(groupPrice(best))}</strong></div>
         </article>`;
     }).join("");
   }
 
   function updateRangeLabels() {
-    elements.priceOutput.value = `${euro(state.maxPrice)}`;
+    elements.priceOutput.value = `${euro(groupPrice(state.maxPrice))}`;
     elements.durationOutput.value = duration(state.maxDuration);
     elements.dateFromOutput.value = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
     elements.dateToOutput.value = rangeDateLabel(addDays(payload.start_date, state.lastVisibleDay));
     const windowEndDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     const scale = Math.max(1, windowEndDay - state.firstVisibleDay);
     elements.dateRange.style.setProperty("--range-to", `${((state.lastVisibleDay - state.firstVisibleDay) / scale) * 100}%`);
-    renderWeekendMarkers(elements.dateWeekendMarkers, state.firstVisibleDay, windowEndDay);
-    elements.dateTo.classList.toggle("weekend-day", isWeekendDay(state.lastVisibleDay));
   }
 
   function syncDateRange() {
@@ -452,7 +463,7 @@
           <td class="column-departure"><span class="date-cell"><strong>${date} (${escapeHtml(departureWeekday || "—")})</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")}${responsiveDuration}</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? t("results.totalUnavailable") : `${euro(offer.price + returnPrice)}*`}</small></td>
+          <td class="column-price price-cell">${euro(groupPrice(offer.price))}<small>${returnPrice == null ? t("results.totalUnavailable") : `${euro(groupPrice(offer.price + returnPrice))}*`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");
@@ -504,8 +515,8 @@
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
               </div>
               <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>
-              <div class="return-price"><span>${t("return.journey")}</span><strong>${euro(item.price)}</strong></div>
-              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(offer.price + item.price)}</strong></div>`;
+              <div class="return-price"><span>${t("return.journey")}</span><strong>${euro(groupPrice(item.price))}</strong></div>
+              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(groupPrice(offer.price + item.price))}</strong></div>`;
           const flightButton = window.FlightBookingButtons.createReturnButton({
             airline: offer.airline,
             trip: {
@@ -513,7 +524,7 @@
               destinationIata: offer.destination_iata,
               outboundDate: offer.departure_local,
               returnDate: item.departure_local,
-              adults: 1,
+              adults: state.travellers,
             },
             className: "return-flight-link",
             label: t("return.bookingLabel", {
@@ -530,7 +541,7 @@
             destinationName: window.FLIGHT_TRANSLATIONS.en.destinations[offer.destination_iata] || displayDestination(offer),
             checkinDate: offer.arrival_local || offer.departure_local,
             checkoutDate: item.departure_local,
-            adults: 1,
+            adults: state.travellers,
           };
           const hotelButton = window.BookingComLinks.createButton({
             stay: hotelStay,
@@ -576,8 +587,8 @@
       </div>
       <div class="detail-body">
         <div class="detail-price">
-          <div><span>${t("detail.selectedPrice")}</span><strong>${euro(offer.price)}</strong><small>${t("detail.oneWayFare")}</small></div>
-          <div><span>${t("detail.cheapestRoundTrip")}</span><strong>${roundTripPrice == null ? "—" : euro(roundTripPrice)}</strong><small>${t("detail.roundTrip")}</small></div>
+          <div><span>${t("detail.selectedPrice")}</span><strong>${euro(groupPrice(offer.price))}</strong><small>${t("detail.oneWayFare")}</small></div>
+          <div><span>${t("detail.cheapestRoundTrip")}</span><strong>${roundTripPrice == null ? "—" : euro(groupPrice(roundTripPrice))}</strong><small>${t("detail.roundTrip")}</small></div>
         </div>
         <div class="detail-grid">
           <div class="detail-item"><span>${t("detail.country")}</span><strong>${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))}</strong></div>
@@ -636,7 +647,7 @@
         <div class="map-popup">
           <strong>${escapeHtml(displayDestination(offer))} (${escapeHtml(offer.destination_iata)})</strong>
           <div class="popup-route">${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))} · ${escapeHtml(offer.airline)}</div>
-          <div class="popup-line"><span>${t("map.priceFrom")}</span><b>${euro(offer.price)}</b></div>
+          <div class="popup-line"><span>${t("map.priceFrom")}</span><b>${euro(groupPrice(offer.price))}</b></div>
           <div class="popup-line"><span>${t("map.duration")}</span><b>${duration(offer.duration_minutes)}</b></div>
           <button type="button" data-map-offer="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}">${t("map.flightDetail")}</button>
         </div>`);
@@ -676,13 +687,15 @@
     state.destination = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
+    state.travellers = 1;
     state.firstVisibleDay = defaultVisibleDay();
     state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
     state.selectedWeekdays.clear();
     elements.country.value = "";
     populateDestinations();
-    elements.price.value = maxPrice;
+    syncPriceControl();
+    updateTravellerControl();
     elements.duration.value = maxDuration;
     syncDateRange();
     elements.weekdays.querySelectorAll("button").forEach((button) => {
@@ -690,6 +703,7 @@
       button.setAttribute("aria-pressed", "false");
     });
     renderCalendar();
+    renderAirlineSummary();
     updateRangeLabels();
     render();
     fitVisibleMap();
@@ -731,8 +745,10 @@
       render();
     });
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
-    elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value) / state.travellers; updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
+    elements.travellerMinus.addEventListener("click", () => setTravellers(state.travellers - 1));
+    elements.travellerPlus.addEventListener("click", () => setTravellers(state.travellers + 1));
     elements.dateTo.addEventListener("input", (event) => {
       state.lastVisibleDay = Number(event.target.value);
       updateRangeLabels();

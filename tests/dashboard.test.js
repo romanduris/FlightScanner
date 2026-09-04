@@ -256,9 +256,22 @@ assert.equal(element("#calendar-selected-date").textContent, "4. 9. 2026 (Pia)")
 assert.match(element("#calendar-months").innerHTML, /september 2026/i);
 assert.match(element("#calendar-months").innerHTML, /október 2026/i);
 assert.match(element("#calendar-months").innerHTML, /data-calendar-day="2"[^>]*aria-pressed="true"/);
-assert.match(element("#date-weekend-markers").innerHTML, /weekend-marker/);
 assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
+assert.equal(element("#traveller-count").value, 1);
+assert.equal(element("#traveller-minus").disabled, true);
+assert.equal(element("#price-filter").max, 100);
+
+element("#traveller-plus").listeners.click();
+assert.equal(element("#traveller-count").value, 2);
+assert.equal(element("#traveller-minus").disabled, false);
+assert.equal(element("#price-filter").max, 200);
+assert.equal(element("#price-filter").value, 200);
+assert.equal(element("#price-output").value, "200,00 €");
+assert.match(rows.innerHTML, /198,00\s*€/);
+assert.match(rows.innerHTML, /249,98\s*€\*/);
+element("#traveller-minus").listeners.click();
+assert.equal(element("#traveller-count").value, 1);
 
 const selectedSeptember18 = { dataset: { calendarDay: "16" }, disabled: false };
 element("#calendar-months").listeners.click({ target: { closest: () => selectedSeptember18 } });
@@ -337,8 +350,9 @@ assert.match(html, /class="table-note table-note-bottom"[^>]*>\* Cena spolu: zob
 const resultsHelp = html.match(/class="results-help">([\s\S]*?)<\/div>/)?.[1] || "";
 assert.doesNotMatch(resultsHelp, /Cena spolu:/);
 assert.match(html, /id="results-content"[\s\S]+class="table-note table-note-bottom"[^>]*>\* Cena spolu:/);
-assert.match(html, /class="weekend-legend"[\s\S]+Svetlosivá označuje víkend/);
-assert.doesNotMatch(html, /id="planning-weekend-markers"/);
+assert.doesNotMatch(html, /weekend-legend|date-weekend-markers|planning-weekend-markers/);
+assert.match(html, /id="traveller-minus"[\s\S]+id="traveller-count"[\s\S]+id="traveller-plus"/);
+assert.match(html, /Posuvníkom môžeš skrátiť predvolené 30-dňové obdobie/);
 assert.match(javascript, /class="scan-label">\$\{t\("header\.updated"\)\}/);
 assert.doesNotMatch(css, /\.scan-status span\s*\{\s*display:\s*none/);
 assert.doesNotMatch(html, /data-sort="country">Krajina/);
@@ -360,8 +374,7 @@ assert.match(calendarContent, /id="weekday-buttons"/);
 assert.ok(html.indexOf('class="map-card') < html.indexOf('class="filter-panel'));
 assert.ok(html.indexOf('class="filter-panel') < html.indexOf('class="calendar-card'));
 assert.ok(html.indexOf('class="calendar-card') < html.indexOf('class="results-card'));
-assert.match(css, /input\.weekend-day::-(?:webkit-slider-thumb|moz-range-thumb)[^}]+background:\s*var\(--weekend\)/);
-assert.match(css, /--weekend:\s*#aeb7c4/);
+assert.doesNotMatch(css, /weekend-marker|weekend-legend|weekend-day|--weekend/);
 assert.match(css, /\.single-range\s*\{[^}]*--range-to:\s*100%/);
 assert.doesNotMatch(css, /\.planning-slider|\.dual-range/);
 assert.match(css, /\.calendar-months\s*\{[^}]*grid-template-columns:\s*repeat\(2/);
@@ -374,6 +387,8 @@ assert.match(javascript, /class="detail-flight"[\s\S]+offer\.flight_number[\s\S]
 assert.match(javascript, /t\("detail\.cheapestRoundTrip"\)[\s\S]+roundTripPrice/);
 assert.match(javascript, /FlightBookingButtons\.createReturnButton/);
 assert.match(javascript, /BookingComLinks\.createButton/);
+assert.match(javascript, /adults:\s*state\.travellers/g);
+assert.match(javascript, /groupPrice\(offer\.price\)/);
 assert.match(javascript, /roundLogoUrls[\s\S]+assets\.ryanair\.com[\s\S]+Wizz_Air_logo_2015\.svg/);
 assert.match(javascript, /roundAirlineLogo\(offer\.airline\)/);
 assert.doesNotMatch(javascript, /class="booking-link|detail\.openAirline|airlineSites/);

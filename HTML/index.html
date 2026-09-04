@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=20260904064400">
+  <link rel="stylesheet" href="dashboard.css?v=20260904071500">
 </head>
 <body>
   <header class="topbar">
@@ -154,17 +154,24 @@
           </div>
         </div>
         <div class="results-date-controls">
+          <div class="traveller-picker">
+            <span data-i18n="travellers.label">Cestujúci</span>
+            <div class="traveller-stepper" role="group" aria-label="Počet cestujúcich" data-i18n-aria="travellers.aria">
+              <button id="traveller-minus" type="button" aria-label="Odobrať cestujúceho" data-i18n-aria="travellers.decrease">−</button>
+              <output id="traveller-count" aria-live="polite">1</output>
+              <button id="traveller-plus" type="button" aria-label="Pridať cestujúceho" data-i18n-aria="travellers.increase">+</button>
+            </div>
+          </div>
           <div class="results-range">
             <div class="range-dates">
               <span><span data-i18n="results.from">Od</span> <output id="date-from-output">—</output></span>
               <label for="date-to-filter"><span data-i18n="results.to">Do</span> <output id="date-to-output">—</output></label>
             </div>
             <div id="date-range" class="single-range">
-              <div id="date-weekend-markers" class="weekend-markers" aria-hidden="true"></div>
               <input id="date-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Zobraziť lety do dátumu" data-i18n-aria="results.dateToAria">
             </div>
+            <small class="range-help" data-i18n="results.rangeHelp">Posuvníkom môžeš skrátiť predvolené 30-dňové obdobie.</small>
           </div>
-          <span class="weekend-legend"><i aria-hidden="true"></i><span data-i18n="results.weekendLegend">Svetlosivá označuje víkend</span></span>
         </div>
         <div class="results-help">
           <p data-i18n="results.help">Klikni na riadok pre kompletný rozpis letu.</p>
@@ -207,21 +214,21 @@
     <span><span data-i18n="footer.mapPrefix">Mapa ©</span> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <span data-i18n="footer.logos">logá sú majetkom aeroliniek</span></span>
   </footer>
 
-  <script src="flight-data.js?v=20260904064400"></script>
+  <script src="flight-data.js?v=20260904071500"></script>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="i18n/sk.js?v=20260904064400"></script>
-  <script src="i18n/en.js?v=20260904064400"></script>
-  <script src="i18n/i18n.js?v=20260904064400"></script>
-  <script src="booking/booking-com-config.js?v=20260904064400"></script>
-  <script src="booking/booking-com.js?v=20260904064400"></script>
-  <script src="booking/booking-buttons.js?v=20260904064400"></script>
-  <script src="booking/ryanair.js?v=20260904064400"></script>
-  <script src="booking/wizzair.js?v=20260904064400"></script>
-  <script src="dashboard.js?v=20260904064400"></script>
+  <script src="i18n/sk.js?v=20260904071500"></script>
+  <script src="i18n/en.js?v=20260904071500"></script>
+  <script src="i18n/i18n.js?v=20260904071500"></script>
+  <script src="booking/booking-com-config.js?v=20260904071500"></script>
+  <script src="booking/booking-com.js?v=20260904071500"></script>
+  <script src="booking/booking-buttons.js?v=20260904071500"></script>
+  <script src="booking/ryanair.js?v=20260904071500"></script>
+  <script src="booking/wizzair.js?v=20260904071500"></script>
+  <script src="dashboard.js?v=20260904071500"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"
