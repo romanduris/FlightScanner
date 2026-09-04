@@ -159,10 +159,10 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .calendar-days button.selected { color: white; border-color: var(--blue); background: var(--blue); box-shadow: 0 0 0 2px white, 0 0 0 3px var(--blue); }
 .calendar-days button:disabled { cursor: default; color: #c8d0db; background: transparent; opacity: .65; }
 
-.results-heading p { margin: 0; color: var(--muted); font-size: 9px; }
-.results-help { display: grid; min-width: 0; max-width: 410px; align-self: flex-end; margin-left: auto; padding-bottom: 1px; text-align: right; }
-.results-date-controls { display: grid; grid-template-columns: auto minmax(260px, 1fr); align-items: end; width: min(500px, 48vw); gap: 14px; }
-.traveller-picker { display: grid; gap: 5px; color: var(--muted); font-size: 8px; font-weight: 800; }
+.results-heading { display: grid; grid-template-areas: "heading range travellers"; grid-template-columns: minmax(120px, 1fr) minmax(300px, 500px) minmax(90px, 1fr); align-items: end; }
+.results-heading > .heading-with-toggle { grid-area: heading; }
+.results-date-controls { display: grid; grid-area: range; width: 100%; }
+.traveller-picker { display: grid; grid-area: travellers; justify-self: end; gap: 5px; color: var(--muted); font-size: 8px; font-weight: 800; }
 .traveller-stepper { display: grid; grid-template-columns: 25px 28px 25px; align-items: center; overflow: hidden; border: 1px solid #d7e1ee; border-radius: 7px; background: #f7f9fc; }
 .traveller-stepper button { height: 25px; padding: 0; cursor: pointer; color: var(--blue); border: 0; background: transparent; font-size: 14px; font-weight: 900; }
 .traveller-stepper button:hover:not(:disabled) { background: #e8eff9; }
@@ -172,7 +172,6 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .range-dates { display: flex; justify-content: space-between; gap: 12px; }
 .range-dates label, .range-dates > span { display: flex; gap: 4px; }
 .results-range output { color: var(--blue); font-weight: 900; }
-.range-help { color: var(--muted); font-size: 7px; font-weight: 650; text-align: right; }
 .single-range { --range-to: 100%; position: relative; height: 18px; background: linear-gradient(to right, var(--blue) 0, var(--blue) var(--range-to), #d5dde9 var(--range-to)); background-position: center; background-repeat: no-repeat; background-size: 100% 4px; }
 .single-range input { position: absolute; z-index: 2; inset: 0; width: 100%; height: 18px; margin: 0; cursor: grab; appearance: none; background: transparent; }
 .single-range input::-webkit-slider-thumb { width: 14px; height: 14px; appearance: none; cursor: grab; border: 2px solid white; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px var(--blue); }
@@ -330,10 +329,8 @@ footer a { color: inherit; }
   .map-card.collapsed .heading-with-toggle { flex: 1 1 auto; }
   .map-card.collapsed .map-actions { width: auto; flex: 0 0 auto; align-items: flex-start; flex-direction: column; gap: 3px; }
   #map { height: 350px; }
-  .results-heading p { display: none; }
-  .results-heading { align-items: flex-start; flex-direction: column; }
-  .results-help { width: 100%; max-width: none; align-self: stretch; text-align: right; }
-  .results-date-controls { grid-template-columns: auto minmax(0, 1fr); width: 100%; gap: 10px; }
+  .results-heading { grid-template-areas: "heading travellers" "range range"; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 9px 10px; }
+  .results-date-controls { width: 100%; }
   .calendar-toolbar { align-items: flex-start; }
   .calendar-content { padding: 12px 8px 14px; }
   .calendar-months { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
