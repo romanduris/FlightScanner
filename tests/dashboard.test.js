@@ -146,6 +146,8 @@ require(path.join(__dirname, "..", "HTML", "i18n", "i18n.js"));
 assert.equal(window.FlightI18n.language, "sk");
 assert.equal(window.FlightI18n.t("filters.title"), "Lety z Bratislavy");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["filters.title"], "Flights from Bratislava");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.flights"], "Flights");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.visiblePeriod"], "displayed period");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.destinations.ATH, "Athens");
 
 require(path.join(__dirname, "..", "HTML", "booking", "booking-com-config.js"));
@@ -259,8 +261,8 @@ assert.match(element("#calendar-months").innerHTML, /data-calendar-day="2"[^>]*a
 assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
 assert.equal(element("#stat-flights").textContent, "3");
-assert.match(element("#airline-summary").innerHTML, /Letov denne<strong>0,0<\/strong>/);
-assert.match(element("#airline-summary").innerHTML, /Dáta do<\/span><strong>30\.11\.2026 \(Pon\)<\/strong>/);
+assert.match(element("#airline-summary").innerHTML, /Letov denne<strong>0<\/strong>/);
+assert.match(element("#airline-summary").innerHTML, /Dáta do<\/span><strong>30\.11\.2026<\/strong>/);
 assert.equal(element("#traveller-count").value, 1);
 assert.equal(element("#traveller-minus").disabled, true);
 assert.equal(element("#price-filter").max, 100);
@@ -275,6 +277,10 @@ assert.match(rows.innerHTML, /198,00\s*€/);
 assert.match(rows.innerHTML, /249,98\s*€\*/);
 element("#traveller-minus").listeners.click();
 assert.equal(element("#traveller-count").value, 1);
+
+const dashboardCss = fs.readFileSync(path.join(__dirname, "..", "HTML", "dashboard.css"), "utf8");
+assert.match(dashboardCss, /\.results-card\.collapsed \.results-date-controls \{ display: none; \}/);
+assert.match(dashboardCss, /@media \(max-width: 400px\)[\s\S]*\.airline-meta span:nth-child\(3\) \{ display: none; \}/);
 
 const selectedSeptember18 = { dataset: { calendarDay: "16" }, disabled: false };
 element("#calendar-months").listeners.click({ target: { closest: () => selectedSeptember18 } });

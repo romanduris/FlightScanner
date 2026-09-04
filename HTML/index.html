@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=20260904081813">
+  <link rel="stylesheet" href="dashboard.css?v=20260904111154">
 </head>
 <body>
   <header class="topbar">
@@ -37,9 +37,15 @@
 
   <main>
     <section class="overview-section collapsible-section" data-collapsible aria-label="Súhrn ponúk" data-i18n-aria="overview.aria">
-      <button class="section-toggle overview-toggle" type="button" aria-expanded="true" aria-controls="overview-content" aria-label="Skryť prehľad letov" data-i18n-aria="overview.toggle" data-section-key="overview.sectionName">
-        <span class="section-chevron" aria-hidden="true"></span><span class="section-toggle-label" data-i18n="overview.label">Prehľad letov</span>
-      </button>
+      <div class="section-header overview-header">
+        <div class="heading-with-toggle">
+          <button class="section-toggle overview-toggle" type="button" aria-expanded="true" aria-controls="overview-content" aria-label="Skryť prehľad letov" data-i18n-aria="overview.toggle" data-section-key="overview.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div class="overview-heading-copy">
+            <span class="eyebrow" data-i18n="overview.eyebrow">Súhrn</span>
+            <h2 data-i18n="overview.label">Prehľad letov</h2>
+          </div>
+        </div>
+      </div>
       <div id="overview-content" class="overview-grid collapsible-content">
         <div class="summary-grid">
           <article class="stat-card stat-primary">
@@ -215,21 +221,21 @@
     <span><span data-i18n="footer.mapPrefix">Mapa ©</span> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · <span data-i18n="footer.logos">logá sú majetkom aeroliniek</span></span>
   </footer>
 
-  <script src="flight-data.js?v=20260904081813"></script>
+  <script src="flight-data.js?v=20260904111154"></script>
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="i18n/sk.js?v=20260904081813"></script>
-  <script src="i18n/en.js?v=20260904081813"></script>
-  <script src="i18n/i18n.js?v=20260904081813"></script>
-  <script src="booking/booking-com-config.js?v=20260904081813"></script>
-  <script src="booking/booking-com.js?v=20260904081813"></script>
-  <script src="booking/booking-buttons.js?v=20260904081813"></script>
-  <script src="booking/ryanair.js?v=20260904081813"></script>
-  <script src="booking/wizzair.js?v=20260904081813"></script>
-  <script src="dashboard.js?v=20260904081813"></script>
+  <script src="i18n/sk.js?v=20260904111154"></script>
+  <script src="i18n/en.js?v=20260904111154"></script>
+  <script src="i18n/i18n.js?v=20260904111154"></script>
+  <script src="booking/booking-com-config.js?v=20260904111154"></script>
+  <script src="booking/booking-com.js?v=20260904111154"></script>
+  <script src="booking/booking-buttons.js?v=20260904111154"></script>
+  <script src="booking/ryanair.js?v=20260904111154"></script>
+  <script src="booking/wizzair.js?v=20260904111154"></script>
+  <script src="dashboard.js?v=20260904111154"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

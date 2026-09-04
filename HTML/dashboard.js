@@ -101,13 +101,6 @@
     return new Intl.NumberFormat(i18n.locale).format(value);
   }
 
-  function decimal(value) {
-    return new Intl.NumberFormat(i18n.locale, {
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 1,
-    }).format(value);
-  }
-
   function duration(minutes) {
     if (!minutes) return "—";
     const hours = Math.floor(minutes / 60);
@@ -129,6 +122,14 @@
     const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
     const weekday = weekdays[(parsed.getUTCDay() + 6) % 7];
     return `${day}.${month}.${parsed.getUTCFullYear()} (${weekday})`;
+  }
+
+  function numericDate(value) {
+    const parsed = isoDate(value);
+    if (!parsed) return "—";
+    const day = String(parsed.getUTCDate()).padStart(2, "0");
+    const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+    return `${day}.${month}.${parsed.getUTCFullYear()}`;
   }
 
   function detailDateTime(value) {
@@ -327,9 +328,9 @@
           <div class="airline-meta">
             <span>${t("summary.routes")}<strong>${airlineOffers.length}</strong></span>
             <span>${t("summary.countries")}<strong>${countries}</strong></span>
-            <span>${t("summary.flightsPerDay")}<strong>${decimal(dailyFlights)}</strong></span>
+            <span>${t("summary.flightsPerDay")}<strong>${integer(Math.round(dailyFlights))}</strong></span>
           </div>
-          <div class="airline-best"><span>${t("summary.dataUntil")}</span><strong>${numericDateWithWeekday(payload.end_date)}</strong></div>
+          <div class="airline-best"><span>${t("summary.dataUntil")}</span><strong>${numericDate(payload.end_date)}</strong></div>
         </article>`;
     }).join("");
   }
