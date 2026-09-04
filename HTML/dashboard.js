@@ -438,6 +438,10 @@
     elements.empty.hidden = items.length !== 0;
     elements.rows.innerHTML = items.map((offer) => {
       const [date, time] = shortDate(offer.departure_local);
+      const departureWeekday = weekdayFor(offer.departure_local);
+      const responsiveDuration = offer.duration_minutes
+        ? `<span class="responsive-duration"> (${duration(offer.duration_minutes)})</span>`
+        : "";
       const returnPrice = cheapestReturnPrice(offer);
       const selected = state.selectedOffer === offer ? "selected" : "";
       return `
@@ -445,7 +449,7 @@
           <td class="column-airline"><span class="airline-cell"><i class="airline-dot ${airlineClass(offer.airline)}"></i><span class="airline-code">${escapeHtml(offer.airline)}</span></span></td>
           <td class="column-destination"><span class="destination-cell">${flag(offer.country_code)}<span class="destination-copy"><strong>${escapeHtml(displayDestination(offer))}</strong><small>BTS → ${escapeHtml(offer.destination_iata)}</small></span></span></td>
           <td class="column-flight"><strong>${escapeHtml(offer.flight_number || "—")}</strong></td>
-          <td class="column-departure"><span class="date-cell"><strong>${date}</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")} ${t("results.localTime")}</small></span></td>
+          <td class="column-departure"><span class="date-cell"><strong>${date} (${escapeHtml(departureWeekday || "—")})</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")}${responsiveDuration}</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
           <td class="column-price price-cell">${euro(offer.price)}<small>${returnPrice == null ? t("results.totalUnavailable") : `${euro(offer.price + returnPrice)}*`}</small></td>

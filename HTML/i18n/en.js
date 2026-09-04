@@ -94,7 +94,6 @@
       "results.emptyTitle": "No flights match the selected filters",
       "results.emptyBody": "Try increasing the price or duration, or clear some filters.",
       "results.priceNote": "* Total price: the displayed outbound flight plus the cheapest return flight found 1 to 10 days after departure.",
-      "results.localTime": "local time",
       "results.totalUnavailable": "total —",
       "dialog.close": "Close details",
       "detail.selectedPrice": "Selected outbound price",

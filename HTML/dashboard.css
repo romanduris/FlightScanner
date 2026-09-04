@@ -211,6 +211,7 @@ td strong { color: var(--ink); }
 .flag-fallback { width: 20px; text-align: center; }
 .date-cell strong, .date-cell small { display: block; }
 .date-cell small { margin-top: 2px; color: var(--muted); font-size: 8px; }
+.responsive-duration { display: none; }
 .price-cell { color: var(--blue-dark); font-size: 13px; font-weight: 950; text-align: right; }
 .price-cell small { display: block; color: var(--muted); font-size: 7px; font-weight: 650; }
 .detail-chevron { font-size: 17px; color: #8b99ad; }
@@ -344,6 +345,7 @@ footer a { color: inherit; }
   .calendar-days button { font-size: 8px; }
   table { min-width: 0; }
   table .column-duration, table .column-detail { display: none; }
+  .responsive-duration { display: inline; }
   table .column-destination { width: 40%; }
   table .column-departure { width: 38%; }
   table .column-price { width: 22%; }

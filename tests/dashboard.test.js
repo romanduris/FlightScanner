@@ -242,6 +242,9 @@ assert.equal(collapseToggle.getAttribute("aria-expanded"), "true");
 
 const rows = element("#flight-rows");
 assert.match(rows.innerHTML, /10\.09\.2026/);
+assert.match(rows.innerHTML, /10\.09\.2026 \(Štv\)/);
+assert.match(rows.innerHTML, /08:00 → 09:00<span class="responsive-duration"> \(1 h 00 min\)<\/span>/);
+assert.doesNotMatch(rows.innerHTML, /miestny čas|local time/);
 assert.match(rows.innerHTML, /124,99\s*€\*/);
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
@@ -342,6 +345,8 @@ assert.doesNotMatch(html, /data-sort="country">Krajina/);
 assert.match(html, /class="column-destination"><button data-sort="destination_name">[\s\S]{0,100}Destinácia/);
 assert.match(javascript, /class="column-destination"><span class="destination-cell">\$\{flag\(offer\.country_code\)\}/);
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
+assert.match(css, /\.responsive-duration\s*\{\s*display:\s*none;/);
+assert.match(css, /max-width:\s*680px[\s\S]+\.responsive-duration\s*\{\s*display:\s*inline;/);
 assert.equal((html.match(/data-collapsible/g) || []).length, 5);
 assert.match(html, /aria-controls="overview-content"/);
 assert.match(html, /aria-controls="filters-content"/);

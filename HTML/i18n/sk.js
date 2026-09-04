@@ -82,7 +82,6 @@
       "results.emptyTitle": "Žiadne lety nezodpovedajú filtrom",
       "results.emptyBody": "Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.",
       "results.priceNote": "* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.",
-      "results.localTime": "miestny čas",
       "results.totalUnavailable": "spolu —",
       "dialog.close": "Zavrieť detail",
       "detail.selectedPrice": "Cena vybraného odletu",
