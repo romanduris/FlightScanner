@@ -114,15 +114,19 @@
     return `<img class="flag" src="https://flagcdn.com/24x18/${code}.png" srcset="https://flagcdn.com/48x36/${code}.png 2x" width="20" height="15" alt="${escapeHtml(code.toUpperCase())}" loading="lazy">`;
   }
 
-  function localDate(value, withYear = false) {
+  function numericDateWithWeekday(value) {
     if (!value) return "—";
-    const [date, time = ""] = value.split("T");
-    const [year, month, day] = date.split("-").map(Number);
-    const formatted = t("date.long", {
-      day,
-      month: monthNames[month - 1],
-      year: withYear ? ` ${year}` : "",
-    });
+    const parsed = isoDate(value);
+    if (!parsed) return "—";
+    const day = String(parsed.getUTCDate()).padStart(2, "0");
+    const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+    const weekday = weekdays[(parsed.getUTCDay() + 6) % 7];
+    return `${day}.${month}.${parsed.getUTCFullYear()} (${weekday})`;
+  }
+
+  function detailDateTime(value) {
+    const formatted = numericDateWithWeekday(value);
+    const time = String(value || "").split("T")[1];
     return `${formatted}${time ? ` · ${time}` : ""}`;
   }
 
@@ -194,10 +198,7 @@
   }
 
   function returnDate(value) {
-    const parsed = isoDate(value);
-    if (!parsed) return "—";
-    const weekday = weekdays[(parsed.getUTCDay() + 6) % 7];
-    return `${weekday} ${calendarDate(parsed)}`;
+    return numericDateWithWeekday(value);
   }
 
   function weekdayFor(value) {
@@ -593,8 +594,8 @@
         <div class="detail-grid">
           <div class="detail-item"><span>${t("detail.country")}</span><strong>${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))}</strong></div>
           <div class="detail-item"><span>${t("detail.distance")}</span><strong>${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</strong></div>
-          <div class="detail-item"><span>${t("detail.departure")}</span><strong>${localDate(offer.departure_local, true)}</strong></div>
-          <div class="detail-item"><span>${t("detail.arrival")}</span><strong>${localDate(offer.arrival_local, true)}</strong></div>
+          <div class="detail-item"><span>${t("detail.departure")}</span><strong>${detailDateTime(offer.departure_local)}</strong></div>
+          <div class="detail-item"><span>${t("detail.arrival")}</span><strong>${detailDateTime(offer.arrival_local)}</strong></div>
         </div>
         <h3 class="schedule-title">${t("detail.schedule")}</h3>
         <div class="schedule-list">${schedule || t("detail.noSchedule")}</div>
