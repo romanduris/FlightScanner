@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "origin_iata": "BTS",
+  "checked_at_utc": "2026-09-04T08:07:00.940503+00:00",
+  "max_search_months": 24,
+  "probe_step_months": 3,
+  "request_delay_seconds": 1.0,
+  "cache_hours": 168,
+  "method": "coarse_anchor_routes_then_all_known_routes_in_last_available_month",
+  "airlines": {
+    "RYANAIR": {
+      "status": "ok",
+      "last_bookable_date": "2027-10-30",
+      "last_bookable_month": "2027-10",
+      "search_limit_month": "2028-09",
+      "search_limit_reached": false,
+      "boundary_confirmed": true,
+      "first_empty_anchor_month": "2027-11",
+      "anchor_routes": [
+        "STN",
+        "DUB",
+        "CIA"
+      ],
+      "destinations_checked_in_final_month": 33,
+      "requests_made": 53,
+      "verification": "all_known_bts_routes_in_final_month",
+      "bookable_days_ahead": 421,
+      "errors": [],
+      "checked_at_utc": "2026-09-04T08:07:00.940503+00:00"
+    },
+    "Wizz Air": {
+      "status": "ok",
+      "last_bookable_date": "2027-10-30",
+      "last_bookable_month": "2027-10",
+      "search_limit_month": "2028-09",
+      "search_limit_reached": false,
+      "boundary_confirmed": true,
+      "first_empty_anchor_month": "2027-11",
+      "anchor_routes": [
+        "LTN",
+        "SKP",
+        "WAW"
+      ],
+      "destinations_checked_in_final_month": 30,
+      "requests_made": 50,
+      "verification": "all_known_bts_routes_in_final_month",
+      "bookable_days_ahead": 421,
+      "errors": [],
+      "checked_at_utc": "2026-09-04T08:07:00.940503+00:00"
+    }
+  },
+  "earliest_airline_horizon_date": "2027-10-30",
+  "latest_airline_horizon_date": "2027-10-30"
+}

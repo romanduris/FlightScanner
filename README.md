@@ -13,6 +13,9 @@ python3 Main.py --days 45
 
 # Spusti stránku v Codespace
 python3 -m http.server 1455 --directory HTML
+
+# Šetrne zisti posledné rezervovateľné dátumy Ryanair a Wizz Air
+python3 4.ProviderHorizon.py
 ```
 
 Stránku potom otvor cez adresu portu Codespace, napríklad:
@@ -30,6 +33,18 @@ aerolínií, naskenuje ceny a vygeneruje dáta stránky. Dáta stránky sú v
 `HTML/flight-data.js` a vytvárajú sa z najnovšieho `Data/destinations_YYYY_MM.json`.
 
 Mapa a logá potrebujú internetové pripojenie. Tabuľka a filtre fungujú lokálne.
+
+## Dostupnosť budúcich letov
+
+Samostatný skript `4.ProviderHorizon.py` kontroluje po mesiacoch niekoľko
+pravidelných trás Ryanair a Wizz Air. V poslednom nájdenom mesiaci overí všetky
+známe destinácie z Bratislavy, priebeh vypisuje do konzoly a výsledok uloží do
+`Data/provider_horizons.json`. Nesťahuje spiatočné lety ani cestovné poriadky.
+
+Predvolená 7-dňová cache chráni API pred opakovaným spustením. Novú kontrolu
+možno vedome vynútiť cez `python3 4.ProviderHorizon.py --force`. Maximálny rozsah
+sa dá zmeniť napríklad cez `--max-months 18`; odporúčaná automatická frekvencia
+je najviac raz týždenne.
 
 ## Booking.com affiliate odkazy
 
