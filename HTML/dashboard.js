@@ -207,6 +207,17 @@
     return numericDateWithWeekday(value);
   }
 
+  function stayLength(outboundValue, returnValue) {
+    const outbound = isoDate(outboundValue);
+    const returning = isoDate(returnValue);
+    if (!outbound || !returning) return "";
+    const days = Math.round((returning.getTime() - outbound.getTime()) / 86400000);
+    if (days < 1) return "";
+    if (days === 1) return t("return.stayOneDay", { count: days });
+    if (days <= 4) return t("return.stayFewDays", { count: days });
+    return t("return.stayDays", { count: days });
+  }
+
   function weekdayFor(value) {
     const parsed = isoDate(value);
     return parsed ? weekdays[(parsed.getUTCDay() + 6) % 7] : null;
@@ -514,10 +525,11 @@
         content = `<div class="return-list">${availableReturns.map((item) => {
           const time = String(item.departure_local || "").split("T")[1] || "—";
           const cheapest = item.price === lowestReturnPrice;
+          const stay = stayLength(offer.departure_local, item.departure_local);
           const optionContent = `
               ${roundAirlineLogo(offer.airline)}
               <div class="return-when">
-                <strong>${returnDate(item.departure_local)}</strong>
+                <strong>${returnDate(item.departure_local)}${stay ? `: ${stay}` : ""}</strong>
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
               </div>
               <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>

@@ -100,6 +100,11 @@ global.window = {
         },
         {
           origin_iata: "ATH",
+          departure_local: "2026-09-23T10:00",
+          price: 29.99,
+        },
+        {
+          origin_iata: "ATH",
           departure_local: "2026-09-29T10:00",
           price: 9.99,
         },
@@ -148,6 +153,8 @@ assert.equal(window.FlightI18n.t("filters.title"), "Lety z Bratislavy");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["filters.title"], "Flights from Bratislava");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.flights"], "Flights");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.visiblePeriod"], "displayed period");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["return.stayOneDay"], "{count} day");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["return.stayDays"], "{count} days");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.destinations.ATH, "Athens");
 
 require(path.join(__dirname, "..", "HTML", "booking", "booking-com-config.js"));
@@ -235,6 +242,13 @@ assert.match(returnButton, /^<a class="return-option cheapest"/);
 assert.match(returnButton, /target="_blank" rel="noopener"/);
 assert.match(returnButton, /BTS\/ALC\/2026-10-23\/2026-10-28/);
 
+const renderedRows = [];
+element("#flight-rows").querySelectorAll = () => {
+  const count = (element("#flight-rows").innerHTML.match(/<tr/g) || []).length;
+  renderedRows.splice(0, renderedRows.length, ...Array.from({ length: count }, () => new Element()));
+  return renderedRows;
+};
+
 require(path.join(__dirname, "..", "HTML", "dashboard.js"));
 
 collapseToggle.listeners.click();
@@ -270,6 +284,11 @@ assert.match(element("#airline-summary").innerHTML, /Dáta do<\/span><strong>30\
 assert.equal(element("#traveller-count").value, 1);
 assert.equal(element("#traveller-minus").disabled, true);
 assert.equal(element("#price-filter").max, 100);
+
+renderedRows[1].listeners.click();
+assert.match(element("#detail-content").innerHTML, /20\.09\.2026 \(Ned\): 2 dni/);
+assert.match(element("#detail-content").innerHTML, /22\.09\.2026 \(Uto\): 4 dni/);
+assert.match(element("#detail-content").innerHTML, /23\.09\.2026 \(Str\): 5 dní/);
 
 element("#traveller-plus").listeners.click();
 assert.equal(element("#traveller-count").value, 2);
