@@ -356,7 +356,7 @@ assert.match(css, /--weekend:\s*#aeb7c4/);
 assert.match(css, /\.single-range\s*\{[^}]*--range-to:\s*100%/);
 assert.doesNotMatch(css, /\.planning-slider|\.dual-range/);
 assert.match(css, /\.calendar-months\s*\{[^}]*grid-template-columns:\s*repeat\(2/);
-assert.match(css, /max-width:\s*680px[\s\S]+\.calendar-months\s*\{[^}]*grid-template-columns:\s*1fr/);
+assert.match(css, /max-width:\s*680px[\s\S]+\.calendar-months\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
 assert.match(css, /\.results-help\s*\{[^}]*align-self:\s*flex-end;[^}]*text-align:\s*right/);
 assert.match(css, /\.table-note-bottom\s*\{[^}]*text-align:\s*right/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);

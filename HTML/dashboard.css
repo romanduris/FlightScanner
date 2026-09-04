@@ -333,7 +333,14 @@ footer a { color: inherit; }
   .results-help { width: 100%; max-width: none; align-self: stretch; text-align: right; }
   .results-date-controls { width: 100%; }
   .calendar-toolbar { align-items: flex-start; }
-  .calendar-months { grid-template-columns: 1fr; }
+  .calendar-content { padding: 12px 8px 14px; }
+  .calendar-months { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .calendar-month { min-width: 0; padding: 7px 3px 8px; }
+  .calendar-month h3 { margin-bottom: 6px; font-size: 10px; }
+  .calendar-weekdays, .calendar-days { gap: 1px; }
+  .calendar-weekdays span { font-size: 6px; }
+  .calendar-days button, .calendar-blank { width: 20px; height: 20px; }
+  .calendar-days button { font-size: 8px; }
   table { min-width: 0; }
   table .column-duration, table .column-detail { display: none; }
   table .column-destination { width: 40%; }
@@ -352,4 +359,9 @@ footer a { color: inherit; }
   .return-when { grid-column: 2 / -1; }
   .return-price { text-align: left; }
   footer { flex-direction: column; padding: 0 11px 18px; }
+}
+
+@media (max-width: 360px) {
+  .calendar-days button, .calendar-blank { width: 17px; height: 19px; }
+  .calendar-days button { font-size: 7px; }
 }
