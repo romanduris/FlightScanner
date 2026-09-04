@@ -36,6 +36,8 @@ main { width: min(1420px, calc(100% - 44px)); margin: 0 auto; padding: 24px 0 36
 .page-heading h1 { margin: 4px 0 5px; font-size: clamp(22px, 3vw, 32px); letter-spacing: -.7px; }
 .page-heading p { max-width: 680px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .eyebrow { color: var(--blue); font-size: 8px; font-weight: 900; letter-spacing: 1.15px; text-transform: uppercase; }
+.heading-controls { display: flex; flex: 0 0 auto; align-items: flex-end; flex-direction: column; gap: 7px; }
+.page-refreshed { color: var(--muted); font-size: 9px; font-weight: 700; }
 .period-switch { display: flex; flex: 0 0 auto; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 9px; background: white; }
 .period-switch button { min-width: 43px; padding: 7px 9px; cursor: pointer; color: var(--muted); border: 0; border-radius: 6px; background: transparent; font-size: 10px; font-weight: 850; }
 .period-switch button.active { color: white; background: var(--blue); }
@@ -52,9 +54,9 @@ h2 { margin: 2px 0 0; font-size: 17px; }
 .metric-grid-five { grid-template-columns: repeat(5, minmax(125px, 1fr)); }
 .metric-grid-six { grid-template-columns: repeat(6, minmax(115px, 1fr)); }
 .metric-card { min-height: 91px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
-.metric-card > span, .insight-card > span { color: var(--muted); font-size: 8px; font-weight: 850; letter-spacing: .65px; text-transform: uppercase; }
+.metric-card > span { color: var(--muted); font-size: 8px; font-weight: 850; letter-spacing: .65px; text-transform: uppercase; }
 .metric-card strong { display: block; margin: 6px 0 2px; font-size: 24px; line-height: 1; letter-spacing: -.6px; }
-.metric-card small, .insight-card small { display: block; overflow: hidden; color: var(--muted); font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }
+.metric-card small { display: block; overflow: hidden; color: var(--muted); font-size: 8px; white-space: nowrap; text-overflow: ellipsis; }
 .metric-card.featured { color: white; border-color: var(--blue); background: linear-gradient(135deg, #174a9d, #0c2b68); }
 .metric-card.featured > span, .metric-card.featured small { color: #c8d8ee; }
 .chart-card { margin: 10px 16px 0; padding: 13px 14px 10px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
@@ -83,9 +85,6 @@ h2 { margin: 2px 0 0; font-size: 17px; }
 .notice { margin: 10px 16px 0; padding: 12px 14px; color: #765a11; border: 1px solid #eedb9b; border-radius: 9px; background: #fff9e8; }
 .notice strong, .notice span { display: block; }
 .notice span { margin-top: 3px; font-size: 9px; }
-.insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 16px 0; }
-.insight-card { min-height: 76px; padding: 12px 14px; border-left: 3px solid var(--yellow); border-radius: 8px; background: #f7f9fc; }
-.insight-card strong { display: block; margin: 5px 0 2px; font-size: 14px; }
 .airline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px 16px 16px; }
 .airline-card { display: grid; grid-template-columns: 110px repeat(4, 1fr); align-items: center; gap: 12px; min-height: 68px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
 .airline-name { font-size: 14px; font-weight: 950; }
@@ -130,14 +129,14 @@ footer a { color: var(--blue); text-decoration: none; }
   main, footer { width: calc(100% - 16px); }
   main { padding-top: 14px; }
   .page-heading { align-items: stretch; flex-direction: column; gap: 13px; }
-  .period-switch { align-self: flex-start; }
+  .heading-controls { align-items: flex-start; }
   .panel-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
   .metric-grid-five, .metric-grid-six { grid-template-columns: repeat(2, 1fr); }
   .metric-card { min-height: 82px; }
   .metric-card strong { font-size: 21px; }
-  .breakdown-grid, .insight-grid, .airline-grid { grid-template-columns: 1fr; }
+  .breakdown-grid, .airline-grid { grid-template-columns: 1fr; }
   .breakdown-grid { padding-inline: 10px; }
-  .metric-grid, .insight-grid, .airline-grid { padding-left: 10px; padding-right: 10px; }
+  .metric-grid, .airline-grid { padding-left: 10px; padding-right: 10px; }
   .chart-card { margin-left: 10px; margin-right: 10px; }
   .airline-card { grid-template-columns: 1fr repeat(4, 1fr); padding-inline: 10px; gap: 6px; }
   .airline-name { font-size: 11px; }

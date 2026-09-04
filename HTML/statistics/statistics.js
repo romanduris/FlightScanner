@@ -6,7 +6,7 @@
       back: "← Späť na lety", eyebrow: "Štatistiky", title: "Ako funguje BTSFLIGHTSCANER",
       subtitle: "Návštevnosť stránky, aktuálnosť letových dát a história automatických zberov.",
       trafficEyebrow: "Návštevnosť", trafficTitle: "Ľudia na stránke", loading: "Načítavam…",
-      visits: "Návštevy", humanTraffic: "bez automatizovaných botov", pageviews: "Zobrazenia", pagesOpened: "otvorené stránky",
+      visits: "Návštevy", humanTraffic: "anonymné návštevy bez sledovania ľudí", pageviews: "Zobrazenia", pagesOpened: "otvorené stránky",
       pagesPerVisit: "Stránky / návštevu", visitAverage: "priemer za návštevu", engagement: "Čas na stránke", engagementNote: "aktívny priemer",
       mobileShare: "Mobilné zariadenia", trafficShare: "podiel návštevnosti", analyticsUnavailable: "Cloudflare štatistiky zatiaľ nie sú pripojené",
       analyticsUnavailableBody: "Letové a GitHub štatistiky nižšie fungujú ďalej.", trafficTrend: "Vývoj návštevnosti",
@@ -20,13 +20,14 @@
       started: "Spustené", type: "Typ", state: "Stav", duration: "Trvanie", details: "Detail", historyNote: "Počty letov sa ukladajú od zavedenia tejto stránky. Staršie behy preto môžu mať iba čas a stav.",
       privacy: "súkromie bez cookies a sledovania jednotlivcov", live: "Aktuálne dáta", noData: "Zatiaľ bez dát", direct: "Priamy vstup", scan: "Zber dát", deploy: "Nasadenie", manual: "Ručný zber",
       success: "Úspešný", failure: "Chyba", cancelled: "Zrušený", in_progress: "Prebieha", queued: "Čaká", open: "Otvoriť", days: "dní", ago: "dozadu",
+      lastRefreshed: "Naposledy obnovené", updatedAt: "údaje z",
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
     en: {
       back: "← Back to flights", eyebrow: "Statistics", title: "How BTSFLIGHTSCANER works",
       subtitle: "Website traffic, flight data freshness and the history of automated scans.",
       trafficEyebrow: "Traffic", trafficTitle: "People on the website", loading: "Loading…",
-      visits: "Visits", humanTraffic: "automated bots excluded", pageviews: "Page views", pagesOpened: "pages opened",
+      visits: "Visits", humanTraffic: "anonymous visits without individual tracking", pageviews: "Page views", pagesOpened: "pages opened",
       pagesPerVisit: "Pages / visit", visitAverage: "average per visit", engagement: "Time on page", engagementNote: "active average",
       mobileShare: "Mobile devices", trafficShare: "share of traffic", analyticsUnavailable: "Cloudflare statistics are not connected yet",
       analyticsUnavailableBody: "Flight and GitHub statistics below remain available.", trafficTrend: "Traffic trend",
@@ -40,12 +41,13 @@
       started: "Started", type: "Type", state: "Status", duration: "Duration", details: "Details", historyNote: "Flight counts are stored from the launch of this page. Older runs may only show their time and status.",
       privacy: "privacy without cookies or individual tracking", live: "Live data", noData: "No data yet", direct: "Direct", scan: "Data scan", deploy: "Deployment", manual: "Manual scan",
       success: "Successful", failure: "Failed", cancelled: "Cancelled", in_progress: "Running", queued: "Queued", open: "Open", days: "days", ago: "ago",
+      lastRefreshed: "Last refreshed", updatedAt: "data from",
       newRoutes: "new", removedRoutes: "removed", noChanges: "No change since the previous scan", flights: "flights", returns: "returns", errors: "errors",
     },
   };
 
   const queryLanguage = new URLSearchParams(location.search).get("lang");
-  let language = queryLanguage === "en" ? "en" : "sk";
+  let language = queryLanguage === "sk" ? "sk" : "en";
   let days = 30;
   let staticData = null;
   let liveData = null;
@@ -55,7 +57,6 @@
   const number = (value, digits = 0) => value == null || !Number.isFinite(Number(value))
     ? "—"
     : new Intl.NumberFormat(language === "sk" ? "sk-SK" : "en-GB", { maximumFractionDigits: digits, minimumFractionDigits: digits }).format(Number(value));
-  const money = (value) => value == null ? "—" : new Intl.NumberFormat(language === "sk" ? "sk-SK" : "en-IE", { style: "currency", currency: "EUR" }).format(value);
   const date = (value, withTime = false) => {
     if (!value) return "—";
     const parsed = new Date(value.length === 10 ? `${value}T12:00:00Z` : value);
@@ -63,6 +64,16 @@
     return new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", withTime
       ? { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Bratislava" }
       : { day: "2-digit", month: "2-digit", year: "numeric" }).format(parsed);
+  };
+  const exactDateTime = (value) => {
+    if (!value) return "—";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return "—";
+    return new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      timeZone: "Europe/Bratislava",
+    }).format(parsed);
   };
   const duration = (seconds) => {
     if (seconds == null) return "—";
@@ -151,8 +162,12 @@
     const traffic = liveData?.traffic;
     const available = traffic?.available === true;
     byId("traffic-unavailable").hidden = available;
-    byId("traffic-state").textContent = available ? text("live") : text("noData");
+    const refreshedAt = liveData?.generated_at_utc;
+    byId("traffic-state").textContent = available
+      ? `${text("live")} · ${text("updatedAt")} ${exactDateTime(refreshedAt)}`
+      : text("noData");
     byId("traffic-state").classList.toggle("loading", !available);
+    byId("page-refreshed").textContent = `${text("lastRefreshed")}: ${exactDateTime(refreshedAt || staticData?.generated_at_utc)}`;
     const summary = traffic?.summary || {};
     setMetric("metric-visits", available ? number(summary.visits) : "—");
     setMetric("metric-pageviews", available ? number(summary.pageviews) : "—");
@@ -192,17 +207,7 @@
     setMetric("scan-through", date(current.period_end));
     setMetric("scan-days", current.scan_days ? `${current.scan_days} ${text("days")}` : "—");
     setMetric("scan-period", `${date(current.period_start)} – ${date(current.period_end)}`);
-    byId("scan-freshness").textContent = scanAge(current.scanned_at_utc);
-    const cheapest = current.cheapest_one_way;
-    setMetric("cheapest-flight", cheapest ? `${money(cheapest.price)} · ${cheapest.destination}` : "—");
-    setMetric("cheapest-detail", cheapest ? `${date(cheapest.date)} · ${cheapest.airline}` : "—");
-    setMetric("average-price", money(current.average_one_way_price));
-    const additions = current.new_routes || [];
-    const removals = current.removed_routes || [];
-    setMetric("route-changes", additions.length || removals.length ? `+${additions.length} / −${removals.length}` : "0");
-    setMetric("route-change-detail", additions.length || removals.length
-      ? `${text("newRoutes")}: ${additions.join(", ") || "—"} · ${text("removedRoutes")}: ${removals.join(", ") || "—"}`
-      : text("noChanges"));
+    byId("scan-freshness").textContent = `${scanAge(current.scanned_at_utc)} · ${exactDateTime(current.scanned_at_utc)}`;
     const target = byId("airline-grid");
     target.replaceChildren();
     (current.airlines || []).forEach((airline) => {
@@ -295,4 +300,6 @@
     renderAll();
     loadLiveData();
   });
+
+  setInterval(() => { loadLiveData(); }, 5 * 60 * 1000);
 })();

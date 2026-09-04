@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="sk">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Štatistiky návštevnosti a zberu dát BTSFLIGHTSCANER.">
-  <title>Štatistiky — BTSFLIGHTSCANER</title>
+  <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
+  <title>Statistics — BTSFLIGHTSCANER</title>
   <link rel="stylesheet" href="statistics.css">
 </head>
 <body>
@@ -29,11 +29,14 @@
         <h1 data-text="title">Ako funguje BTSFLIGHTSCANER</h1>
         <p data-text="subtitle">Návštevnosť stránky, aktuálnosť letových dát a história automatických zberov.</p>
       </div>
-      <div class="period-switch" role="group" aria-label="Obdobie">
-        <button type="button" data-days="1">24 h</button>
-        <button type="button" data-days="7">7 d</button>
-        <button type="button" data-days="30" class="active">30 d</button>
-        <button type="button" data-days="90">90 d</button>
+      <div class="heading-controls">
+        <span id="page-refreshed" class="page-refreshed">Last refreshed: —</span>
+        <div class="period-switch" role="group" aria-label="Period">
+          <button type="button" data-days="1">24 h</button>
+          <button type="button" data-days="7">7 d</button>
+          <button type="button" data-days="30" class="active">30 d</button>
+          <button type="button" data-days="90">90 d</button>
+        </div>
       </div>
     </section>
 
@@ -96,11 +99,6 @@
         <article class="metric-card"><span data-text="returnFlights">Spiatočné lety</span><strong id="scan-returns">—</strong><small data-text="possibleReturns">nájdené návraty</small></article>
         <article class="metric-card"><span data-text="providerErrors">Chyby poskytovateľov</span><strong id="scan-errors">—</strong><small data-text="latestScan">posledný zber</small></article>
         <article class="metric-card"><span data-text="dataThrough">Dáta do</span><strong id="scan-through">—</strong><small id="scan-days">—</small></article>
-      </div>
-      <div class="insight-grid">
-        <article class="insight-card"><span data-text="cheapestFlight">Najlacnejší nájdený let</span><strong id="cheapest-flight">—</strong><small id="cheapest-detail">—</small></article>
-        <article class="insight-card"><span data-text="averagePrice">Priemerná jednosmerná cena</span><strong id="average-price">—</strong><small data-text="allAvailableFlights">všetky dostupné odlety</small></article>
-        <article class="insight-card"><span data-text="routeChanges">Zmeny trás</span><strong id="route-changes">—</strong><small id="route-change-detail">—</small></article>
       </div>
       <div class="airline-grid" id="airline-grid"></div>
     </section>
