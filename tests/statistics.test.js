@@ -14,8 +14,11 @@ assert.match(statisticsHtml, /id="click-offers"/);
 assert.match(statisticsHtml, /id="click-ryanair"/);
 assert.match(statisticsHtml, /id="click-wizz"/);
 assert.match(statisticsHtml, /id="click-booking"/);
+assert.equal((statisticsHtml.match(/data-collapsible/g) || []).length, 5);
+assert.equal((statisticsHtml.match(/class="section-toggle"/g) || []).length, 5);
 assert.match(statisticsJs, /queryLanguage === "sk" \? "sk" : "en"/);
 assert.match(statisticsJs, /clicks\.offer_opens/);
+assert.match(statisticsJs, /bindCollapsibleSections/);
 assert.match(engagementJs, /data-stat-click/);
 assert.match(dashboardJs, /trackClick\("offer_open", offer\.airline\)/);
 

@@ -24,6 +24,7 @@
       clicksEyebrow: "Interakcie", clicksTitle: "Na čo návštevníci klikajú", clicksNote: "anonymné súčty za vybrané obdobie",
       offersOpened: "Otvorené ponuky", flightDetails: "zobrazené detaily letov", ryanairClicks: "Kliknutia na Ryanair", wizzClicks: "Kliknutia na Wizz Air",
       bookingClicks: "Kliknutia na Booking.com", airlineBooking: "odkaz na rezerváciu letu", accommodationLink: "odkaz na ubytovanie",
+      showSection: "Zobraziť", hideSection: "Skryť",
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
     en: {
@@ -48,6 +49,7 @@
       clicksEyebrow: "Interactions", clicksTitle: "What visitors click", clicksNote: "anonymous totals for the selected period",
       offersOpened: "Offers opened", flightDetails: "flight details displayed", ryanairClicks: "Ryanair clicks", wizzClicks: "Wizz Air clicks",
       bookingClicks: "Booking.com clicks", airlineBooking: "airline booking link", accommodationLink: "accommodation link",
+      showSection: "Show", hideSection: "Hide",
       newRoutes: "new", removedRoutes: "removed", noChanges: "No change since the previous scan", flights: "flights", returns: "returns", errors: "errors",
     },
   };
@@ -96,7 +98,30 @@
     const url = new URL(location.href);
     url.searchParams.set("lang", language);
     history.replaceState(null, "", url);
+    updateCollapseLabels();
     if (staticData) renderAll();
+  }
+
+  function updateCollapseLabels() {
+    document.querySelectorAll("[data-collapsible] .section-toggle").forEach((button) => {
+      const action = button.getAttribute("aria-expanded") === "true" ? text("hideSection") : text("showSection");
+      button.setAttribute("aria-label", `${action} ${text(button.dataset.sectionText)}`);
+    });
+  }
+
+  function bindCollapsibleSections() {
+    document.querySelectorAll("[data-collapsible]").forEach((section) => {
+      const button = section.querySelector(".section-toggle");
+      const content = button ? byId(button.getAttribute("aria-controls")) : null;
+      if (!button || !content) return;
+      button.addEventListener("click", () => {
+        const collapse = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!collapse));
+        section.classList.toggle("collapsed", collapse);
+        content.hidden = collapse;
+        updateCollapseLabels();
+      });
+    });
   }
 
   function setMetric(id, value) { byId(id).textContent = value; }
@@ -296,6 +321,7 @@
     await loadLiveData();
   }));
 
+  bindCollapsibleSections();
   applyLanguage();
   Promise.all([
     fetch("data.json", { cache: "no-store" }).then((response) => {
