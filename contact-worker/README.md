@@ -5,7 +5,7 @@ The Worker receives the contact form at `/api/contact`, verifies Cloudflare Turn
 ## One-time Cloudflare setup
 
 1. In **Compute > Email Service > Email Routing > Destination Addresses**, add the destination Gmail address and confirm the verification email.
-2. Enable Email Routing for `rodulab.com`. The Worker sends from `contact@rodulab.com` to the verified destination.
+2. Enable Email Routing for the dedicated `notify.rodulab.com` subdomain. The Worker sends from `contact@notify.rodulab.com` to the verified destination without changing the apex domain's existing mail routing.
 3. In **Turnstile**, create a Managed widget restricted to `btsflightscaner.rodulab.com`.
 4. Install the local tooling:
 

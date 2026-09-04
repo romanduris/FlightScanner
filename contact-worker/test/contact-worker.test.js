@@ -9,7 +9,7 @@ function environment(send) {
   return {
     ALLOWED_ORIGIN: ORIGIN,
     EXPECTED_HOSTNAME: "btsflightscaner.rodulab.com",
-    CONTACT_FROM_EMAIL: "contact@rodulab.com",
+    CONTACT_FROM_EMAIL: "contact@notify.rodulab.com",
     CONTACT_EMAIL: "owner@example.test",
     TURNSTILE_SECRET: "turnstile-secret",
     TURNSTILE_SITE_KEY: "turnstile-site-key",
@@ -83,7 +83,7 @@ test("a valid submission is verified and sent to the secret destination", async 
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), { ok: true });
     assert.equal(sentMessage.to, "owner@example.test");
-    assert.equal(sentMessage.from.email, "contact@rodulab.com");
+    assert.equal(sentMessage.from.email, "contact@notify.rodulab.com");
     assert.equal(sentMessage.replyTo.email, "visitor@example.com");
     assert.match(sentMessage.text, /Hello <script>alert\(1\)<\/script> creators!/);
     assert.doesNotMatch(sentMessage.html, /<script>/);

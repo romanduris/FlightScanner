@@ -17,7 +17,7 @@
   "vars": {
     "ALLOWED_ORIGIN": "https://btsflightscaner.rodulab.com",
     "EXPECTED_HOSTNAME": "btsflightscaner.rodulab.com",
-    "CONTACT_FROM_EMAIL": "contact@rodulab.com"
+    "CONTACT_FROM_EMAIL": "contact@notify.rodulab.com"
   },
   "secrets": {
     "required": [
