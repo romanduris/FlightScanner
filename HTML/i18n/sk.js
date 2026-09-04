@@ -43,8 +43,6 @@
       "filters.allDestinations": "Všetky destinácie",
       "filters.maxPrice": "Max. cena",
       "filters.maxDuration": "Max. dĺžka",
-      "filters.departureDay": "Odlet v deň",
-      "filters.departureDaysAria": "Dni odletu",
       "map.toggle": "Skryť mapu",
       "map.sectionName": "mapu",
       "map.eyebrow": "Mapa spojení",

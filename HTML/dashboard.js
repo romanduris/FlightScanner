@@ -47,7 +47,6 @@
     travellers: 1,
     firstVisibleDay: initialVisibleDay,
     lastVisibleDay: Math.min(lastScanDay, initialVisibleDay + visibleWindowDays - 1),
-    selectedWeekdays: new Set(),
     sortKey: "departure_local",
     sortDirection: "asc",
     selectedOffer: null,
@@ -75,7 +74,6 @@
     calendarSelectedDate: document.querySelector("#calendar-selected-date"),
     calendarPrevious: document.querySelector("#calendar-prev"),
     calendarNext: document.querySelector("#calendar-next"),
-    weekdays: document.querySelector("#weekday-buttons"),
     rows: document.querySelector("#flight-rows"),
     resultCount: document.querySelector("#result-count"),
     empty: document.querySelector("#empty-state"),
@@ -304,7 +302,6 @@
       ...sortedCountries.map(([code, name]) => `<option value="${escapeHtml(code)}">${escapeHtml(name)}</option>`),
     ].join("");
     populateDestinations();
-    elements.weekdays.innerHTML = weekdays.map((day) => `<button type="button" data-weekday="${day}" aria-pressed="false">${day}</button>`).join("");
     syncPriceControl();
     updateTravellerControl();
     elements.duration.max = maxDuration;
@@ -413,7 +410,6 @@
       const departureDate = isoDate(offer.departure_local);
       return (!state.country || offer.country_code === state.country)
         && (!state.destination || offer.destination_iata === state.destination)
-        && (!state.selectedWeekdays.size || state.selectedWeekdays.has(weekdayFor(offer.departure_local)))
         && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
         && offer.price <= state.maxPrice
         && (offer.duration_minutes || Infinity) <= state.maxDuration;
@@ -701,17 +697,12 @@
     state.firstVisibleDay = defaultVisibleDay();
     state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
-    state.selectedWeekdays.clear();
     elements.country.value = "";
     populateDestinations();
     syncPriceControl();
     updateTravellerControl();
     elements.duration.value = maxDuration;
     syncDateRange();
-    elements.weekdays.querySelectorAll("button").forEach((button) => {
-      button.classList.remove("active");
-      button.setAttribute("aria-pressed", "false");
-    });
     renderCalendar();
     renderAirlineSummary();
     updateRangeLabels();
@@ -777,16 +768,6 @@
     elements.calendarNext.addEventListener("click", () => {
       calendarCursor = addMonths(calendarCursor, 1);
       renderCalendar();
-    });
-    elements.weekdays.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-weekday]");
-      if (!button) return;
-      const day = button.dataset.weekday;
-      if (state.selectedWeekdays.has(day)) state.selectedWeekdays.delete(day);
-      else state.selectedWeekdays.add(day);
-      button.classList.toggle("active");
-      button.setAttribute("aria-pressed", String(button.classList.contains("active")));
-      render();
     });
     document.querySelectorAll("th button[data-sort]").forEach((button) => button.addEventListener("click", () => {
       if (state.sortKey === button.dataset.sort) state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";

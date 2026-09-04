@@ -49,6 +49,7 @@
       group_adults: String(Math.max(1, Number(stay.adults) || 1)),
       no_rooms: "1",
       group_children: "0",
+      currency: "EUR",
       selected_currency: "EUR",
     }).toString();
 

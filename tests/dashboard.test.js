@@ -165,6 +165,8 @@ assert.equal(hotelUrl.searchParams.get("checkin"), "2026-09-03");
 assert.equal(hotelUrl.searchParams.get("checkout"), "2026-09-08");
 assert.equal(hotelUrl.searchParams.get("group_adults"), "1");
 assert.equal(hotelUrl.searchParams.get("no_rooms"), "1");
+assert.equal(hotelUrl.searchParams.get("currency"), "EUR");
+assert.equal(hotelUrl.searchParams.get("selected_currency"), "EUR");
 assert.equal(hotelUrl.searchParams.has("aid"), false);
 window.BOOKING_COM_CONFIG.affiliateId = "123456";
 const affiliateHotelUrl = new URL(window.BookingComLinks.buildUrl({
@@ -175,6 +177,8 @@ const affiliateHotelUrl = new URL(window.BookingComLinks.buildUrl({
 assert.equal(affiliateHotelUrl.searchParams.get("ss"), "London");
 assert.equal(affiliateHotelUrl.searchParams.get("aid"), "123456");
 assert.equal(affiliateHotelUrl.searchParams.get("label"), "flightscanner-return-stay");
+assert.equal(affiliateHotelUrl.searchParams.get("currency"), "EUR");
+assert.equal(affiliateHotelUrl.searchParams.get("selected_currency"), "EUR");
 window.BOOKING_COM_CONFIG.affiliateId = "";
 const hotelButton = window.BookingComLinks.createButton({
   stay: {
@@ -314,18 +318,9 @@ assert.doesNotMatch(rows.innerHTML, /SKORŠÍ LET/);
 element("#destination-filter").listeners.change({ target: { value: "ATH" } });
 assert.match(rows.innerHTML, /ATÉNY/);
 
-const fridayButton = {
-  dataset: { weekday: "Pia" },
-  classList: new ClassList(),
-  setAttribute() {},
-};
-element("#weekday-buttons").listeners.click({
-  target: { closest: () => fridayButton },
-});
-
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /42,29/);
-assert.doesNotMatch(rows.innerHTML, /28\.09\.2026/);
+assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
 assert.match(element("#period-label").textContent, /2\. septembra – 30\. novembra 2026/);
 
@@ -346,6 +341,7 @@ const javascript = fs.readFileSync(
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.match(html, /data-sort="departure_local"[^>]*>[\s\S]{0,100}Odlet/);
 assert.match(html, /class="stat-label"[^>]*>Destinácie<\/span>/);
+assert.ok(html.indexOf('data-i18n="overview.countries"') < html.indexOf('data-i18n="overview.destinations"'));
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
@@ -377,7 +373,7 @@ assert.match(html, /aria-controls="results-content"/);
 const filterContent = html.match(/id="filters-content"[\s\S]*?<\/section>/)?.[0] || "";
 const calendarContent = html.match(/id="calendar-content"[\s\S]*?<\/section>/)?.[0] || "";
 assert.doesNotMatch(filterContent, /id="weekday-buttons"/);
-assert.match(calendarContent, /id="weekday-buttons"/);
+assert.doesNotMatch(calendarContent, /id="weekday-buttons"|filters\.departureDay/);
 assert.ok(html.indexOf('class="map-card') < html.indexOf('class="filter-panel'));
 assert.ok(html.indexOf('class="filter-panel') < html.indexOf('class="calendar-card'));
 assert.ok(html.indexOf('class="calendar-card') < html.indexOf('class="results-card'));

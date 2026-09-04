@@ -55,8 +55,6 @@
       "filters.allDestinations": "All destinations",
       "filters.maxPrice": "Max. price",
       "filters.maxDuration": "Max. duration",
-      "filters.departureDay": "Departure day",
-      "filters.departureDaysAria": "Departure days",
       "map.toggle": "Hide map",
       "map.sectionName": "map",
       "map.eyebrow": "Route map",
