@@ -12,7 +12,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=20260904112905">
+  <link rel="stylesheet" href="dashboard.css?v=20260904114649">
 </head>
 <body>
   <header class="topbar">
@@ -36,17 +36,17 @@
   </header>
 
   <main>
-    <section class="overview-section collapsible-section" data-collapsible aria-label="Súhrn ponúk" data-i18n-aria="overview.aria">
+    <section class="overview-section collapsible-section collapsed" data-collapsible aria-label="Súhrn ponúk" data-i18n-aria="overview.aria">
       <div class="section-header overview-header">
         <div class="heading-with-toggle">
-          <button class="section-toggle overview-toggle" type="button" aria-expanded="true" aria-controls="overview-content" aria-label="Skryť prehľad letov" data-i18n-aria="overview.toggle" data-section-key="overview.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle overview-toggle" type="button" aria-expanded="false" aria-controls="overview-content" aria-label="Zobraziť prehľad letov" data-i18n-aria="overview.toggle" data-section-key="overview.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div class="overview-heading-copy">
             <span class="eyebrow" data-i18n="overview.eyebrow">Súhrn</span>
             <h2 data-i18n="overview.label">Prehľad letov</h2>
           </div>
         </div>
       </div>
-      <div id="overview-content" class="overview-grid collapsible-content">
+      <div id="overview-content" class="overview-grid collapsible-content" hidden>
         <div class="summary-grid">
           <article class="stat-card stat-primary">
             <span class="stat-label" data-i18n="overview.countries">Krajiny</span>
@@ -90,10 +90,10 @@
       </div>
     </section>
 
-    <section class="filter-panel collapsible-section" data-collapsible aria-label="Filtrovanie letov" data-i18n-aria="filters.aria">
+    <section class="filter-panel collapsible-section collapsed" data-collapsible aria-label="Filtrovanie letov" data-i18n-aria="filters.aria">
       <div class="filter-heading">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="filters-content" aria-label="Skryť filtre" data-i18n-aria="filters.toggle" data-section-key="filters.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="filters-content" aria-label="Zobraziť filtre" data-i18n-aria="filters.toggle" data-section-key="filters.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div>
             <span class="eyebrow" data-i18n="filters.quick">Rýchly výber</span>
             <h1 data-i18n="filters.title">Lety z Bratislavy</h1>
@@ -102,7 +102,7 @@
         <button id="reset-filters" class="button button-ghost" type="button" data-i18n="filters.reset">↺ Zrušiť filtre</button>
       </div>
 
-      <div id="filters-content" class="collapsible-content">
+      <div id="filters-content" class="collapsible-content" hidden>
         <div class="filter-grid">
           <label class="field">
             <span data-i18n="filters.country">Krajina</span>
@@ -205,6 +205,50 @@
         <p class="table-note table-note-bottom" data-i18n="results.priceNote">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
       </div>
     </section>
+
+    <section class="contact-card collapsible-section collapsed" data-collapsible aria-label="Kontakt" data-i18n-aria="contact.aria">
+      <div class="section-header">
+        <div class="heading-with-toggle">
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="contact-content" aria-label="Zobraziť kontakt" data-i18n-aria="contact.toggle" data-section-key="contact.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div>
+            <span class="eyebrow" data-i18n="contact.eyebrow">Kontakt</span>
+            <h2 data-i18n="contact.title">Napíšte tvorcom</h2>
+          </div>
+        </div>
+      </div>
+      <div id="contact-content" class="contact-content collapsible-content" hidden>
+        <div class="contact-intro">
+          <span class="contact-icon" aria-hidden="true">✉</span>
+          <p data-i18n="contact.intro">Máte nápad, pripomienku alebo ste našli chybu? Pošlite nám krátku správu.</p>
+        </div>
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="contact-fields">
+            <label>
+              <span data-i18n="contact.name">Meno</span>
+              <input id="contact-name" name="name" type="text" autocomplete="name" maxlength="80" required>
+            </label>
+            <label>
+              <span data-i18n="contact.email">E-mail</span>
+              <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+            </label>
+            <label class="contact-message-field">
+              <span data-i18n="contact.message">Správa</span>
+              <textarea id="contact-message" name="message" rows="4" minlength="10" maxlength="2000" required></textarea>
+            </label>
+            <label class="contact-honeypot" aria-hidden="true">
+              <span>Website</span>
+              <input name="website" type="text" tabindex="-1" autocomplete="off">
+            </label>
+          </div>
+          <div id="contact-turnstile" class="contact-turnstile"></div>
+          <div class="contact-actions">
+            <small data-i18n="contact.privacy">Váš e-mail použijeme iba na odpoveď.</small>
+            <button id="contact-submit" class="contact-submit" type="submit" disabled data-i18n="contact.submit">Odoslať správu</button>
+          </div>
+          <p id="contact-status" class="contact-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
   </main>
 
   <dialog id="flight-detail" class="flight-dialog">
@@ -223,8 +267,8 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="i18n/sk.js?v=20260904112905"></script>
-  <script src="i18n/en.js?v=20260904112905"></script>
+  <script src="i18n/sk.js?v=20260904114649"></script>
+  <script src="i18n/en.js?v=20260904114649"></script>
   <script src="i18n/i18n.js?v=20260904112023"></script>
   <script src="booking/booking-com-config.js?v=20260904112023"></script>
   <script src="booking/booking-com.js?v=20260904112023"></script>
@@ -232,6 +276,7 @@
   <script src="booking/ryanair.js?v=20260904112023"></script>
   <script src="booking/wizzair.js?v=20260904112023"></script>
   <script src="dashboard.js?v=20260904112905"></script>
+  <script src="contact/contact.js?v=20260904114649"></script>
   <!-- Cloudflare Web Analytics -->
   <script
     type="module"

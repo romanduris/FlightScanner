@@ -1,0 +1,40 @@
+# FlightScanner contact Worker
+
+The Worker receives the contact form at `/api/contact`, verifies Cloudflare Turnstile, and sends the message to one verified destination through Cloudflare Email Service. The destination address and Turnstile keys are never stored in the repository or returned to the browser.
+
+## One-time Cloudflare setup
+
+1. In **Compute > Email Service > Email Routing > Destination Addresses**, add the destination Gmail address and confirm the verification email.
+2. Enable Email Routing for `rodulab.com`. The Worker sends from `contact@rodulab.com` to the verified destination.
+3. In **Turnstile**, create a Managed widget restricted to `btsflightscaner.rodulab.com`.
+4. Install the local tooling:
+
+   ```bash
+   cd contact-worker
+   npm install
+   npx wrangler login
+   ```
+
+5. Create a local secret file that is ignored by Git:
+
+   ```bash
+   cp .env.example .env.production
+   ```
+
+   Fill in `CONTACT_EMAIL`, `TURNSTILE_SECRET`, and `TURNSTILE_SITE_KEY`.
+
+6. Deploy the code and secrets together:
+
+   ```bash
+   npm run deploy -- --secrets-file .env.production
+   ```
+
+The route in `wrangler.jsonc` intercepts only `btsflightscaner.rodulab.com/api/contact*`; the rest of the website continues to be served by GitHub Pages.
+
+## Local checks
+
+```bash
+npm test
+```
+
+The public form intentionally stays disabled when the Worker or Turnstile configuration is unavailable.

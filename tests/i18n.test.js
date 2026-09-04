@@ -62,9 +62,11 @@ assert.equal(window.FlightI18n.countryName("GR", "Grécko"), "Greece");
 
 const html = fs.readFileSync(path.join(__dirname, "..", "HTML", "index.html"), "utf8");
 const dashboard = fs.readFileSync(path.join(__dirname, "..", "HTML", "dashboard.js"), "utf8");
+const contact = fs.readFileSync(path.join(__dirname, "..", "HTML", "contact", "contact.js"), "utf8");
 const translationKeys = new Set([
   ...[...html.matchAll(/data-i18n(?:-aria)?="([^"]+)"/g)].map((match) => match[1]),
   ...[...dashboard.matchAll(/\bt\("([^"]+)"/g)].map((match) => match[1]),
+  ...[...contact.matchAll(/\.t\("([^"]+)"/g)].map((match) => match[1]),
 ]);
 for (const language of ["sk", "en"]) {
   const missingKeys = [...translationKeys].filter((key) => !(key in window.FLIGHT_TRANSLATIONS[language].text));

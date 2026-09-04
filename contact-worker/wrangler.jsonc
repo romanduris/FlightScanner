@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flightscanner-contact",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-04",
+  "routes": [
+    {
+      "pattern": "btsflightscaner.rodulab.com/api/contact*",
+      "zone_name": "rodulab.com"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://btsflightscaner.rodulab.com",
+    "EXPECTED_HOSTNAME": "btsflightscaner.rodulab.com",
+    "CONTACT_FROM_EMAIL": "contact@rodulab.com"
+  },
+  "secrets": {
+    "required": [
+      "CONTACT_EMAIL",
+      "TURNSTILE_SECRET",
+      "TURNSTILE_SITE_KEY"
+    ]
+  },
+  "observability": {
+    "enabled": true
+  }
+}

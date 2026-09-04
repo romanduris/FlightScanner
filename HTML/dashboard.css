@@ -22,7 +22,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; background: var(--surface); font-size: 12px; }
-button, input, select { font: inherit; }
+button, input, select, textarea { font: inherit; }
 button { color: inherit; }
 
 .topbar {
@@ -97,7 +97,7 @@ main { max-width: 1540px; margin: 0 auto; padding: 18px 22px 36px; }
 .airline-best span { display: block; color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; }
 .airline-best strong { font-size: 14px; white-space: nowrap; }
 
-.filter-panel, .map-card, .calendar-card, .results-card { margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); }
+.filter-panel, .map-card, .calendar-card, .results-card, .contact-card { margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); }
 .filter-panel { padding: 15px 17px 12px; }
 .filter-heading, .section-header { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
 h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; }
@@ -113,8 +113,8 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .field select { width: 100%; height: 34px; padding: 0 10px; color: var(--ink); border: 1px solid #d7e0ec; border-radius: 7px; outline: none; background: #fbfcfe; }
 .field input:focus, .field select:focus { border-color: #5b83c8; box-shadow: 0 0 0 3px rgba(38, 93, 178, .1); }
 .range-field input { width: 100%; height: 18px; margin: 5px 0 0; accent-color: var(--blue); cursor: pointer; }
-.map-card, .calendar-card { overflow: hidden; }
-.map-card .section-header, .calendar-card .section-header, .results-card .section-header { min-height: 55px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.map-card, .calendar-card, .contact-card { overflow: hidden; }
+.map-card .section-header, .calendar-card .section-header, .results-card .section-header, .contact-card .section-header { min-height: 55px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
 .collapsible-section.collapsed > .section-header { border-bottom: 0; }
 .map-actions { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 9px; }
 .map-actions > span { display: inline-flex; align-items: center; gap: 5px; }
@@ -275,6 +275,29 @@ td strong { color: var(--ink); }
 .return-price strong { margin-top: 2px; font-size: 12px; }
 .return-total strong { margin-top: 2px; color: var(--blue); font-size: 14px; }
 .return-empty { padding: 14px; color: var(--muted); border: 1px dashed #cbd6e4; border-radius: 8px; background: #f8fafc; text-align: center; }
+.contact-content { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(360px, 1.45fr); gap: 28px; padding: 18px 20px 20px; }
+.contact-intro { display: flex; align-items: flex-start; gap: 11px; color: var(--muted); line-height: 1.55; }
+.contact-intro p { max-width: 300px; margin: 4px 0 0; }
+.contact-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; color: white; border-radius: 9px; background: var(--blue); font-size: 16px; }
+.contact-form { min-width: 0; }
+.contact-fields { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.contact-fields label:not(.contact-honeypot) { display: grid; gap: 5px; color: var(--muted); font-size: 9px; font-weight: 800; }
+.contact-fields input, .contact-fields textarea { width: 100%; color: var(--ink); border: 1px solid #d7e0ec; border-radius: 7px; outline: none; background: #fbfcfe; }
+.contact-fields input { height: 34px; padding: 0 10px; }
+.contact-fields textarea { min-height: 86px; padding: 9px 10px; resize: vertical; line-height: 1.45; }
+.contact-fields input:focus, .contact-fields textarea:focus { border-color: #5b83c8; box-shadow: 0 0 0 3px rgba(38, 93, 178, .1); }
+.contact-message-field { grid-column: 1 / -1; }
+.contact-honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.contact-turnstile { min-height: 0; margin-top: 11px; }
+.contact-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 11px; }
+.contact-actions small { color: var(--muted); font-size: 8px; }
+.contact-submit { min-height: 34px; padding: 7px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-weight: 850; }
+.contact-submit:hover:not(:disabled) { background: var(--blue-dark); }
+.contact-submit:focus-visible { outline: 3px solid rgba(38, 93, 178, .2); outline-offset: 2px; }
+.contact-submit:disabled { cursor: default; opacity: .48; }
+.contact-status { min-height: 16px; margin: 7px 0 0; color: var(--muted); font-size: 9px; }
+.contact-status[data-state="success"] { color: var(--green); }
+.contact-status[data-state="error"] { color: #b42318; }
 footer { display: flex; justify-content: space-between; gap: 20px; max-width: 1540px; margin: 0 auto; padding: 0 22px 24px; color: #77869a; font-size: 9px; }
 footer a { color: inherit; }
 
@@ -359,7 +382,16 @@ footer a { color: inherit; }
   .return-airline-logo { grid-row: 1 / span 2; }
   .return-when { grid-column: 2 / -1; }
   .return-price { text-align: left; }
+  .contact-content { grid-template-columns: 1fr; gap: 15px; padding: 15px 13px 17px; }
+  .contact-intro p { max-width: none; }
+  .contact-fields { grid-template-columns: 1fr; }
+  .contact-message-field { grid-column: auto; }
   footer { flex-direction: column; padding: 0 11px 18px; }
+}
+
+@media (max-width: 420px) {
+  .contact-actions { align-items: stretch; flex-direction: column; }
+  .contact-submit { width: 100%; }
 }
 
 @media (max-width: 400px) {

@@ -357,6 +357,10 @@ const javascript = fs.readFileSync(
   path.join(__dirname, "..", "HTML", "dashboard.js"),
   "utf8",
 );
+const contactJavascript = fs.readFileSync(
+  path.join(__dirname, "..", "HTML", "contact", "contact.js"),
+  "utf8",
+);
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.match(html, /data-sort="departure_local"[^>]*>[\s\S]{0,100}Odlet/);
 assert.match(html, /class="stat-label"[^>]*>Destinácie<\/span>/);
@@ -383,12 +387,18 @@ assert.match(javascript, /class="column-destination"><span class="destination-ce
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*40%/);
 assert.match(css, /\.responsive-duration\s*\{\s*display:\s*none;/);
 assert.match(css, /max-width:\s*680px[\s\S]+\.responsive-duration\s*\{\s*display:\s*inline;/);
-assert.equal((html.match(/data-collapsible/g) || []).length, 5);
+assert.equal((html.match(/data-collapsible/g) || []).length, 6);
 assert.match(html, /aria-controls="overview-content"/);
 assert.match(html, /aria-controls="filters-content"/);
 assert.match(html, /aria-controls="map-content"/);
 assert.match(html, /aria-controls="calendar-content"/);
 assert.match(html, /aria-controls="results-content"/);
+assert.match(html, /aria-controls="contact-content"/);
+assert.match(html, /class="overview-section collapsible-section collapsed"[\s\S]+aria-expanded="false"[^>]+aria-controls="overview-content"[\s\S]+id="overview-content"[^>]+hidden/);
+assert.match(html, /class="filter-panel collapsible-section collapsed"[\s\S]+aria-expanded="false"[^>]+aria-controls="filters-content"[\s\S]+id="filters-content"[^>]+hidden/);
+assert.match(html, /class="contact-card collapsible-section collapsed"[\s\S]+aria-expanded="false"[^>]+aria-controls="contact-content"[\s\S]+id="contact-content"[^>]+hidden/);
+assert.match(html, /id="contact-name"[\s\S]+id="contact-email"[\s\S]+id="contact-message"[\s\S]+id="contact-submit"/);
+assert.doesNotMatch(html, /mailto:/i);
 const filterContent = html.match(/id="filters-content"[\s\S]*?<\/section>/)?.[0] || "";
 const calendarContent = html.match(/id="calendar-content"[\s\S]*?<\/section>/)?.[0] || "";
 assert.doesNotMatch(filterContent, /id="weekday-buttons"/);
@@ -441,5 +451,9 @@ assert.doesNotMatch(javascript, /plane-arrow|arrowPoint/);
 assert.match(html, /class="language-switcher"[\s\S]+data-language="sk"[\s\S]+data-language="en"/);
 assert.match(html, /i18n\/sk\.js[\s\S]+i18n\/en\.js[\s\S]+i18n\/i18n\.js[\s\S]+dashboard\.js/);
 assert.match(css, /\.language-switcher button\.active\s*\{[^}]*background:\s*var\(--yellow\)/);
+assert.match(css, /\.contact-content\s*\{[^}]*grid-template-columns:/);
+assert.match(contactJavascript, /new URL\("\/api\/contact", window\.location\.origin\)/);
+assert.match(contactJavascript, /turnstile\.render/);
+assert.doesNotMatch(contactJavascript, /roman\.duris|gmail\.com/i);
 
 console.log("Dashboard filters, branding and map routes: OK");

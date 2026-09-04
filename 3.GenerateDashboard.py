@@ -29,6 +29,7 @@ LOCAL_ASSETS = (
     "booking/ryanair.js",
     "booking/wizzair.js",
     "dashboard.js",
+    "contact/contact.js",
 )
 
 
