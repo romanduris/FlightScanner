@@ -32,7 +32,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     env:
-      SCAN_DAYS: ${{ inputs.days || '90' }}
+      SCAN_DAYS: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[refresh-data]') && '150' || inputs.days || '90' }}
 
     steps:
       - name: Check out FlightScanner
@@ -44,11 +44,11 @@ jobs:
           python-version: "3.12"
 
       - name: Refresh all dashboard data
-        if: github.event_name != 'push'
+        if: github.event_name != 'push' || contains(github.event.head_commit.message, '[refresh-data]')
         run: python3 Main.py --days "$SCAN_DAYS"
 
       - name: Preserve latest scan on code-only deploy
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && !contains(github.event.head_commit.message, '[refresh-data]')
         run: python3 scripts/preserve_production_data.py
 
       - name: Build public statistics data
