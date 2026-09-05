@@ -51,6 +51,7 @@
       group_children: "0",
       currency: "EUR",
       selected_currency: "EUR",
+      changed_currency: "1",
     }).toString();
 
     const affiliateId = String(config.affiliateId || "").trim();

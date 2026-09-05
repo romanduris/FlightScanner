@@ -37,7 +37,7 @@
       "overview.countries": "Countries",
       "overview.directConnections": "direct connections",
       "overview.flights": "Flights",
-      "overview.visiblePeriod": "displayed period",
+      "overview.totalAvailable": "total available",
       "overview.airlines": "Airlines",
       "summary.routes": "Routes",
       "summary.countries": "Countries",

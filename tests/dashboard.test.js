@@ -152,7 +152,7 @@ assert.equal(window.FlightI18n.language, "sk");
 assert.equal(window.FlightI18n.t("filters.title"), "Lety z Bratislavy");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["filters.title"], "Flights from Bratislava");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.flights"], "Flights");
-assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.visiblePeriod"], "displayed period");
+assert.equal(window.FLIGHT_TRANSLATIONS.en.text["overview.totalAvailable"], "total available");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["return.stayOneDay"], "{count} day");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.text["return.stayDays"], "{count} days");
 assert.equal(window.FLIGHT_TRANSLATIONS.en.destinations.ATH, "Athens");
@@ -174,7 +174,17 @@ assert.equal(hotelUrl.searchParams.get("group_adults"), "1");
 assert.equal(hotelUrl.searchParams.get("no_rooms"), "1");
 assert.equal(hotelUrl.searchParams.get("currency"), "EUR");
 assert.equal(hotelUrl.searchParams.get("selected_currency"), "EUR");
+assert.equal(hotelUrl.searchParams.get("changed_currency"), "1");
 assert.equal(hotelUrl.searchParams.has("aid"), false);
+const polishHotelUrl = new URL(window.BookingComLinks.buildUrl({
+  destinationIata: "WMI",
+  checkinDate: "2026-12-01",
+  checkoutDate: "2026-12-05",
+  adults: 1,
+}));
+assert.equal(polishHotelUrl.searchParams.get("ss"), "Warsaw");
+assert.equal(polishHotelUrl.searchParams.get("selected_currency"), "EUR");
+assert.equal(polishHotelUrl.searchParams.get("changed_currency"), "1");
 window.BOOKING_COM_CONFIG.affiliateId = "123456";
 const affiliateHotelUrl = new URL(window.BookingComLinks.buildUrl({
   destinationIata: "STN",
@@ -186,6 +196,7 @@ assert.equal(affiliateHotelUrl.searchParams.get("aid"), "123456");
 assert.equal(affiliateHotelUrl.searchParams.get("label"), "flightscanner-return-stay");
 assert.equal(affiliateHotelUrl.searchParams.get("currency"), "EUR");
 assert.equal(affiliateHotelUrl.searchParams.get("selected_currency"), "EUR");
+assert.equal(affiliateHotelUrl.searchParams.get("changed_currency"), "1");
 window.BOOKING_COM_CONFIG.affiliateId = "";
 const hotelButton = window.BookingComLinks.createButton({
   stay: {
@@ -336,6 +347,7 @@ assert.match(element("#destination-filter").innerHTML, /ATÉNY \(ATH\)/);
 assert.doesNotMatch(element("#destination-filter").innerHTML, /SKORŠÍ LET/);
 assert.match(rows.innerHTML, /ATÉNY/);
 assert.doesNotMatch(rows.innerHTML, /SKORŠÍ LET/);
+assert.equal(element("#stat-flights").textContent, "3");
 
 element("#destination-filter").listeners.change({ target: { value: "ATH" } });
 assert.match(rows.innerHTML, /ATÉNY/);
@@ -368,6 +380,7 @@ const contactJavascript = fs.readFileSync(
 assert.match(html, /class="brand-bts">BTS<\/span><span class="brand-flight">FLIGHT<\/span><span class="brand-scaner">SCANER<\/span>/);
 assert.match(html, /data-sort="departure_local"[^>]*>[\s\S]{0,100}Odlet/);
 assert.match(html, /class="stat-label"[^>]*>Destinácie<\/span>/);
+assert.match(html, /data-i18n="overview\.totalAvailable">celkom dostupných<\/small>/);
 assert.ok(html.indexOf('data-i18n="overview.countries"') < html.indexOf('data-i18n="overview.destinations"'));
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);

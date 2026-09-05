@@ -439,7 +439,7 @@
     document.querySelector("#stat-routes").textContent = new Set(items.map((item) => item.destination_iata)).size;
     document.querySelector("#stat-routes-total").textContent = t("overview.destinationCount", { count: totalDestinations });
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country_code)).size;
-    document.querySelector("#stat-flights").textContent = integer(items.length);
+    document.querySelector("#stat-flights").textContent = integer(flights.length);
   }
 
   function availableReturnOffers(offer) {

@@ -25,7 +25,7 @@
       "overview.countries": "Krajiny",
       "overview.directConnections": "priame spojenia",
       "overview.flights": "Počet letov",
-      "overview.visiblePeriod": "v období",
+      "overview.totalAvailable": "celkom dostupných",
       "overview.airlines": "Aerolinky",
       "summary.routes": "Trasy",
       "summary.countries": "Krajiny",
