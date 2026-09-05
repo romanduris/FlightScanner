@@ -15,10 +15,10 @@ from services.bts_schedule import (
     BtsScheduleError,
     ScheduledFlight,
     find_scheduled_flight,
-    load_bts_schedule,
-    schedule_url_from_airlines_json,
+    load_bts_schedules,
+    schedule_urls_from_airlines_json,
 )
-from services.flight_time import calculate_duration_minutes
+from services.flight_time import calculate_arrival_local, calculate_duration_minutes
 
 from .base import (
     BaseAirlineProvider,
@@ -61,6 +61,7 @@ class WizzAirProvider(BaseAirlineProvider):
         # posielame po dávkach, aby sme zbytočne nezaťažovali server.
         self.max_workers = max(1, min(max_workers, 8))
         self._api_url: str | None = None
+        self._bts_schedule: list[ScheduledFlight] | None = None
 
     def scan_month(
         self,
@@ -70,8 +71,10 @@ class WizzAirProvider(BaseAirlineProvider):
         month: int,
     ) -> tuple[list[FlightOffer], list[RouteFailure]]:
         try:
-            schedule_url = schedule_url_from_airlines_json(AIRLINES_FILE)
-            bts_schedule = load_bts_schedule(schedule_url)
+            if self._bts_schedule is None:
+                schedule_urls = schedule_urls_from_airlines_json(AIRLINES_FILE)
+                self._bts_schedule = load_bts_schedules(schedule_urls)
+            bts_schedule = self._bts_schedule
             monthly_flights, monthly_return_flights, request_failures = (
                 self._load_monthly_flights(
                     origin_iata, destinations, year, month
@@ -361,24 +364,45 @@ class WizzAirProvider(BaseAirlineProvider):
                 bts_schedule,
                 destination.iata,
                 departure,
-                carrier_prefixes=("W6", "W4"),
+                carrier_prefixes=("W6", "W4", "W9"),
             )
-            if scheduled_flight is None:
-                continue
-            arrival = scheduled_flight.arrival_datetime_for(departure)
+            if scheduled_flight is not None:
+                arrival = scheduled_flight.arrival_datetime_for(departure)
+                flight_number = scheduled_flight.flight_number
+                duration_minutes = calculate_duration_minutes(
+                    departure,
+                    arrival,
+                    origin_iata,
+                    destination.iata,
+                )
+            else:
+                duration_minutes = self._nearest_scheduled_duration(
+                    origin_iata,
+                    destination.iata,
+                    departure,
+                    bts_schedule,
+                )
+                if duration_minutes is None:
+                    continue
+                arrival = calculate_arrival_local(
+                    departure,
+                    duration_minutes,
+                    origin_iata,
+                    destination.iata,
+                )
+                if arrival is None:
+                    continue
+                # Číslo letu sa môže medzi sezónami zmeniť. Pri odvodenom
+                # čase preto radšej nezobrazíme staré číslo ako aktuálne.
+                flight_number = None
             outbound_offers.append(
                 OutboundOffer(
                     departure_local=departure.isoformat(timespec="minutes"),
                     arrival_local=arrival.isoformat(timespec="minutes"),
                     price=amount,
                     currency=currency,
-                    flight_number=scheduled_flight.flight_number,
-                    duration_minutes=calculate_duration_minutes(
-                        departure,
-                        arrival,
-                        origin_iata,
-                        destination.iata,
-                    ),
+                    flight_number=flight_number,
+                    duration_minutes=duration_minutes,
                 )
             )
 
@@ -406,3 +430,40 @@ class WizzAirProvider(BaseAirlineProvider):
             duration_minutes=cheapest.duration_minutes,
             outbound_offers=tuple(outbound_offers),
         )
+
+    @staticmethod
+    def _nearest_scheduled_duration(
+        origin_iata: str,
+        destination_iata: str,
+        departure: datetime,
+        bts_schedule: list[ScheduledFlight],
+    ) -> int | None:
+        """Odvodí dĺžku z najbližšieho poriadku, ak BTS ešte nemá novú sezónu."""
+
+        candidates = [
+            flight
+            for flight in bts_schedule
+            if flight.destination_iata == destination_iata
+            and flight.flight_number.startswith(("W6", "W4", "W9"))
+        ]
+        candidates.sort(
+            key=lambda flight: min(
+                abs((departure.date() - flight.valid_from).days),
+                abs((departure.date() - flight.valid_to).days),
+            )
+        )
+        for flight in candidates:
+            reference_date = flight.valid_from
+            reference_departure = datetime.combine(
+                reference_date, flight.departure_time
+            )
+            reference_arrival = flight.arrival_datetime_for(reference_departure)
+            duration = calculate_duration_minutes(
+                reference_departure,
+                reference_arrival,
+                origin_iata,
+                destination_iata,
+            )
+            if duration is not None:
+                return duration
+        return None

@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
+from typing import Iterable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -121,6 +122,28 @@ def schedule_url_from_airlines_json(path: Path) -> str:
     return schedule_url
 
 
+def schedule_urls_from_airlines_json(path: Path) -> tuple[str, ...]:
+    """Získa všetky sezónne poriadky s podporou staršieho JSON formátu."""
+
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise BtsScheduleError(f"Nepodarilo sa načítať {path}: {error}") from error
+
+    configured = payload.get("schedule_source_urls")
+    values = configured if isinstance(configured, list) else [payload.get("schedule_source_url")]
+    urls = tuple(
+        dict.fromkeys(
+            str(value or "").strip()
+            for value in values
+            if str(value or "").strip()
+        )
+    )
+    if not urls:
+        raise BtsScheduleError(f"V {path} chýbajú schedule_source_urls.")
+    return urls
+
+
 def load_bts_schedule(url: str) -> list[ScheduledFlight]:
     """Stiahne a spracuje aktuálny odletový poriadok BTS."""
 
@@ -144,6 +167,24 @@ def load_bts_schedule(url: str) -> list[ScheduledFlight]:
     if not parser.flights:
         raise BtsScheduleError("V letovom poriadku BTS sa nenašli žiadne lety.")
     return parser.flights
+
+
+def load_bts_schedules(urls: Iterable[str]) -> list[ScheduledFlight]:
+    """Spojí poriadky; nedostupný doplnkový zdroj nezruší celý zber."""
+
+    schedules: list[ScheduledFlight] = []
+    errors: list[str] = []
+    for url in dict.fromkeys(urls):
+        try:
+            schedules.extend(load_bts_schedule(url))
+        except BtsScheduleError as error:
+            errors.append(f"{url}: {error}")
+    if not schedules:
+        detail = "; ".join(errors) or "nie je nakonfigurovaný žiadny zdroj"
+        raise BtsScheduleError(
+            f"Nepodarilo sa načítať žiadny poriadok BTS ({detail})."
+        )
+    return list(dict.fromkeys(schedules))
 
 
 def find_scheduled_flight(

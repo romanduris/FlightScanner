@@ -123,6 +123,58 @@ class WizzReturnOffersTest(unittest.TestCase):
         )
         self.assertEqual([item.price for item in offer.outbound_offers], [9, 29])
 
+    def test_winter_schedule_keeps_wizz_fares_after_summer_boundary(self) -> None:
+        provider = WizzAirProvider(max_workers=1)
+        flights = [self._flight("2026-11-01T23:45:00", 19)]
+        schedule = [
+            ScheduledFlight(
+                destination_iata="SKP",
+                valid_from=date(2026, 10, 25),
+                valid_to=date(2027, 3, 27),
+                operating_days=("Ned",),
+                departure_time=time(23, 45),
+                arrival_time=time(1, 15),
+                arrival_day_offset=1,
+                flight_number="W64704",
+            )
+        ]
+
+        offer = provider._build_cheapest_offer(
+            "BTS", Destination("Skopje", "SKP"), flights, schedule
+        )
+
+        self.assertIsNotNone(offer)
+        assert offer is not None
+        self.assertEqual(offer.departure_local, "2026-11-01T23:45")
+        self.assertEqual(offer.arrival_local, "2026-11-02T01:15")
+        self.assertEqual(offer.flight_number, "W64704")
+
+    def test_missing_new_schedule_uses_nearest_route_duration(self) -> None:
+        provider = WizzAirProvider(max_workers=1)
+        flights = [self._flight("2026-11-01T23:45:00", 19)]
+        schedule = [
+            ScheduledFlight(
+                destination_iata="SKP",
+                valid_from=date(2026, 9, 4),
+                valid_to=date(2026, 10, 23),
+                operating_days=("Pia",),
+                departure_time=time(8, 35),
+                arrival_time=time(10, 5),
+                arrival_day_offset=0,
+                flight_number="W64762",
+            )
+        ]
+
+        offer = provider._build_cheapest_offer(
+            "BTS", Destination("Skopje", "SKP"), flights, schedule
+        )
+
+        self.assertIsNotNone(offer)
+        assert offer is not None
+        self.assertEqual(offer.arrival_local, "2026-11-02T01:15")
+        self.assertEqual(offer.duration_minutes, 90)
+        self.assertIsNone(offer.flight_number)
+
     def test_month_request_fetches_outbound_and_return_together(self) -> None:
         class StubClient:
             def __init__(self) -> None:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
@@ -11,10 +11,12 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 AIRPORT_TIMEZONES = {
     "BTS": "Europe/Bratislava",
     "ACE": "Atlantic/Canary",
+    "AGA": "Africa/Casablanca",
     "AGP": "Europe/Madrid",
     "AHO": "Europe/Rome",
     "ALC": "Europe/Madrid",
     "ATH": "Europe/Athens",
+    "AYT": "Europe/Istanbul",
     "BCN": "Europe/Madrid",
     "BER": "Europe/Berlin",
     "BOJ": "Europe/Sofia",
@@ -26,11 +28,16 @@ AIRPORT_TIMEZONES = {
     "DLM": "Europe/Istanbul",
     "DTM": "Europe/Berlin",
     "DUB": "Europe/Dublin",
+    "DXB": "Asia/Dubai",
     "EDI": "Europe/London",
     "EIN": "Europe/Amsterdam",
     "EVN": "Asia/Yerevan",
     "FCO": "Europe/Rome",
     "GDN": "Europe/Warsaw",
+    "GYD": "Asia/Baku",
+    "HER": "Europe/Athens",
+    "HRG": "Africa/Cairo",
+    "INI": "Europe/Belgrade",
     "JMK": "Europe/Athens",
     "JSI": "Europe/Athens",
     "KSC": "Europe/Bratislava",
@@ -45,6 +52,7 @@ AIRPORT_TIMEZONES = {
     "NCE": "Europe/Paris",
     "OHD": "Europe/Skopje",
     "OSL": "Europe/Oslo",
+    "OTP": "Europe/Bucharest",
     "PDV": "Europe/Sofia",
     "PFO": "Asia/Nicosia",
     "PMI": "Europe/Madrid",
@@ -52,6 +60,9 @@ AIRPORT_TIMEZONES = {
     "PRN": "Europe/Belgrade",
     "PSA": "Europe/Rome",
     "RMO": "Europe/Chisinau",
+    "RHO": "Europe/Athens",
+    "SAW": "Europe/Istanbul",
+    "SJJ": "Europe/Sarajevo",
     "SKG": "Europe/Athens",
     "SKP": "Europe/Skopje",
     "STN": "Europe/London",
@@ -65,6 +76,7 @@ AIRPORT_TIMEZONES = {
     "WAW": "Europe/Warsaw",
     "WMI": "Europe/Warsaw",
     "ZAD": "Europe/Zagreb",
+    "ZTH": "Europe/Athens",
 }
 
 
@@ -93,3 +105,28 @@ def calculate_duration_minutes(
 
     duration_minutes = round((arrival_utc - departure_utc).total_seconds() / 60)
     return duration_minutes if duration_minutes > 0 else None
+
+
+def calculate_arrival_local(
+    departure_local: datetime,
+    duration_minutes: int,
+    origin_iata: str,
+    destination_iata: str,
+) -> datetime | None:
+    """Pripočíta reálnu dĺžku letu a vráti miestny čas v cieli."""
+
+    origin_timezone = AIRPORT_TIMEZONES.get(origin_iata)
+    destination_timezone = AIRPORT_TIMEZONES.get(destination_iata)
+    if origin_timezone is None or destination_timezone is None:
+        return None
+
+    try:
+        departure_utc = departure_local.replace(
+            tzinfo=ZoneInfo(origin_timezone)
+        ).astimezone(timezone.utc)
+        arrival_local = (departure_utc + timedelta(minutes=duration_minutes)).astimezone(
+            ZoneInfo(destination_timezone)
+        )
+    except ZoneInfoNotFoundError:
+        return None
+    return arrival_local.replace(tzinfo=None)

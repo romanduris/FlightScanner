@@ -19,6 +19,10 @@ SOURCE_URL = "https://www.bts.aero/lety/letecke-spolocnosti/"
 DEFAULT_SCHEDULE_URL = (
     "https://www.bts.aero/lety/letovy-poriadok-leto-2026/odlety/"
 )
+SUPPLEMENTAL_SCHEDULE_URLS = (
+    # BTS na tejto adrese publikuje aj záznamy nasledujúceho zimného obdobia.
+    "https://www.bts.aero/lety/letovy-poriadok-zima-2025-26/odlety/",
+)
 REQUEST_TIMEOUT_SECONDS = 15
 PROJECT_DIR = Path(__file__).resolve().parent
 OUTPUT_FILE = PROJECT_DIR / "Data" / "airlines.json"
@@ -32,6 +36,7 @@ AIRLINE_BY_PREFIX = {
     "FR": "RYANAIR",
     "W6": "Wizz Air",
     "W4": "Wizz Air",
+    "W9": "Wizz Air",
     "PC": "Pegasus Airlines",
     "SM": "Air Cairo",
     "4O": "Air Montenegro",
@@ -236,18 +241,29 @@ def load_airlines() -> tuple[list[Airline], str, str]:
 
 
 def fetch_destinations(
-    schedule_url: str,
+    schedule_urls: list[str],
 ) -> tuple[dict[str, tuple[Destination, ...]], list[str]]:
-    """Spočíta unikátne destinácie aeroliniek z aktuálneho letového poriadku."""
+    """Spočíta unikátne destinácie zo všetkých dostupných sezónnych poriadkov."""
 
-    parser = ScheduleParser()
-    parser.feed(download_page(schedule_url))
-    if not parser.routes:
-        raise ValueError("V letovom poriadku sa nepodarilo nájsť žiadne odlety.")
+    routes: list[tuple[str, Destination]] = []
+    errors: list[str] = []
+    for schedule_url in schedule_urls:
+        parser = ScheduleParser()
+        try:
+            parser.feed(download_page(schedule_url))
+        except (HTTPError, URLError, TimeoutError, OSError, UnicodeError) as error:
+            errors.append(f"{schedule_url}: {error}")
+            continue
+        routes.extend(parser.routes)
+    if not routes:
+        detail = f" ({'; '.join(errors)})" if errors else ""
+        raise ValueError(
+            f"V letovom poriadku sa nepodarilo nájsť žiadne odlety{detail}."
+        )
 
     destinations_by_airline: dict[str, set[Destination]] = {}
     unknown_prefixes: set[str] = set()
-    for prefix, destination in parser.routes:
+    for prefix, destination in routes:
         airline_name = AIRLINE_BY_PREFIX.get(prefix)
         if airline_name is None:
             unknown_prefixes.add(prefix)
@@ -262,12 +278,12 @@ def fetch_destinations(
 
 
 def load_destinations(
-    schedule_url: str,
+    schedule_urls: list[str],
 ) -> tuple[dict[str, tuple[Destination, ...]], str, list[str]]:
     """Vráti destinácie z cestovného poriadku alebo označí údaje ako nedostupné."""
 
     try:
-        destinations, unknown_prefixes = fetch_destinations(schedule_url)
+        destinations, unknown_prefixes = fetch_destinations(schedule_urls)
         if unknown_prefixes:
             print(
                 "Upozornenie: neznáme prefixy letov v cestovnom poriadku: "
@@ -304,6 +320,7 @@ def save_to_json(
     airlines: list[Airline],
     data_origin: str,
     schedule_url: str,
+    schedule_urls: list[str],
     schedule_data_origin: str,
     unknown_prefixes: list[str],
 ) -> None:
@@ -318,6 +335,7 @@ def save_to_json(
         "source_url": SOURCE_URL,
         "data_origin": data_origin,
         "schedule_source_url": schedule_url,
+        "schedule_source_urls": schedule_urls,
         "schedule_data_origin": schedule_data_origin,
         "unmapped_flight_prefixes": unknown_prefixes,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -382,14 +400,16 @@ def print_airlines(airlines: list[Airline], destination_data_available: bool) ->
 
 def main() -> int:
     airlines, data_origin, schedule_url = load_airlines()
+    schedule_urls = list(dict.fromkeys((schedule_url, *SUPPLEMENTAL_SCHEDULE_URLS)))
     destinations, schedule_data_origin, unknown_prefixes = load_destinations(
-        schedule_url
+        schedule_urls
     )
     airlines = add_destinations(airlines, destinations)
     save_to_json(
         airlines,
         data_origin,
         schedule_url,
+        schedule_urls,
         schedule_data_origin,
         unknown_prefixes,
     )

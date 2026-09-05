@@ -6,16 +6,24 @@
   "source_url": "https://www.bts.aero/lety/letecke-spolocnosti/",
   "data_origin": "official_web",
   "schedule_source_url": "https://www.bts.aero/lety/letovy-poriadok-leto-2026/odlety/",
+  "schedule_source_urls": [
+    "https://www.bts.aero/lety/letovy-poriadok-leto-2026/odlety/",
+    "https://www.bts.aero/lety/letovy-poriadok-zima-2025-26/odlety/"
+  ],
   "schedule_data_origin": "official_schedule",
   "unmapped_flight_prefixes": [],
-  "generated_at_utc": "2026-09-03T09:00:32.201508+00:00",
+  "generated_at_utc": "2026-09-05T04:43:15.502526+00:00",
   "airline_count": 16,
   "airlines": [
     {
       "name": "RYANAIR",
       "flight_type": "pravidelné lety",
-      "destination_count": 33,
+      "destination_count": 34,
       "destinations": [
+        {
+          "name": "AGADIR",
+          "iata": "AGA"
+        },
         {
           "name": "ALGHERO",
           "iata": "AHO"
@@ -153,8 +161,12 @@
     {
       "name": "Wizz Air",
       "flight_type": "pravidelné lety",
-      "destination_count": 30,
+      "destination_count": 36,
       "destinations": [
+        {
+          "name": "AGADIR",
+          "iata": "AGA"
+        },
         {
           "name": "ALICANTE",
           "iata": "ALC"
@@ -162,6 +174,10 @@
         {
           "name": "ATÉNY",
           "iata": "ATH"
+        },
+        {
+          "name": "BAKU",
+          "iata": "GYD"
         },
         {
           "name": "BARCELONA",
@@ -176,8 +192,16 @@
           "iata": "BER"
         },
         {
+          "name": "BUKUREŠŤ-OTOPENI",
+          "iata": "OTP"
+        },
+        {
           "name": "DORTMUND",
           "iata": "DTM"
+        },
+        {
+          "name": "HURGADA",
+          "iata": "HRG"
         },
         {
           "name": "JEREVAN",
@@ -224,6 +248,10 @@
           "iata": "NCE"
         },
         {
+          "name": "NIŠ",
+          "iata": "INI"
+        },
+        {
           "name": "OHRID",
           "iata": "OHD"
         },
@@ -250,6 +278,10 @@
         {
           "name": "RÍM-FIUMICINO",
           "iata": "FCO"
+        },
+        {
+          "name": "SARAJEVO",
+          "iata": "SJJ"
         },
         {
           "name": "SKOPJE",
@@ -317,8 +349,12 @@
     {
       "name": "SMARTWINGS",
       "flight_type": "pravidelné lety",
-      "destination_count": 6,
+      "destination_count": 7,
       "destinations": [
+        {
+          "name": "DUBAJ-INTERNATIONAL",
+          "iata": "DXB"
+        },
         {
           "name": "IRAKLIO",
           "iata": "HER"
