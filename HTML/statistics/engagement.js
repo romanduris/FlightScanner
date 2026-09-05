@@ -1,16 +1,26 @@
 (() => {
   "use strict";
-  if (!crypto?.randomUUID || !navigator.sendBeacon) return;
+  if (!globalThis.crypto?.randomUUID) return;
 
   const session = crypto.randomUUID();
   let visibleSince = document.visibilityState === "visible" ? performance.now() : null;
   let unsentSeconds = 0;
 
   function send(payload) {
-    return navigator.sendBeacon(
-      "/api/statistics/engagement",
-      new Blob([JSON.stringify({ session, path: location.pathname, ...payload })], { type: "application/json" }),
-    );
+    const body = JSON.stringify({ session, path: location.pathname, ...payload });
+    if (navigator.sendBeacon) {
+      const queued = navigator.sendBeacon(
+        "/api/statistics/engagement",
+        new Blob([body], { type: "application/json" }),
+      );
+      if (queued) return;
+    }
+    fetch("/api/statistics/engagement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+    }).catch(() => {});
   }
 
   function trackClick(event, provider = "") {

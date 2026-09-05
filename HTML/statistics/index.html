@@ -67,14 +67,6 @@
         <div class="chart-heading"><strong data-text="trafficTrend">Vývoj návštevnosti</strong><span class="chart-legend"><i></i><span data-text="visits">Návštevy</span><i></i><span data-text="pageviews">Zobrazenia</span></span></div>
         <div id="traffic-chart" class="line-chart empty-chart" data-empty="Dáta sa načítavajú"></div>
       </div>
-      <div class="breakdown-grid">
-        <article class="list-card"><h3 data-text="countries">Krajiny</h3><div id="country-list" class="bar-list"></div></article>
-        <article class="list-card"><h3 data-text="devices">Zariadenia</h3><div id="device-list" class="bar-list"></div></article>
-        <article class="list-card"><h3 data-text="browsers">Prehliadače</h3><div id="browser-list" class="bar-list"></div></article>
-        <article class="list-card"><h3 data-text="operatingSystems">Operačné systémy</h3><div id="os-list" class="bar-list"></div></article>
-        <article class="list-card"><h3 data-text="topPages">Najnavštevovanejšie stránky</h3><div id="page-list" class="bar-list"></div></article>
-        <article class="list-card"><h3 data-text="sources">Zdroje návštev</h3><div id="referrer-list" class="bar-list"></div></article>
-      </div>
       </div>
     </section>
 
@@ -89,10 +81,30 @@
       <div id="clicks-content" class="collapsible-content">
       <div class="metric-grid metric-grid-four section-metrics">
         <article class="metric-card featured"><span data-text="offersOpened">Offers opened</span><strong id="click-offers">—</strong><small data-text="flightDetails">flight details displayed</small></article>
+        <article class="metric-card"><span data-text="bookingClicks">Booking.com clicks</span><strong id="click-booking">—</strong><small data-text="accommodationLink">accommodation link</small></article>
         <article class="metric-card"><span data-text="ryanairClicks">Ryanair clicks</span><strong id="click-ryanair">—</strong><small data-text="airlineBooking">airline booking link</small></article>
         <article class="metric-card"><span data-text="wizzClicks">Wizz Air clicks</span><strong id="click-wizz">—</strong><small data-text="airlineBooking">airline booking link</small></article>
-        <article class="metric-card"><span data-text="bookingClicks">Booking.com clicks</span><strong id="click-booking">—</strong><small data-text="accommodationLink">accommodation link</small></article>
       </div>
+      </div>
+    </section>
+
+    <section class="panel collapsible-section" data-collapsible aria-labelledby="audience-title">
+      <div class="panel-heading compact">
+        <div class="heading-with-toggle">
+          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="audience-content" data-section-text="audienceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
+          <div><span class="eyebrow" data-text="audienceEyebrow">Publikum</span><h2 id="audience-title" data-text="audienceTitle">Podrobnosti návštevnosti</h2></div>
+        </div>
+        <span id="audience-freshness" class="freshness section-updated">—</span>
+      </div>
+      <div id="audience-content" class="collapsible-content">
+        <div class="breakdown-grid">
+          <article class="list-card"><h3 data-text="countries">Krajiny</h3><div id="country-list" class="bar-list"></div></article>
+          <article class="list-card"><h3 data-text="devices">Zariadenia</h3><div id="device-list" class="bar-list"></div></article>
+          <article class="list-card"><h3 data-text="browsers">Prehliadače</h3><div id="browser-list" class="bar-list"></div></article>
+          <article class="list-card"><h3 data-text="operatingSystems">Operačné systémy</h3><div id="os-list" class="bar-list"></div></article>
+          <article class="list-card"><h3 data-text="topPages">Najnavštevovanejšie stránky</h3><div id="page-list" class="bar-list"></div></article>
+          <article class="list-card"><h3 data-text="sources">Zdroje návštev</h3><div id="referrer-list" class="bar-list"></div></article>
+        </div>
       </div>
     </section>
 
@@ -161,8 +173,8 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=6"></script>
-  <script src="engagement.js?v=4"></script>
+  <script src="statistics.js?v=7"></script>
+  <script src="engagement.js?v=5"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>
 </html>

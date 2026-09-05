@@ -6,7 +6,7 @@ const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sit
 const MAX_REQUEST_BYTES = 16_384;
 const GITHUB_RUNS_URL = "https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs?per_page=40";
 const GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
-const STATISTICS_CACHE_VERSION = "3";
+const STATISTICS_CACHE_VERSION = "4";
 
 function jsonResponse(body, status = 200, origin = "") {
   const headers = {
@@ -158,7 +158,7 @@ async function fetchClicks(env, days) {
   const empty = { available: false, offer_opens: 0, ryanair: 0, wizz_air: 0, booking_com: 0 };
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return empty;
   const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
-  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double2 > 0 GROUP BY blob4, blob5`;
+  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(_sample_interval * double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double2 > 0 GROUP BY blob4, blob5`;
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },

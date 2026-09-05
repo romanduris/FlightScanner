@@ -5,14 +5,14 @@ on:
     branches:
       - main
   schedule:
-    - cron: "11 8,18 * * *"
+    - cron: "11 6,12,18 * * *"
       timezone: "Europe/Bratislava"
   workflow_dispatch:
     inputs:
       days:
         description: Počet dní, ktoré má skener prehľadať
         required: true
-        default: "90"
+        default: "180"
 
 concurrency:
   group: refresh-public-flight-dashboard
@@ -32,7 +32,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     env:
-      SCAN_DAYS: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[refresh-data]') && '150' || inputs.days || '90' }}
+      SCAN_DAYS: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[refresh-data]') && '180' || inputs.days || '180' }}
 
     steps:
       - name: Check out FlightScanner

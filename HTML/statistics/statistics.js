@@ -22,6 +22,7 @@
       success: "Úspešný", failure: "Chyba", cancelled: "Zrušený", in_progress: "Prebieha", queued: "Čaká", open: "Otvoriť", days: "dní", ago: "dozadu",
       lastRefreshed: "Naposledy obnovené", updatedAt: "údaje z",
       clicksEyebrow: "Interakcie", clicksTitle: "Na čo návštevníci klikajú", clicksNote: "anonymné súčty za vybrané obdobie",
+      audienceEyebrow: "Publikum", audienceTitle: "Podrobnosti návštevnosti",
       offersOpened: "Otvorené ponuky", flightDetails: "zobrazené detaily letov", ryanairClicks: "Kliknutia na Ryanair", wizzClicks: "Kliknutia na Wizz Air",
       bookingClicks: "Kliknutia na Booking.com", airlineBooking: "odkaz na rezerváciu letu", accommodationLink: "odkaz na ubytovanie",
       showSection: "Zobraziť", hideSection: "Skryť",
@@ -47,6 +48,7 @@
       success: "Successful", failure: "Failed", cancelled: "Cancelled", in_progress: "Running", queued: "Queued", open: "Open", days: "days", ago: "ago",
       lastRefreshed: "Last refreshed", updatedAt: "data from",
       clicksEyebrow: "Interactions", clicksTitle: "What visitors click", clicksNote: "anonymous totals for the selected period",
+      audienceEyebrow: "Audience", audienceTitle: "Traffic details",
       offersOpened: "Offers opened", flightDetails: "flight details displayed", ryanairClicks: "Ryanair clicks", wizzClicks: "Wizz Air clicks",
       bookingClicks: "Booking.com clicks", airlineBooking: "airline booking link", accommodationLink: "accommodation link",
       showSection: "Show", hideSection: "Hide",
@@ -198,6 +200,7 @@
     byId("traffic-state").classList.toggle("loading", !available);
     byId("page-refreshed").textContent = `${text("lastRefreshed")}: ${exactDateTime(refreshedAt || staticData?.generated_at_utc)}`;
     byId("clicks-freshness").textContent = updatedStamp(refreshedAt);
+    byId("audience-freshness").textContent = updatedStamp(refreshedAt);
     byId("performance-freshness").textContent = updatedStamp(refreshedAt);
     const summary = traffic?.summary || {};
     setMetric("metric-visits", available ? number(summary.visits) : "—");

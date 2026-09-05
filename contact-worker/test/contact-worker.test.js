@@ -107,6 +107,7 @@ test("an invalid Turnstile result prevents delivery", async () => {
 
 test("statistics combine GitHub runs with anonymous Cloudflare aggregates", async () => {
   const originalFetch = globalThis.fetch;
+  let clicksQuery = "";
   globalThis.fetch = async (url, options = {}) => {
     if (String(url).includes("api.github.com")) {
       return Response.json({ workflow_runs: [{
@@ -121,6 +122,7 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
       }] });
     }
     if (String(url).includes("/analytics_engine/sql") && String(options.body).includes("GROUP BY blob4")) {
+      clicksQuery = String(options.body);
       return Response.json({ data: [
         { click_event: "offer_open", provider: "RYANAIR", clicks: 9 },
         { click_event: "offer_open", provider: "Wizz Air", clicks: 4 },
@@ -171,6 +173,7 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
       wizz_air: 2,
       booking_com: 5,
     });
+    assert.match(clicksQuery, /SUM\(_sample_interval \* double2\) AS clicks/);
     assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
   } finally {
     globalThis.fetch = originalFetch;
