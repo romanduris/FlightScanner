@@ -60,6 +60,7 @@
       "calendar.title": "Vyber deň odletu",
       "calendar.selected": "Vybraný začiatok",
       "calendar.window": "Zobrazí sa najviac nasledujúcich 30 dní",
+      "calendar.legend": "Sivé označenie: víkend alebo deň pracovného pokoja",
       "calendar.previous": "Predchádzajúce mesiace",
       "calendar.next": "Nasledujúce mesiace",
       "calendar.selectDay": "Vybrať {date} ako začiatok obdobia",

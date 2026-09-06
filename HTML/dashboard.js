@@ -53,6 +53,7 @@
   };
   let map = null;
   let routeLayer = null;
+  let publicHolidays = new Set();
   let visibleOffers = [...flights];
   let calendarCursor = startOfMonth(addDays(payload.start_date, initialVisibleDay));
 
@@ -382,10 +383,12 @@
       const date = new Date(Date.UTC(year, month, day));
       const offset = dayOffset(date);
       const unavailable = offset < 0 || offset > lastScanDay;
+      const weekend = date.getUTCDay() === 0 || date.getUTCDay() === 6;
+      const holiday = publicHolidays.has(date.toISOString().slice(0, 10));
       const classes = [
         offset === state.firstVisibleDay ? "selected" : "",
         offset === todayOffset ? "today" : "",
-        date.getUTCDay() === 0 || date.getUTCDay() === 6 ? "weekend" : "",
+        weekend || holiday ? "weekend" : "",
       ].filter(Boolean).join(" ");
       cells.push(`<button type="button" class="${classes}" data-calendar-day="${offset}" ${unavailable ? "disabled" : ""} aria-label="${escapeHtml(t("calendar.selectDay", { date: calendarDayLabel(date) }))}" aria-pressed="${offset === state.firstVisibleDay}">${day}</button>`);
     }
@@ -819,4 +822,13 @@
   bindEvents();
   render();
   fitVisibleMap();
+  if (typeof fetch === "function") {
+    fetch("holidays-sk.json", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("holiday_data_unavailable")))
+      .then((data) => {
+        publicHolidays = new Set((data.holidays || []).map((item) => item.date));
+        renderCalendar();
+      })
+      .catch(() => {});
+  }
 })();
