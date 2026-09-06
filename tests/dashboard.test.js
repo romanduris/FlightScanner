@@ -409,6 +409,7 @@ assert.ok(schoolHolidays.periods.some((item) => item.start === "2027-02-15" && i
 assert.ok(schoolHolidays.periods.some((item) => item.start === "2027-03-25" && item.end === "2027-03-30"));
 assert.match(javascript, /readJson\("holidays-sk\.json"/);
 assert.match(javascript, /school-holidays-sk\.json/);
+assert.match(javascript, /value instanceof Date \? new Date\(value\.getTime\(\)\)/);
 assert.match(javascript, /publicHolidays\.has/);
 assert.match(javascript, /schoolHolidays\.has/);
 assert.match(javascript, /weekend \|\| holiday \? "weekend" : schoolHoliday \? "school-holiday"/);

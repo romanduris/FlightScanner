@@ -152,7 +152,7 @@
   }
 
   function addDays(value, days) {
-    const result = isoDate(value);
+    const result = value instanceof Date ? new Date(value.getTime()) : isoDate(value);
     if (!result) return null;
     result.setUTCDate(result.getUTCDate() + days);
     return result;
