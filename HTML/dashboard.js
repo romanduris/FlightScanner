@@ -54,6 +54,7 @@
   let map = null;
   let routeLayer = null;
   let publicHolidays = new Set();
+  let schoolHolidays = new Set();
   let visibleOffers = [...flights];
   let calendarCursor = startOfMonth(addDays(payload.start_date, initialVisibleDay));
 
@@ -384,11 +385,13 @@
       const offset = dayOffset(date);
       const unavailable = offset < 0 || offset > lastScanDay;
       const weekend = date.getUTCDay() === 0 || date.getUTCDay() === 6;
-      const holiday = publicHolidays.has(date.toISOString().slice(0, 10));
+      const dateKey = date.toISOString().slice(0, 10);
+      const holiday = publicHolidays.has(dateKey);
+      const schoolHoliday = schoolHolidays.has(dateKey);
       const classes = [
         offset === state.firstVisibleDay ? "selected" : "",
         offset === todayOffset ? "today" : "",
-        weekend || holiday ? "weekend" : "",
+        weekend || holiday ? "weekend" : schoolHoliday ? "school-holiday" : "",
       ].filter(Boolean).join(" ");
       cells.push(`<button type="button" class="${classes}" data-calendar-day="${offset}" ${unavailable ? "disabled" : ""} aria-label="${escapeHtml(t("calendar.selectDay", { date: calendarDayLabel(date) }))}" aria-pressed="${offset === state.firstVisibleDay}">${day}</button>`);
     }
@@ -823,10 +826,22 @@
   render();
   fitVisibleMap();
   if (typeof fetch === "function") {
-    fetch("holidays-sk.json", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error("holiday_data_unavailable")))
-      .then((data) => {
-        publicHolidays = new Set((data.holidays || []).map((item) => item.date));
+    const readJson = (path) => fetch(path, { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error(`${path}_unavailable`)));
+    const expandPeriods = (periods) => periods.flatMap((period) => {
+      const dates = [];
+      let current = isoDate(period.start);
+      const end = isoDate(period.end);
+      while (current && end && current <= end) {
+        dates.push(current.toISOString().slice(0, 10));
+        current = addDays(current, 1);
+      }
+      return dates;
+    });
+    Promise.all([readJson("holidays-sk.json"), readJson("school-holidays-sk.json")])
+      .then(([holidayData, schoolHolidayData]) => {
+        publicHolidays = new Set((holidayData.holidays || []).map((item) => item.date));
+        schoolHolidays = new Set(expandPeriods(schoolHolidayData.periods || []));
         renderCalendar();
       })
       .catch(() => {});

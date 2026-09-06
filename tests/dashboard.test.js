@@ -372,6 +372,10 @@ const holidays = JSON.parse(fs.readFileSync(
   path.join(__dirname, "..", "HTML", "holidays-sk.json"),
   "utf8",
 ));
+const schoolHolidays = JSON.parse(fs.readFileSync(
+  path.join(__dirname, "..", "HTML", "school-holidays-sk.json"),
+  "utf8",
+));
 const javascript = fs.readFileSync(
   path.join(__dirname, "..", "HTML", "dashboard.js"),
   "utf8",
@@ -394,12 +398,20 @@ assert.doesNotMatch(html, /id="date-from-filter"|id="planning-window-filter"/);
 assert.match(html, /id="calendar-selected-date"/);
 assert.match(html, /id="calendar-prev"[\s\S]+id="calendar-next"[\s\S]+id="calendar-months"/);
 assert.match(html, /data-i18n="calendar\.legend">Sivé označenie:/);
+assert.match(html, /data-i18n="calendar\.schoolLegend">Svetlomodré označenie:/);
 assert.ok(holidays.holidays.some((item) => item.date === "2026-05-01"));
 assert.ok(!holidays.holidays.some((item) => item.date === "2026-05-08"));
 assert.ok(holidays.holidays.some((item) => item.date === "2027-09-15"));
 assert.ok(!holidays.holidays.some((item) => item.date === "2027-11-17"));
-assert.match(javascript, /fetch\("holidays-sk\.json"/);
+assert.equal(schoolHolidays.region, "Bratislavský kraj");
+assert.ok(schoolHolidays.periods.some((item) => item.start === "2026-10-29" && item.end === "2026-10-30"));
+assert.ok(schoolHolidays.periods.some((item) => item.start === "2027-02-15" && item.end === "2027-02-19"));
+assert.ok(schoolHolidays.periods.some((item) => item.start === "2027-03-25" && item.end === "2027-03-30"));
+assert.match(javascript, /readJson\("holidays-sk\.json"/);
+assert.match(javascript, /school-holidays-sk\.json/);
 assert.match(javascript, /publicHolidays\.has/);
+assert.match(javascript, /schoolHolidays\.has/);
+assert.match(javascript, /weekend \|\| holiday \? "weekend" : schoolHoliday \? "school-holiday"/);
 assert.match(javascript, /flagcdn\.com\/24x18/);
 assert.doesNotMatch(rows.innerHTML, /\/h/);
 assert.match(html, /class="table-note table-note-bottom"[^>]*>\* Cena spolu: zobrazený let tam \+ najlacnejší nájdený let späť/);

@@ -73,6 +73,7 @@
       "calendar.selected": "Selected start",
       "calendar.window": "Up to the following 30 days will be shown",
       "calendar.legend": "Grey marking: weekend or public holiday",
+      "calendar.schoolLegend": "Light blue marking: Bratislava region school holidays",
       "calendar.previous": "Previous months",
       "calendar.next": "Next months",
       "calendar.selectDay": "Choose {date} as the start of the period",

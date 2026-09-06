@@ -1,0 +1,12 @@
+{
+  "country": "SK",
+  "region": "Bratislavský kraj",
+  "name": "Školské prázdniny v Bratislavskom kraji",
+  "periods": [
+    { "start": "2026-10-29", "end": "2026-10-30", "name": "Jesenné prázdniny" },
+    { "start": "2026-12-23", "end": "2027-01-07", "name": "Vianočné prázdniny" },
+    { "start": "2027-02-01", "end": "2027-02-01", "name": "Polročné prázdniny" },
+    { "start": "2027-02-15", "end": "2027-02-19", "name": "Jarné prázdniny" },
+    { "start": "2027-03-25", "end": "2027-03-30", "name": "Veľkonočné prázdniny" }
+  ]
+}
