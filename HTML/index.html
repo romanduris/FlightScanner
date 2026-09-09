@@ -225,8 +225,8 @@
         <h2 id="support-title" data-i18n="support.title">Páči sa ti FlightScanner?</h2>
         <p data-i18n="support.description">Prispej na kávu a pomôž nám s prevádzkou a ďalším vývojom.</p>
       </div>
-      <a id="support-link" class="support-link" href="https://ko-fi.com/rodulab" target="_blank" rel="noopener noreferrer">
-        <span data-i18n="support.button">Podporiť projekt</span><span aria-hidden="true">↗</span>
+      <a id="support-link" class="support-link" aria-haspopup="dialog" aria-controls="support-dialog" href="https://ko-fi.com/rodulab" target="_blank" rel="noopener noreferrer">
+        <span data-i18n="support.button">Podporiť projekt</span>
       </a>
     </aside>
 
@@ -275,6 +275,15 @@
     </section>
   </main>
 
+  <dialog id="support-dialog" class="support-dialog" aria-labelledby="support-dialog-title">
+    <div class="support-dialog-header">
+      <h2 id="support-dialog-title" data-i18n="support.button">Podporiť projekt</h2>
+      <button id="support-close" type="button" aria-label="Zavrieť" data-i18n-aria="support.close" autofocus>×</button>
+    </div>
+    <iframe id="support-frame" title="Podpora projektu cez Ko-fi" data-i18n-title="support.frameTitle"></iframe>
+    <p class="support-fallback"><a href="https://ko-fi.com/rodulab" target="_blank" rel="noopener noreferrer" data-i18n="support.fallback">Formulár nefunguje? Otvoriť Ko-fi v novej karte</a></p>
+  </dialog>
+
   <dialog id="flight-detail" class="flight-dialog">
     <button id="close-detail" class="dialog-close" type="button" aria-label="Zavrieť detail" data-i18n-aria="dialog.close">×</button>
     <div id="detail-content"></div>
@@ -299,6 +308,7 @@
   <script src="booking/booking-buttons.js?v=20260904181000"></script>
   <script src="booking/ryanair.js?v=20260904112023"></script>
   <script src="booking/wizzair.js?v=20260904112023"></script>
+  <script src="support.js?v=2026090901"></script>
   <script src="dashboard.js?v=2026090901"></script>
   <script src="contact/contact.js?v=20260904114649"></script>
   <script src="statistics/engagement.js?v=20260905050000"></script>
