@@ -56,6 +56,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Refresh browser asset versions
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          import re
+          from pathlib import Path
+
+          version = os.environ["GITHUB_SHA"]
+          for page in Path("HTML").rglob("*.html"):
+              html = page.read_text(encoding="utf-8")
+              html = re.sub(
+                  r'((?:src|href)="(?!https?://)[^"?]+\.(?:js|css)\?v=)[^"]+',
+                  lambda match: match[1] + version,
+                  html,
+              )
+              page.write_text(html, encoding="utf-8")
+          PYTHON
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
