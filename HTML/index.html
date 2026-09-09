@@ -219,13 +219,13 @@
       </div>
     </section>
 
-    <section class="contact-card collapsible-section collapsed" data-collapsible aria-label="Kontakt" data-i18n-aria="contact.aria">
+    <section class="contact-card collapsible-section collapsed" data-collapsible aria-label="Kontakt a podpora" data-i18n-aria="contact.aria">
       <div class="section-header">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="contact-content" aria-label="Zobraziť kontakt" data-i18n-aria="contact.toggle" data-section-key="contact.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="contact-content" aria-label="Zobraziť kontakt a podporu" data-i18n-aria="contact.toggle" data-section-key="contact.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div>
             <span class="eyebrow" data-i18n="contact.eyebrow">Kontakt</span>
-            <h2 data-i18n="contact.title">Napíšte nám</h2>
+            <h2 data-i18n="contact.title">Kontakt a podpora</h2>
           </div>
         </div>
       </div>
@@ -260,20 +260,21 @@
           </div>
           <p id="contact-status" class="contact-status" role="status" aria-live="polite"></p>
         </form>
+
+        <aside class="support-card" aria-labelledby="support-title">
+          <span class="support-icon" aria-hidden="true">☕</span>
+          <div class="support-copy">
+            <span class="eyebrow" data-i18n="support.eyebrow">Podpora</span>
+            <h2 id="support-title" data-i18n="support.title">Páči sa ti FlightScanner?</h2>
+            <p data-i18n="support.description">Podpor prevádzku stránky a pomôž nám zlepšovať vyhľadávanie letov.</p>
+          </div>
+          <a id="support-link" class="support-link" aria-haspopup="dialog" aria-controls="support-dialog" href="https://ko-fi.com/rodulab" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="support.button">Podporiť projekt</span>
+          </a>
+        </aside>
       </div>
     </section>
 
-    <aside class="support-card" aria-labelledby="support-title">
-      <span class="support-icon" aria-hidden="true">☕</span>
-      <div class="support-copy">
-        <span class="eyebrow" data-i18n="support.eyebrow">Podpora</span>
-        <h2 id="support-title" data-i18n="support.title">Páči sa ti FlightScanner?</h2>
-        <p data-i18n="support.description">Podpor prevádzku stránky a pomôž nám zlepšovať vyhľadávanie letov.</p>
-      </div>
-      <a id="support-link" class="support-link" aria-haspopup="dialog" aria-controls="support-dialog" href="https://ko-fi.com/rodulab" target="_blank" rel="noopener noreferrer">
-        <span data-i18n="support.button">Podporiť projekt</span>
-      </a>
-    </aside>
   </main>
 
   <dialog id="support-dialog" class="support-dialog" aria-labelledby="support-dialog-title">

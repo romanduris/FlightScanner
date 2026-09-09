@@ -439,7 +439,7 @@ assert.match(html, /class="overview-section collapsible-section"[\s\S]+aria-expa
 assert.doesNotMatch(html, /id="overview-content"[^>]+hidden/);
 assert.match(html, /class="filter-panel collapsible-section collapsed"[\s\S]+aria-expanded="false"[^>]+aria-controls="filters-content"[\s\S]+id="filters-content"[^>]+hidden/);
 assert.match(html, /class="contact-card collapsible-section collapsed"[\s\S]+aria-expanded="false"[^>]+aria-controls="contact-content"[\s\S]+id="contact-content"[^>]+hidden/);
-assert.match(html, /data-i18n="contact\.eyebrow">Kontakt<\/span>[\s\S]+data-i18n="contact\.title">Napíšte nám<\/h2>/);
+assert.match(html, /data-i18n="contact\.eyebrow">Kontakt<\/span>[\s\S]+data-i18n="contact\.title">Kontakt a podpora<\/h2>/);
 assert.match(html, /id="contact-name"[\s\S]+id="contact-email"[\s\S]+id="contact-message"[\s\S]+id="contact-submit"/);
 assert.doesNotMatch(html, /mailto:/i);
 const filterContent = html.match(/id="filters-content"[\s\S]*?<\/section>/)?.[0] || "";
