@@ -301,7 +301,7 @@ td strong { color: var(--ink); }
 .contact-turnstile { min-height: 0; margin-top: 16px; }
 .contact-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
 .contact-actions small { color: var(--muted); font-size: 12px; }
-.contact-submit, .support-link { min-height: 40px; padding: 10px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-size: 13px; line-height: 20px; font-weight: 700; }
+.contact-submit, .support-link { width: 152px; flex-shrink: 0; min-height: 40px; padding: 10px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-size: 13px; line-height: 20px; font-weight: 700; }
 .contact-submit:hover:not(:disabled), .support-link:hover { background: var(--blue-dark); }
 .contact-submit:focus-visible, .support-link:focus-visible { outline: 3px solid rgba(38, 93, 178, .2); outline-offset: 2px; }
 .contact-submit:disabled { cursor: default; opacity: .48; }
@@ -410,7 +410,7 @@ footer a { color: inherit; }
   .support-link { width: 100%; }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 480px) {
   .contact-actions { align-items: stretch; flex-direction: column; }
   .contact-submit { width: 100%; }
 }
