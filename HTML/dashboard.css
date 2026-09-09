@@ -399,7 +399,7 @@ footer a { color: inherit; }
   footer { flex-direction: column; padding: 0 11px 18px; }
 }
 
-.support-card { grid-column: 1 / -1; border-top: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 9px; min-height: 55px; padding: 16px 0 0; }
+.support-card { grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 9px; min-height: 55px; padding: 0 0 16px; }
 .support-icon { display: grid; place-items: center; flex: 0 0 24px; height: 24px; border: 1px solid #d7e1ee; border-radius: 6px; background: #f7f9fc; font-size: 15px; }
 .support-copy { flex: 1 1 220px; }
 .support-copy p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
