@@ -56,6 +56,7 @@
       "support.close": "Zavrieť",
       "support.frameTitle": "Podpora projektu cez Ko-fi",
       "support.fallback": "Formulár nefunguje? Otvoriť Ko-fi v novej karte",
+      "support.eyebrow": "Podpora",
       "support.title": "Páči sa ti FlightScanner?",
       "support.description": "Prispej na kávu a pomôž nám s prevádzkou a ďalším vývojom.",
       "support.button": "Podporiť projekt",

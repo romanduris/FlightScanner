@@ -68,6 +68,7 @@
       "support.close": "Close",
       "support.frameTitle": "Support the project through Ko-fi",
       "support.fallback": "Having trouble? Open Ko-fi in a new tab",
+      "support.eyebrow": "Support",
       "support.title": "Enjoying FlightScanner?",
       "support.description": "Buy us a coffee and help keep FlightScanner running and improving.",
       "support.button": "Support the project",
