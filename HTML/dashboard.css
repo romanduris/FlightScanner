@@ -300,9 +300,9 @@ td strong { color: var(--ink); }
 .contact-turnstile { min-height: 0; margin-top: 11px; }
 .contact-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 11px; }
 .contact-actions small { color: var(--muted); font-size: 8px; }
-.contact-submit { min-height: 34px; padding: 7px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-weight: 850; }
-.contact-submit:hover:not(:disabled) { background: var(--blue-dark); }
-.contact-submit:focus-visible { outline: 3px solid rgba(38, 93, 178, .2); outline-offset: 2px; }
+.contact-submit, .support-link { min-height: 34px; padding: 7px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-weight: 850; }
+.contact-submit:hover:not(:disabled), .support-link:hover { background: var(--blue-dark); }
+.contact-submit:focus-visible, .support-link:focus-visible { outline: 3px solid rgba(38, 93, 178, .2); outline-offset: 2px; }
 .contact-submit:disabled { cursor: default; opacity: .48; }
 .contact-status { min-height: 16px; margin: 7px 0 0; color: var(--muted); font-size: 9px; }
 .contact-status[data-state="success"] { color: var(--green); }
@@ -403,9 +403,7 @@ footer a { color: inherit; }
 .support-icon { display: grid; place-items: center; flex: 0 0 24px; height: 24px; border: 1px solid #d7e1ee; border-radius: 6px; background: #f7f9fc; font-size: 15px; }
 .support-copy { flex: 1 1 220px; }
 .support-copy p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.support-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 9px 16px; border: 1px solid #e6c84e; border-radius: 8px; background: #fff5c5; color: var(--blue-dark); font-size: 12px; font-weight: 400; text-decoration: none; }
-.support-link:hover { background: #ffed98; border-color: #c5a52c; }
-.support-link:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+.support-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 @media (max-width: 480px) {
   .support-copy { flex-basis: calc(100% - 33px); }
   .support-link { width: 100%; }
