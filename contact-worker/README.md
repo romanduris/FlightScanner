@@ -54,4 +54,6 @@ Anonymous active-time measurement and aggregate clicks on flight details, airlin
 ]
 ```
 
-The Cloudflare account must have Workers Analytics Engine enabled before deployment. No IP address, cookie, email address, or browser fingerprint is written to this dataset. Click statistics follow the selected 24-hour, 7-day, 30-day, or 90-day period and may be delayed by the five-minute statistics cache.
+The Cloudflare account must have Workers Analytics Engine enabled before deployment. No IP address, cookie, email address, or browser fingerprint is written to this dataset. Click statistics follow the selected 7-day, 30-day, or 90-day period and may be delayed by the five-minute statistics cache.
+
+Periods include today and the preceding calendar days in UTC, with a shared start/end for traffic, clicks, engagement and performance. Traffic totals and the chart use the same daily rows from fixed Monday-to-Monday Cloudflare queries, cached for five minutes and reused across periods. This avoids changing the sampling window when switching filters. Cloudflare counts remain estimates; averages and percentages can legitimately fall over longer periods.

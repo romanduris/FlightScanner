@@ -174,19 +174,25 @@
       return;
     }
     target.className = "line-chart";
-    const width = 1000, height = 180, left = 34, right = 8, top = 10, bottom = 25;
+    const width = Math.max(240, target.clientWidth), height = 180, left = 40, right = 18, top = 10, bottom = 25;
     const max = Math.max(...points.flatMap((item) => [item.visits || 0, item.pageviews || 0]), 1);
     const x = (index) => left + (points.length === 1 ? (width - left - right) / 2 : index * (width - left - right) / (points.length - 1));
     const y = (value) => top + (height - top - bottom) * (1 - value / max);
     const line = (key) => points.map((item, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(item[key] || 0).toFixed(1)}`).join(" ");
-    const labels = points.length <= 8 ? points : points.filter((_, index) => index % Math.ceil(points.length / 7) === 0 || index === points.length - 1);
+    const labelCount = Math.max(2, Math.floor((width - left - right) / 65));
+    const labelStep = Math.max(1, Math.ceil((points.length - 1) / (labelCount - 1)));
+    const labels = points.filter((_, index) => index % labelStep === 0);
+    if (labels.at(-1) !== points.at(-1)) {
+      if (points.length - 1 - points.indexOf(labels.at(-1)) < labelStep / 2) labels.pop();
+      labels.push(points.at(-1));
+    }
     const svg = `
-      <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="${text("trafficTrend")}">
+      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${text("trafficTrend")}">
         <defs><linearGradient id="traffic-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#133f91"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>
         ${[0, .25, .5, .75, 1].map((part) => `<line class="grid" x1="${left}" y1="${y(max * part)}" x2="${width - right}" y2="${y(max * part)}"/><text class="axis-label" x="0" y="${y(max * part) + 3}">${Math.round(max * part)}</text>`).join("")}
         <path class="area" d="${line("visits")} L${x(points.length - 1)},${height - bottom} L${x(0)},${height - bottom} Z"/>
         <path class="visits-line" d="${line("visits")}"/><path class="views-line" d="${line("pageviews")}"/>
-        ${labels.map((item) => { const index = points.indexOf(item); return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${date(item.date).slice(0, 5)}</text>`; }).join("")}
+        ${labels.map((item) => { const index = points.indexOf(item); return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(new Date(`${item.date}T12:00:00Z`))}</text>`; }).join("")}
       </svg>`;
     target.innerHTML = svg;
   }
@@ -309,16 +315,24 @@
     renderRuns();
   }
 
+  let liveRequest = 0;
   async function loadLiveData() {
+    const request = ++liveRequest;
+    const requestedDays = days;
+    let result;
     try {
-      const response = await fetch(`/api/statistics?days=${days}`, { headers: { Accept: "application/json" } });
+      const response = await fetch(`/api/statistics?days=${requestedDays}`, { headers: { Accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      liveData = await response.json();
+      result = await response.json();
     } catch (_error) {
-      liveData = { traffic: { available: false }, github: { runs: staticData?.action_runs || [] } };
+      result = { traffic: { available: false }, github: { runs: staticData?.action_runs || [] } };
     }
+    if (request !== liveRequest) return;
+    liveData = result;
     renderAll();
   }
+
+  new ResizeObserver(() => renderChart(liveData?.traffic?.trend)).observe(byId("traffic-chart"));
 
   document.querySelectorAll("[data-lang]").forEach((button) => button.addEventListener("click", () => { language = button.dataset.lang; applyLanguage(); }));
   document.querySelectorAll("[data-days]").forEach((button) => button.addEventListener("click", async () => {

@@ -6,7 +6,7 @@ const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sit
 const MAX_REQUEST_BYTES = 16_384;
 const GITHUB_RUNS_URL = "https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs?per_page=40";
 const GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
-const STATISTICS_CACHE_VERSION = "4";
+const STATISTICS_CACHE_VERSION = "5";
 
 function jsonResponse(body, status = 200, origin = "") {
   const headers = {
@@ -67,26 +67,25 @@ async function fetchGithubRuns(env) {
 }
 
 const PAGELOAD_QUERY = `
-  query Traffic($accountTag: string!, $start: Time!, $host: string!) {
+  query Traffic($accountTag: string!, $start: Time!, $end: Time!, $host: string!) {
     viewer { accounts(filter: { accountTag: $accountTag }) {
-      totals: rumPageloadEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count sum { visits } }
-      trend: rumPageloadEventsAdaptiveGroups(limit: 100, orderBy: [date_ASC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count sum { visits } dimensions { date } }
-      countries: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { countryName } }
-      devices: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { deviceType } }
-      browsers: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { userAgentBrowser } }
-      operatingSystems: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { userAgentOS } }
-      pages: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { requestPath } }
-      referrers: rumPageloadEventsAdaptiveGroups(limit: 10, orderBy: [count_DESC], filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) { count dimensions { refererHost } }
+      trend: rumPageloadEventsAdaptiveGroups(limit: 100, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count sum { visits } dimensions { date } }
+      countries: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date countryName } }
+      devices: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date deviceType } }
+      browsers: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date userAgentBrowser } }
+      operatingSystems: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date userAgentOS } }
+      pages: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date requestPath } }
+      referrers: rumPageloadEventsAdaptiveGroups(limit: 10000, orderBy: [date_ASC], filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) { count dimensions { date refererHost } }
     } }
   }`;
 
 const PERFORMANCE_QUERY = `
-  query Performance($accountTag: string!, $start: Time!, $host: string!) {
+  query Performance($accountTag: string!, $start: Time!, $end: Time!, $host: string!) {
     viewer { accounts(filter: { accountTag: $accountTag }) {
-      performance: rumPerformanceEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) {
+      performance: rumPerformanceEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) {
         avg { pageLoadTime firstContentfulPaint }
       }
-      vitals: rumWebVitalsEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $start, requestHost: $host, bot: 0 }) {
+      vitals: rumWebVitalsEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $start, datetime_lt: $end, requestHost: $host, bot: 0 }) {
         avg { largestContentfulPaint interactionToNextPaint cumulativeLayoutShift firstContentfulPaint }
       }
     } }
@@ -137,10 +136,55 @@ function microsecondsToMilliseconds(value) {
   return value == null ? null : Number(value) / 1000;
 }
 
-async function fetchEngagement(env, days) {
+const DAY_MS = 86_400_000;
+
+function statisticsRange(days, now = Date.now()) {
+  // Calendar days in UTC, including today, shared by every statistics source.
+  const today = Math.floor(now / DAY_MS) * DAY_MS;
+  return { start: new Date(today - (days - 1) * DAY_MS).toISOString(), end: new Date(now).toISOString() };
+}
+
+async function fetchPageBuckets(env, range) {
+  const first = new Date(range.start);
+  first.setUTCDate(first.getUTCDate() - (first.getUTCDay() + 6) % 7);
+  const starts = [];
+  for (let time = first.getTime(); time < Date.parse(range.end); time += 7 * DAY_MS) starts.push(time);
+  const buckets = new Array(starts.length);
+  const cache = globalThis.caches?.default;
+  let next = 0;
+  // Fixed Monday-to-Monday queries avoid changing sampling resolution when a
+  // visitor switches periods. Reuse the same daily rows and cached weeks.
+  await Promise.all(Array.from({ length: Math.min(3, starts.length) }, async () => {
+    while (next < starts.length) {
+      const index = next++;
+      const start = new Date(starts[index]).toISOString();
+      const end = new Date(Math.min(starts[index] + 7 * DAY_MS, Date.parse(range.end))).toISOString();
+      const key = new Request(`https://${env.EXPECTED_HOSTNAME}/api/statistics/bucket?start=${start}&v=${STATISTICS_CACHE_VERSION}`);
+      const cached = cache ? await cache.match(key) : null;
+      if (cached) {
+        buckets[index] = await cached.json();
+        continue;
+      }
+      const bucket = await graphql(env, PAGELOAD_QUERY, { accountTag: env.CLOUDFLARE_ACCOUNT_ID, start, end, host: env.EXPECTED_HOSTNAME });
+      // Never silently show partial totals if a breakdown hits the API limit.
+      if (Object.values(bucket).some((rows) => Array.isArray(rows) && rows.length >= 10000)) throw new Error("traffic_group_limit");
+      buckets[index] = bucket;
+      if (cache) await cache.put(key, Response.json(bucket, { headers: { "Cache-Control": "public, max-age=300" } }));
+    }
+  }));
+  const page = {};
+  for (const bucket of buckets) {
+    for (const [key, rows] of Object.entries(bucket)) {
+      page[key] ??= [];
+      page[key].push(...rows.filter((row) => row.dimensions?.date >= range.start.slice(0, 10) && row.dimensions.date <= range.end.slice(0, 10)));
+    }
+  }
+  return page;
+}
+
+async function fetchEngagement(env, range) {
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return null;
-  const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
-  const query = `SELECT SUM(double1) AS seconds, COUNT(DISTINCT index1) AS sessions FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double1 > 0`;
+  const query = `SELECT SUM(double1) AS seconds, COUNT(DISTINCT index1) AS sessions FROM flightscanner_engagement WHERE timestamp >= toDateTime('${range.start.slice(0, 19).replace('T', ' ')}') AND timestamp < toDateTime('${range.end.slice(0, 19).replace('T', ' ')}') AND double1 > 0`;
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },
@@ -154,11 +198,10 @@ async function fetchEngagement(env, days) {
   return Number(row.seconds || 0) / Number(row.sessions);
 }
 
-async function fetchClicks(env, days) {
+async function fetchClicks(env, range) {
   const empty = { available: false, offer_opens: 0, ryanair: 0, wizz_air: 0, booking_com: 0 };
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return empty;
-  const safeDays = [1, 7, 30, 90].includes(days) ? days : 30;
-  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(_sample_interval * double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= NOW() - INTERVAL '${safeDays}' DAY AND double2 > 0 GROUP BY blob4, blob5`;
+  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(_sample_interval * double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= toDateTime('${range.start.slice(0, 19).replace('T', ' ')}') AND timestamp < toDateTime('${range.end.slice(0, 19).replace('T', ' ')}') AND double2 > 0 GROUP BY blob4, blob5`;
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },
@@ -183,22 +226,22 @@ async function fetchTraffic(env, days) {
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID || !env.EXPECTED_HOSTNAME) {
     return { available: false, reason: "not_configured" };
   }
-  const start = new Date(Date.now() - days * 86_400_000).toISOString();
-  const variables = { accountTag: env.CLOUDFLARE_ACCOUNT_ID, start, host: env.EXPECTED_HOSTNAME };
+  const range = statisticsRange(days);
+  const variables = { accountTag: env.CLOUDFLARE_ACCOUNT_ID, ...range, host: env.EXPECTED_HOSTNAME };
   const [page, performance, engagement, clicks] = await Promise.all([
-    graphql(env, PAGELOAD_QUERY, variables),
+    fetchPageBuckets(env, range),
     graphql(env, PERFORMANCE_QUERY, variables),
-    fetchEngagement(env, days),
-    fetchClicks(env, days),
+    fetchEngagement(env, range),
+    fetchClicks(env, range),
   ]);
-  const total = page.totals?.[0] || {};
+  const trend = aggregateTrend(page.trend);
   const timings = performance.performance?.[0]?.avg || {};
   const vitals = performance.vitals?.[0]?.avg || {};
   return {
     available: true,
     summary: {
-      visits: Number(total.sum?.visits || 0),
-      pageviews: Number(total.count || 0),
+      visits: trend.reduce((total, point) => total + point.visits, 0),
+      pageviews: trend.reduce((total, point) => total + point.pageviews, 0),
       average_engagement_seconds: engagement,
       page_load_ms: microsecondsToMilliseconds(timings.pageLoadTime),
       fcp_ms: microsecondsToMilliseconds(vitals.firstContentfulPaint ?? timings.firstContentfulPaint),
@@ -206,7 +249,8 @@ async function fetchTraffic(env, days) {
       inp_ms: microsecondsToMilliseconds(vitals.interactionToNextPaint),
       cls: vitals.cumulativeLayoutShift ?? null,
     },
-    trend: aggregateTrend(page.trend),
+    trend,
+    range: { ...range, days, timezone: "UTC" },
     countries: aggregateGroups(page.countries, "countryName"),
     devices: aggregateGroups(page.devices, "deviceType"),
     browsers: aggregateGroups(page.browsers, "userAgentBrowser"),
@@ -415,7 +459,7 @@ export default {
     const allowedOrigin = env.ALLOWED_ORIGIN || "";
 
     if (url.pathname === STATISTICS_PATH && request.method === "GET") {
-      const days = [1, 7, 30, 90].includes(Number(url.searchParams.get("days"))) ? Number(url.searchParams.get("days")) : 30;
+      const days = [7, 30, 90].includes(Number(url.searchParams.get("days"))) ? Number(url.searchParams.get("days")) : 30;
       const cache = globalThis.caches?.default;
       const cacheKey = new Request(`${url.origin}${STATISTICS_PATH}?days=${days}&v=${STATISTICS_CACHE_VERSION}`, request);
       const cached = cache ? await cache.match(cacheKey) : null;

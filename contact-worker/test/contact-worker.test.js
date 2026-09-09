@@ -107,6 +107,8 @@ test("an invalid Turnstile result prevents delivery", async () => {
 
 test("statistics combine GitHub runs with anonymous Cloudflare aggregates", async () => {
   const originalFetch = globalThis.fetch;
+  const originalNow = Date.now;
+  Date.now = () => Date.parse("2026-09-09T12:00:00Z");
   let clicksQuery = "";
   globalThis.fetch = async (url, options = {}) => {
     if (String(url).includes("api.github.com")) {
@@ -136,15 +138,16 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     }
     const body = JSON.parse(options.body);
     if (body.query.includes("query Traffic")) {
+      if (body.variables.start > "2026-09-04") return Response.json({ data: { viewer: { accounts: [{}] } } });
       return Response.json({ data: { viewer: { accounts: [{
         totals: [{ count: 12, sum: { visits: 8 } }],
         trend: [{ count: 12, sum: { visits: 8 }, dimensions: { date: "2026-09-04" } }],
-        countries: [{ count: 7, dimensions: { countryName: "SK" } }],
-        devices: [{ count: 6, dimensions: { deviceType: "mobile" } }],
-        browsers: [{ count: 8, dimensions: { userAgentBrowser: "Chrome" } }],
-        operatingSystems: [{ count: 5, dimensions: { userAgentOS: "Android" } }],
-        pages: [{ count: 12, dimensions: { requestPath: "/" } }],
-        referrers: [{ count: 4, dimensions: { refererHost: "" } }],
+        countries: [{ count: 7, dimensions: { date: "2026-09-04", countryName: "SK" } }],
+        devices: [{ count: 6, dimensions: { date: "2026-09-04", deviceType: "mobile" } }],
+        browsers: [{ count: 8, dimensions: { date: "2026-09-04", userAgentBrowser: "Chrome" } }],
+        operatingSystems: [{ count: 5, dimensions: { date: "2026-09-04", userAgentOS: "Android" } }],
+        pages: [{ count: 12, dimensions: { date: "2026-09-04", requestPath: "/" } }],
+        referrers: [{ count: 4, dimensions: { date: "2026-09-04", refererHost: "" } }],
       }] } } });
     }
     return Response.json({ data: { viewer: { accounts: [{
@@ -177,6 +180,7 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
   } finally {
     globalThis.fetch = originalFetch;
+    Date.now = originalNow;
   }
 });
 
@@ -221,4 +225,55 @@ test("click events store anonymous event and provider counters", async () => {
     doubles: [0, 1],
     indexes: ["temporary-session"],
   });
+});
+
+test("7/30/90-day totals share weekly rows, include boundaries once and match their trend", async () => {
+  const originalFetch = globalThis.fetch, originalNow = Date.now, originalCaches = globalThis.caches;
+  const now = Date.parse("2026-09-09T12:00:00Z"), day = 86400000;
+  Date.now = () => now;
+  const stored = new Map(), requests = [];
+  globalThis.caches = { default: {
+    async match(key) { return stored.get(key.url)?.clone(); },
+    async put(key, value) { stored.set(key.url, value.clone()); },
+  } };
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).includes("api.github.com")) return Response.json({ workflow_runs: [] });
+    if (String(url).includes("analytics_engine/sql")) {
+      assert.match(options.body, /timestamp >= toDateTime\('[\d-]+ 00:00:00'\) AND timestamp < toDateTime\('2026-09-09 12:00:00'\)/);
+      return Response.json({ data: [] });
+    }
+    const { query, variables } = JSON.parse(options.body);
+    if (!query.includes("query Traffic")) return Response.json({ data: { viewer: { accounts: [{}] } } });
+    assert.match(query, /datetime_lt: \$end/);
+    assert.equal(new Date(variables.start).getUTCDay(), 1);
+    assert.ok(Date.parse(variables.end) - Date.parse(variables.start) <= 7 * day);
+    requests.push(variables.start);
+    const rows = [];
+    for (let time = Date.parse(variables.start); time < Date.parse(variables.end); time += day) {
+      rows.push({ count: 3, sum: { visits: 2 }, dimensions: { date: new Date(time).toISOString().slice(0, 10), countryName: "SK" } });
+    }
+    return Response.json({ data: { viewer: { accounts: [{ trend: rows, countries: rows }] } } });
+  };
+  try {
+    const env = { ...environment(async () => {}), CLOUDFLARE_ACCOUNT_ID: "account", CLOUDFLARE_ANALYTICS_TOKEN: "token" };
+    for (const days of [7, 30, 90, 7]) {
+      const response = await worker.fetch(new Request(`${ORIGIN}/api/statistics?days=${days}`), env);
+      const { traffic } = await response.json();
+      assert.equal(traffic.available, true);
+      assert.equal(traffic.trend.length, days);
+      assert.equal(new Set(traffic.trend.map(p => p.date)).size, days);
+      assert.equal(traffic.trend.at(-1).date, "2026-09-09");
+      assert.equal(traffic.summary.visits, 2 * days);
+      assert.equal(traffic.summary.pageviews, 3 * days);
+      assert.equal(traffic.summary.visits, traffic.trend.reduce((sum, p) => sum + p.visits, 0));
+      assert.equal(traffic.countries[0].count, 3 * days);
+      assert.equal(traffic.range.days, days);
+    }
+    assert.equal(requests.length, new Set(requests).size, "overlapping weeks must come from the same cache");
+    assert.ok(requests.length <= 14, "90 days need no more than 14 weekly requests");
+    const fallback = await (await worker.fetch(new Request(`${ORIGIN}/api/statistics?days=1`), env)).json();
+    assert.equal(fallback.traffic.range.days, 30);
+  } finally {
+    globalThis.fetch = originalFetch; Date.now = originalNow; globalThis.caches = originalCaches;
+  }
 });
