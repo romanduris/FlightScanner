@@ -284,27 +284,28 @@ td strong { color: var(--ink); }
 .return-price strong { margin-top: 2px; font-size: 12px; }
 .return-total strong { margin-top: 2px; color: var(--blue); font-size: 14px; }
 .return-empty { padding: 14px; color: var(--muted); border: 1px dashed #cbd6e4; border-radius: 8px; background: #f8fafc; text-align: center; }
-.contact-content { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(360px, 1.45fr); gap: 28px; padding: 18px 20px 20px; }
-.contact-intro { display: flex; align-items: flex-start; gap: 11px; color: var(--muted); line-height: 1.55; }
-.contact-intro p { max-width: 300px; margin: 4px 0 0; }
-.contact-icon { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; color: white; border-radius: 9px; background: var(--blue); font-size: 16px; }
+.contact-content { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(360px, 1.45fr); gap: 24px; padding: 20px; font-size: 14px; line-height: 1.5; }
+.contact-intro { display: flex; align-items: flex-start; gap: 12px; color: var(--muted); }
+.contact-intro p { max-width: 300px; margin: 0; }
+.contact-icon, .support-icon { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; color: var(--blue); border-radius: 9px; background: #edf2fb; }
+.contact-icon svg, .support-icon svg { width: 20px; height: 20px; }
 .contact-form { min-width: 0; }
-.contact-fields { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
-.contact-fields label:not(.contact-honeypot) { display: grid; gap: 5px; color: var(--muted); font-size: 9px; font-weight: 800; }
-.contact-fields input, .contact-fields textarea { width: 100%; color: var(--ink); border: 1px solid #d7e0ec; border-radius: 7px; outline: none; background: #fbfcfe; }
-.contact-fields input { height: 34px; padding: 0 10px; }
-.contact-fields textarea { min-height: 86px; padding: 9px 10px; resize: vertical; line-height: 1.45; }
+.contact-fields { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.contact-fields label:not(.contact-honeypot) { display: grid; gap: 6px; color: var(--ink); font-size: 12px; font-weight: 600; }
+.contact-fields input, .contact-fields textarea { width: 100%; font-size: 14px; color: var(--ink); border: 1px solid #d7e0ec; border-radius: 7px; outline: none; background: #fbfcfe; }
+.contact-fields input { height: 40px; padding: 0 12px; }
+.contact-fields textarea { min-height: 112px; padding: 10px 12px; resize: vertical; line-height: 1.45; }
 .contact-fields input:focus, .contact-fields textarea:focus { border-color: #5b83c8; box-shadow: 0 0 0 3px rgba(38, 93, 178, .1); }
 .contact-message-field { grid-column: 1 / -1; }
 .contact-honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.contact-turnstile { min-height: 0; margin-top: 11px; }
-.contact-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 11px; }
-.contact-actions small { color: var(--muted); font-size: 8px; }
-.contact-submit, .support-link { min-height: 34px; padding: 7px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-weight: 850; }
+.contact-turnstile { min-height: 0; margin-top: 16px; }
+.contact-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.contact-actions small { color: var(--muted); font-size: 12px; }
+.contact-submit, .support-link { min-height: 40px; padding: 10px 16px; cursor: pointer; color: white; border: 0; border-radius: 7px; background: var(--blue); font-size: 13px; line-height: 20px; font-weight: 700; }
 .contact-submit:hover:not(:disabled), .support-link:hover { background: var(--blue-dark); }
 .contact-submit:focus-visible, .support-link:focus-visible { outline: 3px solid rgba(38, 93, 178, .2); outline-offset: 2px; }
 .contact-submit:disabled { cursor: default; opacity: .48; }
-.contact-status { min-height: 16px; margin: 7px 0 0; color: var(--muted); font-size: 9px; }
+.contact-status { min-height: 18px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
 .contact-status[data-state="success"] { color: var(--green); }
 .contact-status[data-state="error"] { color: #b42318; }
 footer { display: flex; justify-content: space-between; gap: 20px; max-width: 1540px; margin: 0 auto; padding: 0 22px 24px; color: #77869a; font-size: 9px; }
@@ -392,20 +393,21 @@ footer a { color: inherit; }
   .return-airline-logo { grid-row: 1 / span 2; }
   .return-when { grid-column: 2 / -1; }
   .return-price { text-align: left; }
-  .contact-content { grid-template-columns: 1fr; gap: 15px; padding: 15px 13px 17px; }
+  .contact-content { grid-template-columns: 1fr; gap: 20px; padding: 16px; }
   .contact-intro p { max-width: none; }
   .contact-fields { grid-template-columns: 1fr; }
+  .contact-fields input, .contact-fields textarea { font-size: 16px; }
   .contact-message-field { grid-column: auto; }
   footer { flex-direction: column; padding: 0 11px 18px; }
 }
 
-.support-card { grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 9px; min-height: 55px; padding: 0 0 16px; }
-.support-icon { display: grid; place-items: center; flex: 0 0 24px; height: 24px; border: 1px solid #d7e1ee; border-radius: 6px; background: #f7f9fc; font-size: 15px; }
+.support-card { grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 0 0 20px; }
+.support-copy h2 { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 700; }
 .support-copy { flex: 1 1 220px; }
-.support-copy p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.support-copy p { margin: 4px 0 0; color: var(--muted); }
 .support-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 @media (max-width: 480px) {
-  .support-copy { flex-basis: calc(100% - 33px); }
+  .support-copy { flex-basis: calc(100% - 48px); }
   .support-link { width: 100%; }
 }
 
