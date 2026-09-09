@@ -74,6 +74,7 @@
     travellerMinus: document.querySelector("#traveller-minus"),
     travellerCount: document.querySelector("#traveller-count"),
     travellerPlus: document.querySelector("#traveller-plus"),
+    calendarSchoolLegend: document.querySelector("#calendar-school-legend"),
     calendarRegion: document.querySelector("#calendar-region"),
     calendarMonths: document.querySelector("#calendar-months"),
     calendarSelectedDate: document.querySelector("#calendar-selected-date"),
@@ -402,6 +403,7 @@
   }
 
   function renderCalendar() {
+    elements.calendarSchoolLegend.textContent = t(`calendar.schoolLegend.${schoolRegion}`);
     const firstMonth = startOfMonth(payload.start_date);
     const lastMonth = startOfMonth(addDays(payload.start_date, lastScanDay));
     const latestCursor = lastMonth > firstMonth ? addMonths(lastMonth, -1) : firstMonth;

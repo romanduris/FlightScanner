@@ -398,7 +398,7 @@ assert.doesNotMatch(html, /id="date-from-filter"|id="planning-window-filter"/);
 assert.match(html, /id="calendar-selected-date"/);
 assert.match(html, /id="calendar-prev"[\s\S]+id="calendar-next"[\s\S]+id="calendar-months"/);
 assert.match(html, /calendar-legend-dot-weekend[\s\S]+data-i18n="calendar\.legend">Víkend alebo deň pracovného pokoja/);
-assert.match(html, /calendar-legend-dot-school[\s\S]+data-i18n="calendar\.schoolLegend">Školské prázdniny vybraného regiónu/);
+assert.match(html, /calendar-legend-dot-school[\s\S]+id="calendar-school-legend" aria-live="polite">Školské prázdniny západného Slovenska/);
 assert.ok(holidays.holidays.some((item) => item.date === "2026-05-01"));
 assert.ok(!holidays.holidays.some((item) => item.date === "2026-05-08"));
 assert.ok(holidays.holidays.some((item) => item.date === "2027-09-15"));
@@ -514,12 +514,15 @@ require('node:vm').runInThisContext(javascript);
 setImmediate(() => {
   const region = element('#calendar-region');
   const hasSchoolHoliday = (offset) => new RegExp(`class="[^"]*school-holiday[^"]*" data-calendar-day="${offset}"`).test(element('#calendar-months').innerHTML);
+  assert.equal(element('#calendar-school-legend').textContent, 'Školské prázdniny západného Slovenska');
   assert.ok(hasSchoolHoliday(28), 'West is the default: March 1');
   assert.ok(hasSchoolHoliday(32), 'West includes March 5');
   assert.ok(!hasSchoolHoliday(14), 'West excludes February 15');
   const selected = element('#calendar-selected-date').textContent;
   for (const [value, start, end] of [['central', 14, 18], ['east', 21, 25], ['west', 28, 32]]) {
     region.listeners.change({ target: { value } });
+    const regionNames = { west: 'západného', central: 'stredného', east: 'východného' };
+    assert.equal(element('#calendar-school-legend').textContent, `Školské prázdniny ${regionNames[value]} Slovenska`);
     assert.ok(hasSchoolHoliday(start), `${value} spring start`);
     assert.ok(hasSchoolHoliday(end), `${value} spring end`);
     for (const other of [14, 21, 28].filter((day) => day !== start)) assert.ok(!hasSchoolHoliday(other));
