@@ -285,7 +285,7 @@ td strong { color: var(--ink); }
 .return-total strong { margin-top: 2px; color: var(--blue); font-size: 14px; }
 .return-empty { padding: 14px; color: var(--muted); border: 1px dashed #cbd6e4; border-radius: 8px; background: #f8fafc; text-align: center; }
 .contact-content { display: grid; grid-template-columns: minmax(180px, .55fr) minmax(360px, 1.45fr); gap: 24px; padding: 20px; font-size: 14px; line-height: 1.5; }
-.contact-intro { display: flex; align-items: flex-start; gap: 12px; color: var(--muted); }
+.contact-intro { display: flex; align-self: start; align-items: center; gap: 12px; color: var(--muted); }
 .contact-intro p { max-width: 300px; margin: 0; }
 .contact-icon, .support-icon { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; color: var(--blue); border-radius: 9px; background: #edf2fb; }
 .contact-icon svg, .support-icon svg { width: 20px; height: 20px; }
@@ -402,9 +402,8 @@ footer a { color: inherit; }
 }
 
 .support-card { grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 0 0 20px; }
-.support-copy h2 { margin: 0; font-size: 16px; line-height: 1.5; font-weight: 700; }
 .support-copy { flex: 1 1 220px; }
-.support-copy p { margin: 4px 0 0; color: var(--muted); }
+.support-copy p { margin: 0; color: var(--muted); }
 .support-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 @media (max-width: 480px) {
   .support-copy { flex-basis: calc(100% - 48px); }
