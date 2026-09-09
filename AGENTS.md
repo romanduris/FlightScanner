@@ -5,4 +5,4 @@
 - If work was performed on another task branch, merge it into `main` after verification. Do not create an empty merge when already on `main`.
 - Inspect the working tree before staging and never include unrelated user changes.
 - Use a concise commit message describing the completed result.
-- Do not push to a remote unless the user explicitly requests it.
+- After completing and verifying changes, always push `main` to `origin`.
