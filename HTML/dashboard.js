@@ -55,6 +55,8 @@
   let routeLayer = null;
   let publicHolidays = new Set();
   let schoolHolidays = new Set();
+  let schoolHolidaysByRegion = {};
+  let schoolRegion = "west";
   let visibleOffers = [...flights];
   let calendarCursor = startOfMonth(addDays(payload.start_date, initialVisibleDay));
 
@@ -72,6 +74,7 @@
     travellerMinus: document.querySelector("#traveller-minus"),
     travellerCount: document.querySelector("#traveller-count"),
     travellerPlus: document.querySelector("#traveller-plus"),
+    calendarRegion: document.querySelector("#calendar-region"),
     calendarMonths: document.querySelector("#calendar-months"),
     calendarSelectedDate: document.querySelector("#calendar-selected-date"),
     calendarPrevious: document.querySelector("#calendar-prev"),
@@ -780,6 +783,11 @@
       if (!button || button.disabled) return;
       selectCalendarDay(Number(button.dataset.calendarDay));
     });
+    elements.calendarRegion.addEventListener("change", (event) => {
+      schoolRegion = event.target.value;
+      schoolHolidays = schoolHolidaysByRegion[schoolRegion] || new Set();
+      renderCalendar();
+    });
     elements.calendarPrevious.addEventListener("click", () => {
       calendarCursor = addMonths(calendarCursor, -1);
       renderCalendar();
@@ -841,7 +849,12 @@
     Promise.all([readJson("holidays-sk.json"), readJson("school-holidays-sk.json")])
       .then(([holidayData, schoolHolidayData]) => {
         publicHolidays = new Set((holidayData.holidays || []).map((item) => item.date));
-        schoolHolidays = new Set(expandPeriods(schoolHolidayData.periods || []));
+        schoolHolidaysByRegion = Object.fromEntries(
+          Object.entries(schoolHolidayData.regions || {}).map(([region, data]) => [
+            region, new Set(expandPeriods([...(schoolHolidayData.periods || []), ...(data.periods || [])])),
+          ]),
+        );
+        schoolHolidays = schoolHolidaysByRegion[schoolRegion] || new Set();
         renderCalendar();
       })
       .catch(() => {});

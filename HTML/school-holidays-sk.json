@@ -1,12 +1,63 @@
 {
   "country": "SK",
-  "region": "Bratislavský kraj",
-  "name": "Školské prázdniny v Bratislavskom kraji",
+  "name": "Školské prázdniny 2026/2027",
   "periods": [
-    { "start": "2026-10-29", "end": "2026-10-30", "name": "Jesenné prázdniny" },
-    { "start": "2026-12-23", "end": "2027-01-07", "name": "Vianočné prázdniny" },
-    { "start": "2027-02-01", "end": "2027-02-01", "name": "Polročné prázdniny" },
-    { "start": "2027-02-15", "end": "2027-02-19", "name": "Jarné prázdniny" },
-    { "start": "2027-03-25", "end": "2027-03-30", "name": "Veľkonočné prázdniny" }
-  ]
+    {
+      "start": "2026-10-29",
+      "end": "2026-10-30",
+      "name": "Jesenné prázdniny"
+    },
+    {
+      "start": "2026-12-23",
+      "end": "2027-01-07",
+      "name": "Vianočné prázdniny"
+    },
+    {
+      "start": "2027-02-01",
+      "end": "2027-02-01",
+      "name": "Polročné prázdniny"
+    },
+    {
+      "start": "2027-03-25",
+      "end": "2027-03-30",
+      "name": "Veľkonočné prázdniny"
+    },
+    {
+      "start": "2027-07-01",
+      "end": "2027-08-31",
+      "name": "Letné prázdniny"
+    }
+  ],
+  "regions": {
+    "west": {
+      "name": "Bratislavský, Nitriansky a Trnavský kraj",
+      "periods": [
+        {
+          "start": "2027-03-01",
+          "end": "2027-03-05",
+          "name": "Jarné prázdniny"
+        }
+      ]
+    },
+    "central": {
+      "name": "Banskobystrický, Žilinský a Trenčiansky kraj",
+      "periods": [
+        {
+          "start": "2027-02-15",
+          "end": "2027-02-19",
+          "name": "Jarné prázdniny"
+        }
+      ]
+    },
+    "east": {
+      "name": "Košický a Prešovský kraj",
+      "periods": [
+        {
+          "start": "2027-02-22",
+          "end": "2027-02-26",
+          "name": "Jarné prázdniny"
+        }
+      ]
+    }
+  }
 }
