@@ -4,12 +4,12 @@
   const copy = {
     sk: {
       back: "← Späť na lety", eyebrow: "Štatistiky", title: "Ako funguje BTSFLIGHTSCANER",
-      subtitle: "Návštevnosť stránky, aktuálnosť letových dát a história automatických zberov.",
+      subtitle: "Návštevnosť stránky, interakcie návštevníkov a história automatických zberov.",
       trafficEyebrow: "Návštevnosť", trafficTitle: "Ľudia na stránke", loading: "Načítavam…",
       visits: "Návštevy", humanTraffic: "anonymné návštevy bez sledovania ľudí", pageviews: "Zobrazenia", pagesOpened: "otvorené stránky",
       pagesPerVisit: "Stránky / návštevu", visitAverage: "priemer za návštevu", engagement: "Čas na stránke", engagementNote: "aktívny priemer",
       mobileShare: "Mobilné zariadenia", trafficShare: "podiel návštevnosti", analyticsUnavailable: "Cloudflare štatistiky zatiaľ nie sú pripojené",
-      analyticsUnavailableBody: "Letové a GitHub štatistiky nižšie fungujú ďalej.", trafficTrend: "Vývoj návštevnosti",
+      analyticsUnavailableBody: "História automatizácie nižšie funguje ďalej.", trafficTrend: "Vývoj návštevnosti",
       countries: "Krajiny", devices: "Zariadenia", browsers: "Prehliadače", operatingSystems: "Operačné systémy", topPages: "Najnavštevovanejšie stránky", sources: "Zdroje návštev",
       performanceEyebrow: "Výkon", performanceTitle: "Rýchlosť a stabilita stránky", realVisitors: "merané u skutočných návštevníkov",
       pageLoad: "Načítanie stránky", average: "priemer", largestContent: "hlavný obsah", interaction: "odozva interakcií", layoutStability: "stabilita rozloženia", firstContent: "prvý obsah",
@@ -21,6 +21,7 @@
       privacy: "súkromie bez cookies a sledovania jednotlivcov", live: "Aktuálne dáta", noData: "Zatiaľ bez dát", direct: "Priamy vstup", scan: "Zber dát", deploy: "Nasadenie", manual: "Ručný zber",
       success: "Úspešný", failure: "Chyba", cancelled: "Zrušený", in_progress: "Prebieha", queued: "Čaká", open: "Otvoriť", days: "dní", ago: "dozadu",
       lastRefreshed: "Naposledy obnovené", updatedAt: "údaje z",
+      clickComparison: "Porovnanie interakcií", clicksUnavailable: "Údaje o kliknutiach nie sú dostupné.",
       clicksEyebrow: "Interakcie", clicksTitle: "Na čo návštevníci klikajú", clicksNote: "anonymné súčty za vybrané obdobie",
       audienceEyebrow: "Publikum", audienceTitle: "Podrobnosti návštevnosti",
       offersOpened: "Otvorené ponuky", flightDetails: "zobrazené detaily letov", ryanairClicks: "Kliknutia na Ryanair", wizzClicks: "Kliknutia na Wizz Air",
@@ -30,12 +31,12 @@
     },
     en: {
       back: "← Back to flights", eyebrow: "Statistics", title: "How BTSFLIGHTSCANER works",
-      subtitle: "Website traffic, flight data freshness and the history of automated scans.",
+      subtitle: "Website traffic, visitor interactions and the history of automated scans.",
       trafficEyebrow: "Traffic", trafficTitle: "People on the website", loading: "Loading…",
       visits: "Visits", humanTraffic: "anonymous visits without individual tracking", pageviews: "Page views", pagesOpened: "pages opened",
       pagesPerVisit: "Pages / visit", visitAverage: "average per visit", engagement: "Time on page", engagementNote: "active average",
       mobileShare: "Mobile devices", trafficShare: "share of traffic", analyticsUnavailable: "Cloudflare statistics are not connected yet",
-      analyticsUnavailableBody: "Flight and GitHub statistics below remain available.", trafficTrend: "Traffic trend",
+      analyticsUnavailableBody: "The automation history below remains available.", trafficTrend: "Traffic trend",
       countries: "Countries", devices: "Devices", browsers: "Browsers", operatingSystems: "Operating systems", topPages: "Most visited pages", sources: "Traffic sources",
       performanceEyebrow: "Performance", performanceTitle: "Website speed and stability", realVisitors: "measured for real visitors",
       pageLoad: "Page load", average: "average", largestContent: "main content", interaction: "interaction response", layoutStability: "layout stability", firstContent: "first content",
@@ -47,6 +48,7 @@
       privacy: "privacy without cookies or individual tracking", live: "Live data", noData: "No data yet", direct: "Direct", scan: "Data scan", deploy: "Deployment", manual: "Manual scan",
       success: "Successful", failure: "Failed", cancelled: "Cancelled", in_progress: "Running", queued: "Queued", open: "Open", days: "days", ago: "ago",
       lastRefreshed: "Last refreshed", updatedAt: "data from",
+      clickComparison: "Interaction comparison", clicksUnavailable: "Click data is unavailable.",
       clicksEyebrow: "Interactions", clicksTitle: "What visitors click", clicksNote: "anonymous totals for the selected period",
       audienceEyebrow: "Audience", audienceTitle: "Traffic details",
       offersOpened: "Offers opened", flightDetails: "flight details displayed", ryanairClicks: "Ryanair clicks", wizzClicks: "Wizz Air clicks",
@@ -229,10 +231,47 @@
     barList("page-list", traffic?.pages);
     barList("referrer-list", traffic?.referrers);
     const clicks = traffic?.clicks;
+    renderInteractions(clicks);
     setMetric("click-offers", clicks?.available ? number(clicks.offer_opens) : "—");
     setMetric("click-ryanair", clicks?.available ? number(clicks.ryanair) : "—");
     setMetric("click-wizz", clicks?.available ? number(clicks.wizz_air) : "—");
     setMetric("click-booking", clicks?.available ? number(clicks.booking_com) : "—");
+  }
+
+  function renderInteractions(clicks) {
+    const target = byId("interaction-bars");
+    target.replaceChildren();
+    if (!clicks?.available) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = text("clicksUnavailable");
+      target.append(empty);
+      return;
+    }
+    const entries = [
+      ["offer_opens", text("offersOpened")],
+      ["booking_com", "Booking.com"],
+      ["ryanair", "Ryanair"],
+      ["wizz_air", "Wizz Air"],
+    ].map(([key, label]) => ({ key, label, count: Math.max(0, Number(clicks[key]) || 0) }));
+    const maximum = Math.max(1, ...entries.map((entry) => entry.count));
+    entries.forEach(({ key, label, count }) => {
+      const row = document.createElement("div");
+      row.className = "interaction-row";
+      row.dataset.category = key;
+      const name = document.createElement("span");
+      name.textContent = label;
+      const track = document.createElement("span");
+      track.className = "interaction-track";
+      track.setAttribute("aria-hidden", "true");
+      const fill = document.createElement("i");
+      fill.style.width = `${count / maximum * 100}%`;
+      track.append(fill);
+      const value = document.createElement("b");
+      value.textContent = number(count);
+      row.append(name, track, value);
+      target.append(row);
+    });
   }
 
   function scanAge(value) {
@@ -244,32 +283,6 @@
 
   function updatedStamp(value) {
     return value ? `${scanAge(value)} · ${exactDateTime(value)}` : "—";
-  }
-
-  function renderScanner() {
-    const current = staticData?.current || {};
-    setMetric("scan-flights", number(current.flights));
-    setMetric("scan-routes", number(current.routes));
-    setMetric("scan-countries", number(current.countries));
-    setMetric("scan-returns", number(current.return_flights));
-    setMetric("scan-errors", number(current.failures));
-    setMetric("scan-through", date(current.period_end));
-    setMetric("scan-days", current.scan_days ? `${current.scan_days} ${text("days")}` : "—");
-    setMetric("scan-period", `${date(current.period_start)} – ${date(current.period_end)}`);
-    byId("scan-freshness").textContent = updatedStamp(current.scanned_at_utc);
-    const target = byId("airline-grid");
-    target.replaceChildren();
-    (current.airlines || []).forEach((airline) => {
-      const card = document.createElement("article");
-      card.className = "airline-card";
-      const display = airline.airline === "RYANAIR" ? "RYANAIR" : "Wizz Air";
-      card.innerHTML = `<strong class="airline-name ${airline.airline === "Wizz Air" ? "wizz" : ""}">${display}</strong>
-        <span class="airline-stat"><span>${text("routes")}</span><b>${number(airline.routes)}</b></span>
-        <span class="airline-stat"><span>${text("flights")}</span><b>${number(airline.flights)}</b></span>
-        <span class="airline-stat"><span>${text("returns")}</span><b>${number(airline.returns)}</b></span>
-        <span class="airline-stat"><span>${text("errors")}</span><b>${number(airline.failures)}</b></span>`;
-      target.append(card);
-    });
   }
 
   function findSnapshot(run, history) {
@@ -311,7 +324,6 @@
 
   function renderAll() {
     renderTraffic();
-    renderScanner();
     renderRuns();
   }
 

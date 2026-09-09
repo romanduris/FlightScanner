@@ -63,7 +63,6 @@ h2 { margin: 2px 0 0; font-size: 17px; }
 .metric-grid { display: grid; gap: 10px; padding: 14px 16px 0; }
 .metric-grid-five { grid-template-columns: repeat(5, minmax(125px, 1fr)); }
 .metric-grid-four { grid-template-columns: repeat(4, minmax(125px, 1fr)); }
-.metric-grid-six { grid-template-columns: repeat(6, minmax(115px, 1fr)); }
 .section-metrics { padding-bottom: 16px; }
 .metric-card { min-height: 91px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
 .metric-card > span { color: var(--muted); font-size: 8px; font-weight: 850; letter-spacing: .65px; text-transform: uppercase; }
@@ -97,12 +96,6 @@ h2 { margin: 2px 0 0; font-size: 17px; }
 .notice { margin: 10px 16px 0; padding: 12px 14px; color: #765a11; border: 1px solid #eedb9b; border-radius: 9px; background: #fff9e8; }
 .notice strong, .notice span { display: block; }
 .notice span { margin-top: 3px; font-size: 9px; }
-.airline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px 16px 16px; }
-.airline-card { display: grid; grid-template-columns: 110px repeat(4, 1fr); align-items: center; gap: 12px; min-height: 68px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
-.airline-name { font-size: 14px; font-weight: 950; }
-.airline-name.wizz { color: var(--pink); font-style: italic; }
-.airline-stat span { display: block; color: var(--muted); font-size: 7px; text-transform: uppercase; }
-.airline-stat b { display: block; margin-top: 3px; font-size: 12px; }
 .run-summary { display: flex; gap: 22px; color: var(--muted); font-size: 8px; }
 .run-summary b { color: var(--ink); font-size: 11px; }
 .table-wrap { overflow-x: auto; }
@@ -129,9 +122,7 @@ footer a { color: var(--blue); text-decoration: none; }
 @media (max-width: 1050px) {
   .metric-grid-five { grid-template-columns: repeat(3, 1fr); }
   .metric-grid-four { grid-template-columns: repeat(2, 1fr); }
-  .metric-grid-six { grid-template-columns: repeat(3, 1fr); }
   .breakdown-grid { grid-template-columns: repeat(2, 1fr); }
-  .airline-card { grid-template-columns: 90px repeat(4, 1fr); }
 }
 
 @media (max-width: 700px) {
@@ -146,22 +137,33 @@ footer a { color: var(--blue); text-decoration: none; }
   .panel-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
   .header-side { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
   .section-updated { margin-left: 0; }
-  .metric-grid-four, .metric-grid-five, .metric-grid-six { grid-template-columns: repeat(2, 1fr); }
+  .metric-grid-four, .metric-grid-five { grid-template-columns: repeat(2, 1fr); }
   .metric-card { min-height: 82px; }
   .metric-card strong { font-size: 21px; }
-  .breakdown-grid, .airline-grid { grid-template-columns: 1fr; }
+  .breakdown-grid { grid-template-columns: 1fr; }
   .breakdown-grid { padding-inline: 10px; }
-  .metric-grid, .airline-grid { padding-left: 10px; padding-right: 10px; }
+  .metric-grid { padding-left: 10px; padding-right: 10px; }
   .chart-card { margin-left: 10px; margin-right: 10px; }
-  .airline-card { grid-template-columns: 1fr repeat(4, 1fr); padding-inline: 10px; gap: 6px; }
-  .airline-name { font-size: 11px; }
   .run-summary { width: 100%; justify-content: space-between; }
   footer { flex-direction: column; }
 }
 
 @media (max-width: 420px) {
-  .metric-grid-five, .metric-grid-six { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metric-grid-five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .performance-grid .metric-card:last-child { grid-column: 1 / -1; }
-  .airline-card { grid-template-columns: repeat(4, 1fr); }
-  .airline-name { grid-column: 1 / -1; }
+}
+
+.interaction-chart { margin: 0 16px 16px; padding: 16px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
+.interaction-chart figcaption { margin-bottom: 18px; font-size: 10px; font-weight: 700; }
+.interaction-bars { display: grid; gap: 16px; }
+.interaction-row { display: grid; grid-template-columns: minmax(100px, 140px) minmax(0, 1fr) minmax(28px, auto); align-items: center; gap: 12px; font-size: 10px; }
+.interaction-row > b { text-align: right; font-variant-numeric: tabular-nums; }
+.interaction-track { height: 14px; border-radius: 5px; background: #e6ebf2; overflow: hidden; }
+.interaction-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #2e69bb); }
+.interaction-row[data-category="booking_com"] i { background: linear-gradient(90deg, #087da0, #12a8c6); }
+.interaction-row[data-category="ryanair"] i { background: linear-gradient(90deg, #bd8b12, #e9bd35); }
+.interaction-row[data-category="wizz_air"] i { background: linear-gradient(90deg, #9e1765, var(--pink)); }
+@media (max-width: 480px) {
+  .interaction-chart { margin: 0 10px 10px; padding: 14px; }
+  .interaction-row { grid-template-columns: minmax(84px, 100px) minmax(0, 1fr) minmax(24px, auto); gap: 8px; }
 }

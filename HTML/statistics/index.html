@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=9">
+  <link rel="stylesheet" href="statistics.css?v=10">
 </head>
 <body>
   <header class="topbar">
@@ -28,7 +28,7 @@
       <div>
         <span class="eyebrow" data-text="eyebrow">Štatistiky</span>
         <h1 data-text="title">Ako funguje BTSFLIGHTSCANER</h1>
-        <p data-text="subtitle">Návštevnosť stránky, aktuálnosť letových dát a história automatických zberov.</p>
+        <p data-text="subtitle">Návštevnosť stránky, interakcie návštevníkov a história automatických zberov.</p>
       </div>
       <div class="heading-controls">
         <span id="page-refreshed" class="page-refreshed">Last refreshed: —</span>
@@ -85,6 +85,10 @@
         <article class="metric-card"><span data-text="ryanairClicks">Ryanair clicks</span><strong id="click-ryanair">—</strong><small data-text="airlineBooking">airline booking link</small></article>
         <article class="metric-card"><span data-text="wizzClicks">Wizz Air clicks</span><strong id="click-wizz">—</strong><small data-text="airlineBooking">airline booking link</small></article>
       </div>
+      <figure class="interaction-chart" aria-labelledby="interaction-chart-title">
+        <figcaption id="interaction-chart-title" data-text="clickComparison">Interaction comparison</figcaption>
+        <div id="interaction-bars" class="interaction-bars"></div>
+      </figure>
       </div>
     </section>
 
@@ -127,27 +131,6 @@
       </div>
     </section>
 
-    <section class="panel collapsible-section" data-collapsible aria-labelledby="scanner-title">
-      <div class="panel-heading">
-        <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="scanner-content" data-section-text="scannerTitle"><span class="section-chevron" aria-hidden="true"></span></button>
-          <div><span class="eyebrow" data-text="scannerEyebrow">Letové dáta</span><h2 id="scanner-title" data-text="scannerTitle">Aktuálny zber</h2></div>
-        </div>
-        <span id="scan-freshness" class="freshness section-updated">—</span>
-      </div>
-      <div id="scanner-content" class="collapsible-content">
-      <div class="metric-grid metric-grid-six">
-        <article class="metric-card featured"><span data-text="flightsFound">Nájdené lety</span><strong id="scan-flights">—</strong><small id="scan-period">—</small></article>
-        <article class="metric-card"><span data-text="routes">Trasy</span><strong id="scan-routes">—</strong><small data-text="directDestinations">priame destinácie</small></article>
-        <article class="metric-card"><span data-text="countries">Krajiny</span><strong id="scan-countries">—</strong><small data-text="directConnections">priame spojenia</small></article>
-        <article class="metric-card"><span data-text="returnFlights">Spiatočné lety</span><strong id="scan-returns">—</strong><small data-text="possibleReturns">nájdené návraty</small></article>
-        <article class="metric-card"><span data-text="providerErrors">Chyby poskytovateľov</span><strong id="scan-errors">—</strong><small data-text="latestScan">posledný zber</small></article>
-        <article class="metric-card"><span data-text="dataThrough">Dáta do</span><strong id="scan-through">—</strong><small id="scan-days">—</small></article>
-      </div>
-      <div class="airline-grid" id="airline-grid"></div>
-      </div>
-    </section>
-
     <section class="panel collapsible-section" data-collapsible aria-labelledby="runs-title">
       <div class="panel-heading">
         <div class="heading-with-toggle">
@@ -173,7 +156,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=8"></script>
+  <script src="statistics.js?v=9"></script>
   <script src="engagement.js?v=5"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>
