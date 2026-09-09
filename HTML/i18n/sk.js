@@ -58,7 +58,7 @@
       "support.fallback": "Formulár nefunguje? Otvoriť Ko-fi v novej karte",
       "support.eyebrow": "Podpora",
       "support.title": "Páči sa ti FlightScanner?",
-      "support.description": "Prispej na kávu a pomôž nám s prevádzkou a ďalším vývojom.",
+      "support.description": "Podpor prevádzku stránky a pomôž nám zlepšovať vyhľadávanie letov.",
       "support.button": "Podporiť projekt",
       "calendar.aria": "Výber dátumu odletu",
       "calendar.toggle": "Skryť kalendár",

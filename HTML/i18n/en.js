@@ -70,7 +70,7 @@
       "support.fallback": "Having trouble? Open Ko-fi in a new tab",
       "support.eyebrow": "Support",
       "support.title": "Enjoying FlightScanner?",
-      "support.description": "Buy us a coffee and help keep FlightScanner running and improving.",
+      "support.description": "Help keep FlightScanner running and improve the flight search.",
       "support.button": "Support the project",
       "calendar.aria": "Departure date selection",
       "calendar.toggle": "Hide calendar",

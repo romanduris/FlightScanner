@@ -403,7 +403,7 @@ footer a { color: inherit; }
 .support-icon { display: grid; place-items: center; flex: 0 0 24px; height: 24px; border: 1px solid #d7e1ee; border-radius: 6px; background: #f7f9fc; font-size: 15px; }
 .support-copy { flex: 1 1 220px; }
 .support-copy p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.support-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 9px 16px; border: 1px solid #e6c84e; border-radius: 8px; background: #fff5c5; color: var(--blue-dark); font-size: 12px; font-weight: 800; text-decoration: none; }
+.support-link { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 40px; padding: 9px 16px; border: 1px solid #e6c84e; border-radius: 8px; background: #fff5c5; color: var(--blue-dark); font-size: 12px; font-weight: 400; text-decoration: none; }
 .support-link:hover { background: #ffed98; border-color: #c5a52c; }
 .support-link:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 @media (max-width: 480px) {
