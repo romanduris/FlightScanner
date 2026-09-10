@@ -81,11 +81,12 @@
     if (!value) return "—";
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return "—";
-    return new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("sk-SK", {
       day: "2-digit", month: "2-digit", year: "numeric",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
       timeZone: "Europe/Bratislava",
-    }).format(parsed);
+    }).formatToParts(parsed).map(({ type, value }) => [type, value]));
+    return `${parts.day}.${parts.month}.${parts.year} ${parts.hour}:${parts.minute}:${parts.second}`;
   };
   const duration = (seconds) => {
     if (seconds == null) return "—";
@@ -204,7 +205,7 @@
     const available = traffic?.available === true;
     byId("traffic-unavailable").hidden = available;
     const refreshedAt = liveData?.generated_at_utc;
-    byId("traffic-state").textContent = `${available ? text("live") : text("noData")} · ${updatedStamp(refreshedAt)}`;
+    byId("traffic-state").textContent = updatedStamp(refreshedAt);
     byId("traffic-state").classList.toggle("loading", !available);
     byId("clicks-freshness").textContent = updatedStamp(refreshedAt);
     byId("audience-freshness").textContent = updatedStamp(refreshedAt);
@@ -281,7 +282,7 @@
   }
 
   function updatedStamp(value) {
-    return value ? `${scanAge(value)} · ${exactDateTime(value)}` : "—";
+    return exactDateTime(value);
   }
 
   function findSnapshot(run, history) {
