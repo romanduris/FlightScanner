@@ -91,15 +91,15 @@
       </div>
     </section>
 
-    <section class="panel collapsible-section" data-collapsible aria-labelledby="audience-title">
+    <section class="panel collapsible-section collapsed" data-collapsible aria-labelledby="audience-title">
       <div class="panel-heading compact">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="audience-content" data-section-text="audienceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="audience-content" data-section-text="audienceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow" data-text="audienceEyebrow">Publikum</span><h2 id="audience-title" data-text="audienceTitle">Podrobnosti návštevnosti</h2></div>
         </div>
         <span id="audience-freshness" class="freshness section-updated">—</span>
       </div>
-      <div id="audience-content" class="collapsible-content">
+      <div id="audience-content" class="collapsible-content" hidden>
         <div class="breakdown-grid">
           <article class="list-card"><h3 data-text="countries">Krajiny</h3><div id="country-list" class="bar-list"></div></article>
           <article class="list-card"><h3 data-text="devices">Zariadenia</h3><div id="device-list" class="bar-list"></div></article>
@@ -111,15 +111,15 @@
       </div>
     </section>
 
-    <section class="panel collapsible-section" data-collapsible aria-labelledby="performance-title">
+    <section class="panel collapsible-section collapsed" data-collapsible aria-labelledby="performance-title">
       <div class="panel-heading compact">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="performance-content" data-section-text="performanceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="performance-content" data-section-text="performanceTitle"><span class="section-chevron" aria-hidden="true"></span></button>
           <div><span class="eyebrow" data-text="performanceEyebrow">Výkon</span><h2 id="performance-title" data-text="performanceTitle">Rýchlosť a stabilita</h2></div>
         </div>
         <div class="header-side"><span class="muted" data-text="realVisitors">merané u skutočných návštevníkov</span><span id="performance-freshness" class="freshness section-updated">—</span></div>
       </div>
-      <div id="performance-content" class="collapsible-content">
+      <div id="performance-content" class="collapsible-content" hidden>
       <div class="metric-grid metric-grid-five performance-grid">
         <article class="metric-card"><span data-text="pageLoad">Načítanie stránky</span><strong id="metric-load">—</strong><small data-text="average">priemer</small></article>
         <article class="metric-card"><span>LCP</span><strong id="metric-lcp">—</strong><small data-text="largestContent">hlavný obsah</small></article>
