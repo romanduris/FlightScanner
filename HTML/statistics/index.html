@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=2026091009">
+  <link rel="stylesheet" href="statistics.css?v=2026091010">
 </head>
 <body>
   <header class="topbar">
@@ -141,9 +141,14 @@
       <div id="runs-content" class="collapsible-content">
       <div class="table-wrap">
         <table>
-          <thead><tr><th data-text="started">Spustené</th><th data-text="type">Typ</th><th data-text="state">Stav</th><th data-text="duration">Trvanie</th><th data-text="routes">Trasy</th><th data-text="flightsFound">Nájdené lety</th><th data-text="details">Detail</th></tr></thead>
+          <colgroup><col class="run-date-column"><col class="run-type-column"><col class="run-status-column"><col class="run-duration-column"></colgroup>
+          <thead><tr><th scope="col" data-text="started">Spustené</th><th scope="col" data-text="type">Typ</th><th scope="col"><span data-text="state">Stav</span><small data-text="runCounts">lety / trasy</small></th><th scope="col" data-text="duration">Trvanie</th></tr></thead>
           <tbody id="runs-table"></tbody>
         </table>
+      </div>
+      <div class="runs-pagination">
+        <button id="runs-more" type="button" data-text="moreRuns" hidden>Zobraziť ďalších 10</button>
+        <p id="runs-error" role="status" hidden></p>
       </div>
       <p class="panel-note" data-text="historyNote">Počty letov sa ukladajú od zavedenia tejto stránky. Staršie behy preto môžu mať iba čas a stav.</p>
       </div>
@@ -155,7 +160,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=2026091009"></script>
+  <script src="statistics.js?v=2026091010"></script>
   <script src="engagement.js?v=2026091009"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>

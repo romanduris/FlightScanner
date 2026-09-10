@@ -27,6 +27,7 @@
       offersOpened: "Ponuky", flightDetails: "detaily", ryanairClicks: "Ryanair", wizzClicks: "Wizz Air",
       bookingClicks: "Booking.com", airlineBooking: "letenky", accommodationLink: "ubytovanie",
       showSection: "Zobraziť", hideSection: "Skryť",
+      runCounts: "lety / trasy", moreRuns: "Zobraziť ďalších 10", runsError: "Staršie behy sa nepodarilo načítať. Skúste znova.",
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
     en: {
@@ -54,6 +55,7 @@
       offersOpened: "Offers", flightDetails: "details", ryanairClicks: "Ryanair", wizzClicks: "Wizz Air",
       bookingClicks: "Booking.com", airlineBooking: "flights", accommodationLink: "stays",
       showSection: "Show", hideSection: "Hide",
+      runCounts: "flights / routes", moreRuns: "Show 10 more", runsError: "Could not load older runs. Please try again.",
       newRoutes: "new", removedRoutes: "removed", noChanges: "No change since the previous scan", flights: "flights", returns: "returns", errors: "errors",
     },
   };
@@ -319,10 +321,65 @@
     }) || null;
   }
 
+  let visibleRuns = 10;
+  let nextRunsPage = 1;
+  let moreRunsAvailable = true;
+  let loadingRuns = false;
+  let runsError = false;
+  const olderRuns = new Map();
+
+  function allRuns() {
+    const recent = liveData?.github?.runs?.length ? liveData.github.runs : (staticData?.action_runs || []);
+    const merged = new Map(olderRuns);
+    recent.forEach(run => {
+      const previous = merged.get(run.id);
+      if (!previous || Date.parse(run.updated_at) > Date.parse(previous.updated_at)) merged.set(run.id, run);
+    });
+    return [...merged.values()].sort((a, b) => Date.parse(b.started_at) - Date.parse(a.started_at) || b.id - a.id);
+  }
+
+  async function showMoreRuns() {
+    if (loadingRuns) return;
+    const limit = visibleRuns + 10;
+    loadingRuns = true;
+    runsError = false;
+    renderRuns();
+    try {
+      while (allRuns().length < limit && moreRunsAvailable) {
+        const url = new URL("https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs");
+        url.searchParams.set("per_page", "100");
+        url.searchParams.set("page", String(nextRunsPage));
+        const response = await fetch(url, { headers: { Accept: "application/vnd.github+json" }, signal: AbortSignal.timeout(10_000) });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data.workflow_runs)) throw new Error("Invalid runs response");
+        data.workflow_runs.forEach(run => {
+          const start = run.run_started_at || run.created_at;
+          const elapsed = (Date.parse(run.updated_at) - Date.parse(start)) / 1000;
+          olderRuns.set(run.id, {
+            id: run.id, event: run.event, status: run.status, conclusion: run.conclusion,
+            started_at: start, updated_at: run.updated_at,
+            duration_seconds: run.status === "completed" && Number.isFinite(elapsed) ? Math.max(0, Math.round(elapsed)) : null,
+            url: run.html_url, commit: String(run.head_sha || "").slice(0, 7),
+          });
+        });
+        moreRunsAvailable = data.workflow_runs.length === 100;
+        nextRunsPage++;
+      }
+      visibleRuns = limit;
+    } catch (_error) {
+      runsError = true;
+    } finally {
+      loadingRuns = false;
+      renderRuns();
+    }
+  }
+
   function renderRuns() {
-    const runs = liveData?.github?.runs?.length ? liveData.github.runs : (staticData?.action_runs || []);
+    const runs = allRuns();
     const history = staticData?.scan_history || [];
-    const completed = runs.filter((run) => run.status === "completed");
+    const recent = liveData?.github?.runs?.length ? liveData.github.runs : (staticData?.action_runs || []);
+    const completed = recent.filter((run) => run.status === "completed");
     const successful = completed.filter((run) => run.conclusion === "success");
     const scans = completed.filter((run) => ["schedule", "workflow_dispatch"].includes(run.event) && run.duration_seconds != null);
     byId("runs-freshness").textContent = updatedStamp(liveData?.generated_at_utc);
@@ -330,20 +387,34 @@
     setMetric("average-duration", scans.length ? duration(scans.reduce((sum, run) => sum + run.duration_seconds, 0) / scans.length) : "—");
     const body = byId("runs-table");
     body.replaceChildren();
-    runs.slice(0, 20).forEach((run) => {
+    runs.slice(0, visibleRuns).forEach((run) => {
       const snapshot = findSnapshot(run, history);
       const type = run.event === "schedule" ? text("scan") : run.event === "workflow_dispatch" ? text("manual") : text("deploy");
       const stateKey = run.status !== "completed" ? run.status : run.conclusion;
       const row = document.createElement("tr");
-      row.innerHTML = `<td><strong>${date(run.started_at, true)}</strong><small>${run.commit || ""}</small></td>
-        <td><span class="run-type">${type}</span></td>
-        <td><span class="status ${stateKey}">${text(stateKey)}</span></td>
-        <td>${duration(run.duration_seconds)}</td>
-        <td>${snapshot ? number(snapshot.routes) : "—"}</td>
-        <td>${snapshot ? number(snapshot.flights) : "—"}</td>
-        <td><a class="detail-link" href="${run.url}" target="_blank" rel="noopener">${text("open")} ↗</a></td>`;
+      row.innerHTML = '<td><a class="detail-link" target="_blank" rel="noopener"></a><small></small></td><td><span class="run-type"></span></td><td><span class="status"></span></td><td></td>';
+      const link = row.querySelector("a");
+      link.textContent = date(run.started_at, true);
+      if (String(run.url).startsWith("https://github.com/")) link.href = run.url;
+      row.querySelector("small").textContent = run.commit || "";
+      row.querySelector(".run-type").textContent = type;
+      const status = row.querySelector(".status");
+      status.classList.add(stateKey || "queued");
+      status.textContent = text(stateKey);
+      if (snapshot && (snapshot.flights != null || snapshot.routes != null)) {
+        const counts = document.createElement("small");
+        counts.textContent = `${number(snapshot.flights)} / ${number(snapshot.routes)}`;
+        status.parentElement.append(counts);
+      }
+      row.lastElementChild.textContent = duration(run.duration_seconds);
       body.append(row);
     });
+    const more = byId("runs-more");
+    more.hidden = runs.length <= visibleRuns && !moreRunsAvailable;
+    more.disabled = loadingRuns;
+    more.textContent = text(loadingRuns ? "loading" : "moreRuns");
+    byId("runs-error").hidden = !runsError;
+    byId("runs-error").textContent = runsError ? text("runsError") : "";
   }
 
   function renderAll() {
@@ -398,6 +469,7 @@
     await loadLiveData();
   }));
 
+  byId("runs-more").addEventListener("click", showMoreRuns);
   bindCollapsibleSections();
   applyLanguage();
   Promise.all([
