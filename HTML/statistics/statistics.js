@@ -6,9 +6,9 @@
       back: "← Späť na lety", eyebrow: "Štatistiky", title: "BTSFLIGHTSCANER",
       subtitle: "Návštevnosť, interakcie a história automatických zberov.",
       trafficEyebrow: "Návštevnosť", trafficTitle: "Ľudia na stránke", loading: "Načítavam…",
-      visits: "Návštevy", humanTraffic: "anonymné návštevy bez sledovania ľudí", pageviews: "Zobrazenia", pagesOpened: "otvorené stránky",
-      pagesPerVisit: "Stránky / návštevu", visitAverage: "priemer za návštevu", engagement: "Čas na stránke", engagementNote: "aktívny priemer",
-      mobileShare: "Mobilné zariadenia", trafficShare: "podiel návštevnosti", analyticsUnavailable: "Cloudflare štatistiky zatiaľ nie sú pripojené",
+      visits: "Návštevy", humanTraffic: "príchody",
+      engagement: "Čas na webe", engagementNote: "priemer m:ss",
+      mobileShare: "Mobily", trafficShare: "podiel", analyticsUnavailable: "Cloudflare štatistiky zatiaľ nie sú pripojené",
       analyticsUnavailableBody: "História automatizácie nižšie funguje ďalej.", trafficTrend: "Vývoj návštevnosti",
       countries: "Krajiny", devices: "Zariadenia", browsers: "Prehliadače", operatingSystems: "Operačné systémy", topPages: "Najnavštevovanejšie stránky", sources: "Zdroje návštev",
       performanceEyebrow: "Výkon", performanceTitle: "Rýchlosť a stabilita", realVisitors: "merané u skutočných návštevníkov",
@@ -33,9 +33,9 @@
       back: "← Back to flights", eyebrow: "Statistics", title: "BTSFLIGHTSCANER",
       subtitle: "Traffic, interactions and the history of automated scans.",
       trafficEyebrow: "Traffic", trafficTitle: "People on the website", loading: "Loading…",
-      visits: "Visits", humanTraffic: "anonymous visits without individual tracking", pageviews: "Page views", pagesOpened: "pages opened",
-      pagesPerVisit: "Pages / visit", visitAverage: "average per visit", engagement: "Time on page", engagementNote: "active average",
-      mobileShare: "Mobile devices", trafficShare: "share of traffic", analyticsUnavailable: "Cloudflare statistics are not connected yet",
+      visits: "Visits", humanTraffic: "arrivals",
+      engagement: "Time on site", engagementNote: "avg. m:ss",
+      mobileShare: "Mobile", trafficShare: "share", analyticsUnavailable: "Cloudflare statistics are not connected yet",
       analyticsUnavailableBody: "The automation history below remains available.", trafficTrend: "Traffic trend",
       countries: "Countries", devices: "Devices", browsers: "Browsers", operatingSystems: "Operating systems", topPages: "Most visited pages", sources: "Traffic sources",
       performanceEyebrow: "Performance", performanceTitle: "Speed and stability", realVisitors: "measured for real visitors",
@@ -93,6 +93,11 @@
     const minutes = Math.floor(seconds / 60);
     const rest = Math.round(seconds % 60);
     return minutes ? `${minutes} min ${rest} s` : `${rest} s`;
+  };
+  const engagementDuration = (seconds) => {
+    if (seconds == null) return "—";
+    const total = Math.max(0, Math.round(seconds));
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
   };
   const milliseconds = (value) => value == null ? "—" : value >= 1000 ? `${number(value / 1000, 2)} s` : `${number(value)} ms`;
 
@@ -178,7 +183,7 @@
     }
     target.className = "line-chart";
     const width = Math.max(240, target.clientWidth), height = 180, left = 40, right = 18, top = 10, bottom = 25;
-    const max = Math.max(...points.flatMap((item) => [item.visits || 0, item.pageviews || 0]), 1);
+    const max = Math.max(...points.map((item) => item.visits || 0), 1);
     const x = (index) => left + (points.length === 1 ? (width - left - right) / 2 : index * (width - left - right) / (points.length - 1));
     const y = (value) => top + (height - top - bottom) * (1 - value / max);
     const line = (key) => points.map((item, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(item[key] || 0).toFixed(1)}`).join(" ");
@@ -194,7 +199,7 @@
         <defs><linearGradient id="traffic-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#133f91"/><stop offset="1" stop-color="#fff"/></linearGradient></defs>
         ${[0, .25, .5, .75, 1].map((part) => `<line class="grid" x1="${left}" y1="${y(max * part)}" x2="${width - right}" y2="${y(max * part)}"/><text class="axis-label" x="0" y="${y(max * part) + 3}">${Math.round(max * part)}</text>`).join("")}
         <path class="area" d="${line("visits")} L${x(points.length - 1)},${height - bottom} L${x(0)},${height - bottom} Z"/>
-        <path class="visits-line" d="${line("visits")}"/><path class="views-line" d="${line("pageviews")}"/>
+        <path class="visits-line" d="${line("visits")}"/>
         ${labels.map((item) => { const index = points.indexOf(item); return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(new Date(`${item.date}T12:00:00Z`))}</text>`; }).join("")}
       </svg>`;
     target.innerHTML = svg;
@@ -212,9 +217,7 @@
     byId("performance-freshness").textContent = updatedStamp(refreshedAt);
     const summary = traffic?.summary || {};
     setMetric("metric-visits", available ? number(summary.visits) : "—");
-    setMetric("metric-pageviews", available ? number(summary.pageviews) : "—");
-    setMetric("metric-ratio", available && summary.visits ? number(summary.pageviews / summary.visits, 1) : "—");
-    setMetric("metric-engagement", summary.average_engagement_seconds == null ? "—" : duration(summary.average_engagement_seconds));
+    setMetric("metric-engagement", engagementDuration(summary.average_engagement_seconds));
     const mobile = (traffic?.devices || []).find((item) => item.label?.toLowerCase() === "mobile")?.count || 0;
     const allDevices = (traffic?.devices || []).reduce((sum, item) => sum + (item.count || 0), 0);
     setMetric("metric-mobile", available && allDevices ? `${number(mobile / allDevices * 100)} %` : "—");

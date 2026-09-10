@@ -75,14 +75,12 @@ h2 { margin: 2px 0 0; font-size: 17px; }
 .chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 10px; }
 .chart-legend { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 8px; }
 .chart-legend i { width: 14px; height: 3px; border-radius: 4px; background: var(--blue); }
-.chart-legend i:nth-of-type(2) { margin-left: 7px; background: var(--cyan); }
 .line-chart { min-height: 180px; margin-top: 10px; }
 .line-chart svg { display: block; width: 100%; height: 180px; overflow: visible; }
 .line-chart .grid { stroke: #e8edf4; stroke-width: 1; }
 .line-chart .axis-label { fill: var(--ink); font-family: inherit; font-size: 9px; font-weight: 700; }
 .line-chart .area { fill: url(#traffic-area); opacity: .18; }
 .line-chart .visits-line { fill: none; stroke: var(--blue); stroke-width: 2.5; }
-.line-chart .views-line { fill: none; stroke: var(--cyan); stroke-width: 2; }
 .empty-chart { display: grid; place-items: center; color: var(--muted); }
 .empty-chart::after { content: attr(data-empty); }
 .breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 16px 16px; }
@@ -168,4 +166,15 @@ footer a { color: var(--blue); text-decoration: none; }
 @media (max-width: 480px) {
   .interaction-chart { margin: 0 10px 10px; padding: 14px; }
   .interaction-row { grid-template-columns: minmax(84px, 100px) minmax(0, 1fr) minmax(24px, auto); gap: 8px; }
+}
+
+.traffic-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.traffic-metrics .metric-card { min-width: 0; }
+.traffic-metrics .metric-card > span, .traffic-metrics .metric-card strong { white-space: nowrap; }
+@media (max-width: 480px) {
+  .traffic-metrics { gap: 6px; }
+  .traffic-metrics .metric-card { padding: 12px 8px; }
+  .traffic-metrics .metric-card > span { font-size: 7px; letter-spacing: .3px; }
+  .traffic-metrics .metric-card strong { font-size: 18px; }
+  .traffic-metrics .metric-card small { font-size: 7px; }
 }

@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=2026091002">
+  <link rel="stylesheet" href="statistics.css?v=2026091003">
 </head>
 <body>
   <header class="topbar">
@@ -51,19 +51,17 @@
         <span id="traffic-state" class="freshness section-updated loading" data-text="loading">Načítavam…</span>
       </div>
       <div id="traffic-content" class="collapsible-content">
-      <div id="traffic-cards" class="metric-grid metric-grid-five" aria-live="polite">
-        <article class="metric-card featured"><span data-text="visits">Návštevy</span><strong id="metric-visits">—</strong><small data-text="humanTraffic">bez automatizovaných botov</small></article>
-        <article class="metric-card"><span data-text="pageviews">Zobrazenia</span><strong id="metric-pageviews">—</strong><small data-text="pagesOpened">otvorené stránky</small></article>
-        <article class="metric-card"><span data-text="pagesPerVisit">Stránky / návštevu</span><strong id="metric-ratio">—</strong><small data-text="visitAverage">priemer za návštevu</small></article>
-        <article class="metric-card"><span data-text="engagement">Čas na stránke</span><strong id="metric-engagement">—</strong><small data-text="engagementNote">aktívny priemer</small></article>
-        <article class="metric-card"><span data-text="mobileShare">Mobilné zariadenia</span><strong id="metric-mobile">—</strong><small data-text="trafficShare">podiel návštevnosti</small></article>
+      <div id="traffic-cards" class="metric-grid traffic-metrics" aria-live="polite">
+        <article class="metric-card featured"><span data-text="visits">Návštevy</span><strong id="metric-visits">—</strong><small data-text="humanTraffic">príchody</small></article>
+        <article class="metric-card"><span data-text="engagement">Čas na webe</span><strong id="metric-engagement">—</strong><small data-text="engagementNote">priemer m:ss</small></article>
+        <article class="metric-card"><span data-text="mobileShare">Mobily</span><strong id="metric-mobile">—</strong><small data-text="trafficShare">podiel</small></article>
       </div>
       <div id="traffic-unavailable" class="notice" hidden>
         <strong data-text="analyticsUnavailable">Cloudflare štatistiky zatiaľ nie sú pripojené</strong>
         <span data-text="analyticsUnavailableBody">Letové a GitHub štatistiky nižšie fungujú ďalej.</span>
       </div>
       <div class="chart-card wide-chart">
-        <div class="chart-heading"><strong data-text="trafficTrend">Vývoj návštevnosti</strong><span class="chart-legend"><i></i><span data-text="visits">Návštevy</span><i></i><span data-text="pageviews">Zobrazenia</span></span></div>
+        <div class="chart-heading"><strong data-text="trafficTrend">Vývoj návštevnosti</strong><span class="chart-legend"><i></i><span data-text="visits">Návštevy</span></span></div>
         <div id="traffic-chart" class="line-chart empty-chart" data-empty="Dáta sa načítavajú"></div>
       </div>
       </div>
@@ -155,7 +153,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=2026091002"></script>
+  <script src="statistics.js?v=2026091003"></script>
   <script src="engagement.js?v=5"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>
