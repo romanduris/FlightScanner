@@ -254,10 +254,10 @@
       return;
     }
     const series = [
-      ["offer_opens", text("offersOpened"), "#133f91"],
-      ["booking_com", "Booking.com", "#089bbb"],
-      ["ryanair", "Ryanair", "#bd8b12"],
-      ["wizz_air", "Wizz Air", "#c01878"],
+      ["offer_opens", text("offersOpened"), "var(--interaction-offers)"],
+      ["booking_com", "Booking.com", "var(--interaction-booking)"],
+      ["ryanair", "Ryanair", "var(--interaction-ryanair)"],
+      ["wizz_air", "Wizz Air", "var(--interaction-wizz)"],
     ];
     const points = clicks.trend.map(point => ({
       date: point.date,
@@ -307,7 +307,7 @@
       control.value = String(index);
       control.setAttribute("aria-valuetext", `${date(point.date)}: ${series.map(([, label], i) => `${label} ${number(point.values[i])}`).join(", ")}`);
       scroll.querySelectorAll("[data-day]").forEach(group => group.classList.toggle("selected", Number(group.dataset.day) === index));
-      readout.innerHTML = `<strong>${date(point.date)}</strong><span class="muted">${text("dailyHint")}</span><div class="interaction-legend">${series.map(([, label, color], i) => `<span><i style="background:${color}"></i>${label}<b>${number(point.values[i])}</b></span>`).join("")}</div>`;
+      readout.innerHTML = `<strong>${date(point.date)}</strong><span class="muted">${text("dailyHint")}</span>`;
       if (reveal) scroll.scrollLeft = x(index) - scroll.clientWidth / 2;
     }
     control.addEventListener("input", () => select(Number(control.value), true));
