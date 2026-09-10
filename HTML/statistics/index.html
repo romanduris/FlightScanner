@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=2026091004">
+  <link rel="stylesheet" href="statistics.css?v=2026091005">
 </head>
 <body>
   <header class="topbar">
@@ -78,14 +78,14 @@
         <div class="header-side"><span class="muted" data-text="clicksNote">anonymous totals for the selected period</span><span id="clicks-freshness" class="freshness section-updated">—</span></div>
       </div>
       <div id="clicks-content" class="collapsible-content">
-      <div class="metric-grid metric-grid-four section-metrics">
-        <article class="metric-card featured"><span data-text="offersOpened">Offers opened</span><strong id="click-offers">—</strong><small data-text="flightDetails">flight details displayed</small></article>
-        <article class="metric-card"><span data-text="bookingClicks">Booking.com clicks</span><strong id="click-booking">—</strong><small data-text="accommodationLink">accommodation link</small></article>
-        <article class="metric-card"><span data-text="ryanairClicks">Ryanair clicks</span><strong id="click-ryanair">—</strong><small data-text="airlineBooking">airline booking link</small></article>
-        <article class="metric-card"><span data-text="wizzClicks">Wizz Air clicks</span><strong id="click-wizz">—</strong><small data-text="airlineBooking">airline booking link</small></article>
+      <div class="metric-grid interaction-metrics section-metrics">
+        <article class="metric-card featured"><span data-text="offersOpened">Offers</span><strong id="click-offers">—</strong><small data-text="flightDetails">details</small></article>
+        <article class="metric-card"><span data-text="bookingClicks">Booking.com</span><strong id="click-booking">—</strong><small data-text="accommodationLink">stays</small></article>
+        <article class="metric-card"><span data-text="ryanairClicks">Ryanair</span><strong id="click-ryanair">—</strong><small data-text="airlineBooking">flights</small></article>
+        <article class="metric-card"><span data-text="wizzClicks">Wizz Air</span><strong id="click-wizz">—</strong><small data-text="airlineBooking">flights</small></article>
       </div>
       <figure class="interaction-chart" aria-labelledby="interaction-chart-title">
-        <figcaption id="interaction-chart-title" data-text="clickComparison">Interaction comparison</figcaption>
+        <figcaption id="interaction-chart-title" data-text="clickComparison">Daily interactions</figcaption>
         <div id="interaction-bars" class="interaction-bars"></div>
       </figure>
       </div>
@@ -155,7 +155,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=2026091003"></script>
+  <script src="statistics.js?v=2026091005"></script>
   <script src="engagement.js?v=5"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>

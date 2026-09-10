@@ -21,11 +21,11 @@
       privacy: "súkromie bez cookies a sledovania jednotlivcov", live: "Aktuálne dáta", noData: "Zatiaľ bez dát", direct: "Priamy vstup", scan: "Zber dát", deploy: "Nasadenie", manual: "Ručný zber",
       success: "Úspešný", failure: "Chyba", cancelled: "Zrušený", in_progress: "Prebieha", queued: "Čaká", open: "Otvoriť", days: "dní", ago: "dozadu",
       lastRefreshed: "Naposledy obnovené", updatedAt: "údaje z",
-      clickComparison: "Porovnanie interakcií", clicksUnavailable: "Údaje o kliknutiach nie sú dostupné.",
+      clickComparison: "Interakcie po dňoch", selectDay: "Vybrať deň", dailyHint: "Denné počty · UTC", chartHint: "Vyberte deň v grafe alebo posuvníkom.", clicksUnavailable: "Údaje o kliknutiach nie sú dostupné.",
       clicksEyebrow: "Interakcie", clicksTitle: "Na čo klikajú", clicksNote: "anonymné súčty za vybrané obdobie",
       audienceEyebrow: "Publikum", audienceTitle: "Podrobnosti návštevnosti",
-      offersOpened: "Otvorené ponuky", flightDetails: "zobrazené detaily letov", ryanairClicks: "Kliknutia na Ryanair", wizzClicks: "Kliknutia na Wizz Air",
-      bookingClicks: "Kliknutia na Booking.com", airlineBooking: "odkaz na rezerváciu letu", accommodationLink: "odkaz na ubytovanie",
+      offersOpened: "Ponuky", flightDetails: "detaily", ryanairClicks: "Ryanair", wizzClicks: "Wizz Air",
+      bookingClicks: "Booking.com", airlineBooking: "letenky", accommodationLink: "ubytovanie",
       showSection: "Zobraziť", hideSection: "Skryť",
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
@@ -48,11 +48,11 @@
       privacy: "privacy without cookies or individual tracking", live: "Live data", noData: "No data yet", direct: "Direct", scan: "Data scan", deploy: "Deployment", manual: "Manual scan",
       success: "Successful", failure: "Failed", cancelled: "Cancelled", in_progress: "Running", queued: "Queued", open: "Open", days: "days", ago: "ago",
       lastRefreshed: "Last refreshed", updatedAt: "data from",
-      clickComparison: "Interaction comparison", clicksUnavailable: "Click data is unavailable.",
+      clickComparison: "Daily interactions", selectDay: "Select day", dailyHint: "Daily counts · UTC", chartHint: "Select a day in the chart or with the slider.", clicksUnavailable: "Click data is unavailable.",
       clicksEyebrow: "Interactions", clicksTitle: "What gets clicked", clicksNote: "anonymous totals for the selected period",
       audienceEyebrow: "Audience", audienceTitle: "Traffic details",
-      offersOpened: "Offers opened", flightDetails: "flight details displayed", ryanairClicks: "Ryanair clicks", wizzClicks: "Wizz Air clicks",
-      bookingClicks: "Booking.com clicks", airlineBooking: "airline booking link", accommodationLink: "accommodation link",
+      offersOpened: "Offers", flightDetails: "details", ryanairClicks: "Ryanair", wizzClicks: "Wizz Air",
+      bookingClicks: "Booking.com", airlineBooking: "flights", accommodationLink: "stays",
       showSection: "Show", hideSection: "Hide",
       newRoutes: "new", removedRoutes: "removed", noChanges: "No change since the previous scan", flights: "flights", returns: "returns", errors: "errors",
     },
@@ -241,40 +241,86 @@
     setMetric("click-booking", clicks?.available ? number(clicks.booking_com) : "—");
   }
 
+  let selectedInteractionDate = null;
+
   function renderInteractions(clicks) {
     const target = byId("interaction-bars");
     target.replaceChildren();
-    if (!clicks?.available) {
+    if (!clicks?.available || !clicks.trend?.length) {
       const empty = document.createElement("p");
       empty.className = "muted";
       empty.textContent = text("clicksUnavailable");
       target.append(empty);
       return;
     }
-    const entries = [
-      ["offer_opens", text("offersOpened")],
-      ["booking_com", "Booking.com"],
-      ["ryanair", "Ryanair"],
-      ["wizz_air", "Wizz Air"],
-    ].map(([key, label]) => ({ key, label, count: Math.max(0, Number(clicks[key]) || 0) }));
-    const maximum = Math.max(1, ...entries.map((entry) => entry.count));
-    entries.forEach(({ key, label, count }) => {
-      const row = document.createElement("div");
-      row.className = "interaction-row";
-      row.dataset.category = key;
-      const name = document.createElement("span");
-      name.textContent = label;
-      const track = document.createElement("span");
-      track.className = "interaction-track";
-      track.setAttribute("aria-hidden", "true");
-      const fill = document.createElement("i");
-      fill.style.width = `${count / maximum * 100}%`;
-      track.append(fill);
-      const value = document.createElement("b");
-      value.textContent = number(count);
-      row.append(name, track, value);
-      target.append(row);
+    const series = [
+      ["offer_opens", text("offersOpened"), "#133f91"],
+      ["booking_com", "Booking.com", "#089bbb"],
+      ["ryanair", "Ryanair", "#bd8b12"],
+      ["wizz_air", "Wizz Air", "#c01878"],
+    ];
+    const points = clicks.trend.map(point => ({
+      date: point.date,
+      values: series.map(([key]) => Math.max(0, Number(point[key]) || 0)),
+    }));
+    const width = Math.max(240, target.clientWidth, points.length * 12 + 56);
+    const height = 200, left = 36, right = 20, top = 12, bottom = 28;
+    const plotHeight = height - top - bottom;
+    const max = Math.ceil(Math.max(4, ...points.map(point => point.values.reduce((sum, value) => sum + value, 0))) / 4) * 4;
+    const slot = (width - left - right) / points.length;
+    const barWidth = Math.min(32, slot * .72);
+    const x = index => left + (index + .5) * slot;
+    const y = value => top + plotHeight * (1 - value / max);
+    const labelStep = Math.max(1, Math.ceil(64 / slot));
+    const shortDate = value => new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
+    const scroll = document.createElement("div");
+    scroll.className = "interaction-scroll";
+    scroll.innerHTML = `<svg class="interaction-timeline" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${text("clickComparison")}">
+      ${[0, 1, 2, 3, 4].map(i => `<line class="grid" x1="${left}" x2="${width - right}" y1="${y(i * max / 4)}" y2="${y(i * max / 4)}"/><text class="axis-label" x="0" y="${y(i * max / 4) + 3}">${number(i * max / 4)}</text>`).join("")}
+      ${points.map((point, index) => {
+        let total = 0;
+        const bars = point.values.map((value, seriesIndex) => {
+          total += value;
+          return `<rect data-series="${series[seriesIndex][0]}" x="${x(index) - barWidth / 2}" y="${y(total)}" width="${barWidth}" height="${plotHeight * value / max}" fill="${series[seriesIndex][2]}"><title>${date(point.date)} · ${series[seriesIndex][1]}: ${number(value)}</title></rect>`;
+        }).join("");
+        const showLabel = index === points.length - 1 || (index % labelStep === 0 && points.length - 1 - index >= labelStep / 2);
+        return `<g data-day="${index}"><rect class="day-selection" x="${left + index * slot}" y="${top}" width="${slot}" height="${plotHeight}"/>${bars}</g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
+      }).join("")}
+    </svg>`;
+    const control = document.createElement("input");
+    control.type = "range";
+    control.min = "0";
+    control.max = String(points.length - 1);
+    control.step = "1";
+    control.disabled = points.length === 1;
+    control.setAttribute("aria-label", text("selectDay"));
+    const readout = document.createElement("div");
+    readout.className = "interaction-readout";
+    readout.setAttribute("aria-live", "polite");
+    const hint = document.createElement("p");
+    hint.className = "interaction-hint muted";
+    hint.textContent = text("chartHint");
+    target.append(scroll, control, readout, hint);
+    function select(index, reveal = false) {
+      const point = points[index];
+      selectedInteractionDate = point.date;
+      control.value = String(index);
+      control.setAttribute("aria-valuetext", `${date(point.date)}: ${series.map(([, label], i) => `${label} ${number(point.values[i])}`).join(", ")}`);
+      scroll.querySelectorAll("[data-day]").forEach(group => group.classList.toggle("selected", Number(group.dataset.day) === index));
+      readout.innerHTML = `<strong>${date(point.date)}</strong><span class="muted">${text("dailyHint")}</span><div class="interaction-legend">${series.map(([, label, color], i) => `<span><i style="background:${color}"></i>${label}<b>${number(point.values[i])}</b></span>`).join("")}</div>`;
+      if (reveal) scroll.scrollLeft = x(index) - scroll.clientWidth / 2;
+    }
+    control.addEventListener("input", () => select(Number(control.value), true));
+    const selectPointerDay = event => {
+      const day = event.target.closest("[data-day]");
+      if (day) select(Number(day.dataset.day));
+    };
+    scroll.querySelector("svg").addEventListener("pointerdown", selectPointerDay);
+    scroll.querySelector("svg").addEventListener("pointermove", event => {
+      if (event.pointerType === "mouse") selectPointerDay(event);
     });
+    const selected = points.findIndex(point => point.date === selectedInteractionDate);
+    select(selected < 0 ? points.length - 1 : selected, true);
   }
 
   function scanAge(value) {
@@ -347,6 +393,14 @@
     renderAll();
   }
 
+  let interactionWidth = 0;
+  new ResizeObserver(([entry]) => {
+    const width = Math.round(entry.contentRect.width);
+    if (width > 0 && width !== interactionWidth) {
+      interactionWidth = width;
+      renderInteractions(liveData?.traffic?.clicks);
+    }
+  }).observe(byId("interaction-bars"));
   new ResizeObserver(() => renderChart(liveData?.traffic?.trend)).observe(byId("traffic-chart"));
 
   document.querySelectorAll("[data-lang]").forEach((button) => button.addEventListener("click", () => { language = button.dataset.lang; applyLanguage(); }));

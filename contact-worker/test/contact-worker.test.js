@@ -126,11 +126,11 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     if (String(url).includes("/analytics_engine/sql") && String(options.body).includes("GROUP BY blob4")) {
       clicksQuery = String(options.body);
       return Response.json({ data: [
-        { click_event: "offer_open", provider: "RYANAIR", clicks: 9 },
-        { click_event: "offer_open", provider: "Wizz Air", clicks: 4 },
-        { click_event: "airline_booking", provider: "RYANAIR", clicks: 3 },
-        { click_event: "airline_booking", provider: "Wizz Air", clicks: 2 },
-        { click_event: "booking_com", provider: "Booking.com", clicks: 5 },
+        { date: "2026-09-04", click_event: "offer_open", provider: "RYANAIR", clicks: 9 },
+        { date: "2026-09-04", click_event: "offer_open", provider: "Wizz Air", clicks: 4 },
+        { date: "2026-09-04", click_event: "airline_booking", provider: "RYANAIR", clicks: 3 },
+        { date: "2026-09-04", click_event: "airline_booking", provider: "Wizz Air", clicks: 2 },
+        { date: "2026-09-04", click_event: "booking_com", provider: "Booking.com", clicks: 5 },
       ] });
     }
     if (String(url).includes("/analytics_engine/sql")) {
@@ -169,13 +169,23 @@ test("statistics combine GitHub runs with anonymous Cloudflare aggregates", asyn
     assert.equal(result.traffic.summary.average_engagement_seconds, 120);
     assert.equal(result.traffic.summary.page_load_ms, 900);
     assert.equal(result.traffic.summary.lcp_ms, 800);
-    assert.deepEqual(result.traffic.clicks, {
+    const { trend, ...clickTotals } = result.traffic.clicks;
+    assert.equal(trend.length, 7);
+    assert.equal(trend[1].offer_opens, 13);
+    assert.equal(trend[0].date, "2026-09-03");
+    assert.equal(trend.at(-1).date, "2026-09-09");
+    for (const key of ["offer_opens", "booking_com", "ryanair", "wizz_air"]) {
+      assert.equal(trend[0][key], 0);
+      assert.equal(trend.reduce((sum, point) => sum + point[key], 0), clickTotals[key]);
+    }
+    assert.deepEqual(clickTotals, {
       available: true,
       offer_opens: 13,
       ryanair: 3,
       wizz_air: 2,
       booking_com: 5,
     });
+    assert.match(clicksQuery, /GROUP BY blob4, blob5, date ORDER BY date/);
     assert.match(clicksQuery, /SUM\(_sample_interval \* double2\) AS clicks/);
     assert.deepEqual(result.traffic.referrers[0], { label: "Direct", count: 4 });
   } finally {

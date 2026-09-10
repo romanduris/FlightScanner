@@ -6,7 +6,7 @@ const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/sit
 const MAX_REQUEST_BYTES = 16_384;
 const GITHUB_RUNS_URL = "https://api.github.com/repos/romanduris/FlightScanner/actions/workflows/refresh-dashboard.yml/runs?per_page=40";
 const GRAPHQL_URL = "https://api.cloudflare.com/client/v4/graphql";
-const STATISTICS_CACHE_VERSION = "5";
+const STATISTICS_CACHE_VERSION = "6";
 
 function jsonResponse(body, status = 200, origin = "") {
   const headers = {
@@ -199,9 +199,9 @@ async function fetchEngagement(env, range) {
 }
 
 async function fetchClicks(env, range) {
-  const empty = { available: false, offer_opens: 0, ryanair: 0, wizz_air: 0, booking_com: 0 };
+  const empty = { available: false, offer_opens: 0, ryanair: 0, wizz_air: 0, booking_com: 0, trend: [] };
   if (!env.CLOUDFLARE_ANALYTICS_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return empty;
-  const query = `SELECT blob4 AS click_event, blob5 AS provider, SUM(_sample_interval * double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= toDateTime('${range.start.slice(0, 19).replace('T', ' ')}') AND timestamp < toDateTime('${range.end.slice(0, 19).replace('T', ' ')}') AND double2 > 0 GROUP BY blob4, blob5`;
+  const query = `SELECT formatDateTime(timestamp, '%Y-%m-%d') AS date, blob4 AS click_event, blob5 AS provider, SUM(_sample_interval * double2) AS clicks FROM flightscanner_engagement WHERE timestamp >= toDateTime('${range.start.slice(0, 19).replace('T', ' ')}') AND timestamp < toDateTime('${range.end.slice(0, 19).replace('T', ' ')}') AND double2 > 0 GROUP BY blob4, blob5, date ORDER BY date`;
   const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/analytics_engine/sql`, {
     method: "POST",
     headers: { Authorization: `Bearer ${env.CLOUDFLARE_ANALYTICS_TOKEN}`, "Content-Type": "text/plain" },
@@ -211,13 +211,21 @@ async function fetchClicks(env, range) {
   if (!response.ok) return empty;
   const result = await response.json();
   const rows = result.data || result.result?.data || result.result || [];
-  const totals = { ...empty, available: true };
+  const daily = new Map();
+  for (let time = Date.parse(range.start); time < Date.parse(range.end); time += DAY_MS) {
+    const date = new Date(time).toISOString().slice(0, 10);
+    daily.set(date, { date, offer_opens: 0, booking_com: 0, ryanair: 0, wizz_air: 0 });
+  }
+  const totals = { ...empty, available: true, trend: [...daily.values()] };
   for (const row of Array.isArray(rows) ? rows : []) {
+    const point = daily.get(row.date);
     const clicks = Number(row.clicks || 0);
-    if (row.click_event === "offer_open") totals.offer_opens += clicks;
-    if (row.click_event === "airline_booking" && row.provider === "RYANAIR") totals.ryanair += clicks;
-    if (row.click_event === "airline_booking" && row.provider === "Wizz Air") totals.wizz_air += clicks;
-    if (row.click_event === "booking_com") totals.booking_com += clicks;
+    if (!point || !Number.isFinite(clicks) || clicks < 0) continue;
+    const key = row.click_event === "offer_open" ? "offer_opens"
+      : row.click_event === "booking_com" ? "booking_com"
+      : row.click_event === "airline_booking" && row.provider === "RYANAIR" ? "ryanair"
+      : row.click_event === "airline_booking" && row.provider === "Wizz Air" ? "wizz_air" : null;
+    if (key) { point[key] += clicks; totals[key] += clicks; }
   }
   return totals;
 }

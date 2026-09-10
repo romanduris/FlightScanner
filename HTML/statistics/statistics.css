@@ -158,17 +158,23 @@ footer a { color: var(--blue); text-decoration: none; }
 
 .interaction-chart { margin: 0 16px 16px; padding: 16px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
 .interaction-chart figcaption { margin-bottom: 18px; font-size: 10px; font-weight: 700; }
-.interaction-bars { display: grid; gap: 16px; }
-.interaction-row { display: grid; grid-template-columns: minmax(100px, 140px) minmax(0, 1fr) minmax(28px, auto); align-items: center; gap: 12px; font-size: 10px; }
-.interaction-row > b { text-align: right; font-variant-numeric: tabular-nums; }
-.interaction-track { height: 14px; border-radius: 5px; background: #e6ebf2; overflow: hidden; }
-.interaction-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #2e69bb); }
-.interaction-row[data-category="booking_com"] i { background: linear-gradient(90deg, #087da0, #12a8c6); }
-.interaction-row[data-category="ryanair"] i { background: linear-gradient(90deg, #bd8b12, #e9bd35); }
-.interaction-row[data-category="wizz_air"] i { background: linear-gradient(90deg, #9e1765, var(--pink)); }
+.interaction-scroll { overflow-x: auto; }
+.interaction-timeline { display: block; max-width: none; height: 200px; }
+.interaction-timeline .grid { stroke: #e8edf4; }
+.interaction-timeline .axis-label { fill: var(--ink); font-family: inherit; font-size: 9px; font-weight: 700; }
+.day-selection { fill: transparent; }
+.selected .day-selection { fill: #133f9110; stroke: #9aafcd; stroke-width: 1px; }
+.interaction-timeline [data-day] { cursor: pointer; }
+.interaction-bars input[type="range"] { display: block; width: 100%; margin: 12px 0; accent-color: var(--blue); cursor: pointer; }
+.interaction-readout { font-size: 10px; }
+.interaction-readout > .muted { margin-left: 10px; }
+.interaction-legend { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 12px; }
+.interaction-legend > span { display: flex; align-items: center; gap: 6px; }
+.interaction-legend i { width: 8px; height: 8px; flex-shrink: 0; border-radius: 2px; }
+.interaction-legend b { margin-left: 4px; font-variant-numeric: tabular-nums; }
 @media (max-width: 480px) {
   .interaction-chart { margin: 0 10px 10px; padding: 14px; }
-  .interaction-row { grid-template-columns: minmax(84px, 100px) minmax(0, 1fr) minmax(24px, auto); gap: 8px; }
+  .interaction-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 }
 
 .traffic-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -194,4 +200,18 @@ footer a { color: var(--blue); text-decoration: none; }
   .brand-section { font-size: 10px; }
   .page-heading { column-gap: 8px; }
   .page-heading h1 { font-size: 18px; }
+}
+
+.interaction-hint { margin: 12px 0 0; }
+.interaction-bars input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.interaction-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.interaction-metrics .metric-card { min-width: 0; }
+.interaction-metrics .metric-card > span { text-transform: none; letter-spacing: 0; white-space: nowrap; }
+.interaction-metrics .metric-card strong { white-space: nowrap; }
+@media (max-width: 480px) {
+  .interaction-metrics { gap: 5px; }
+  .interaction-metrics .metric-card { padding: 12px 5px; }
+  .interaction-metrics .metric-card > span, .interaction-metrics .metric-card small { font-size: 7px; }
+  .interaction-metrics .metric-card strong { font-size: 18px; }
+  .interaction-legend { gap: 10px; font-size: 9px; }
 }
