@@ -3,8 +3,8 @@
 
   const copy = {
     sk: {
-      back: "← Späť na lety", eyebrow: "Štatistiky", title: "Ako funguje BTSFLIGHTSCANER",
-      subtitle: "Návštevnosť stránky, interakcie návštevníkov a história automatických zberov.",
+      back: "← Späť na lety", eyebrow: "Štatistiky", title: "BTSFLIGHTSCANER",
+      subtitle: "Návštevnosť, interakcie a história automatických zberov.",
       trafficEyebrow: "Návštevnosť", trafficTitle: "Ľudia na stránke", loading: "Načítavam…",
       visits: "Návštevy", humanTraffic: "anonymné návštevy bez sledovania ľudí", pageviews: "Zobrazenia", pagesOpened: "otvorené stránky",
       pagesPerVisit: "Stránky / návštevu", visitAverage: "priemer za návštevu", engagement: "Čas na stránke", engagementNote: "aktívny priemer",
@@ -30,8 +30,8 @@
       newRoutes: "nové", removedRoutes: "odstránené", noChanges: "Bez zmeny oproti predošlému zberu", flights: "lety", returns: "návraty", errors: "chyby",
     },
     en: {
-      back: "← Back to flights", eyebrow: "Statistics", title: "How BTSFLIGHTSCANER works",
-      subtitle: "Website traffic, visitor interactions and the history of automated scans.",
+      back: "← Back to flights", eyebrow: "Statistics", title: "BTSFLIGHTSCANER",
+      subtitle: "Traffic, interactions and the history of automated scans.",
       trafficEyebrow: "Traffic", trafficTitle: "People on the website", loading: "Loading…",
       visits: "Visits", humanTraffic: "anonymous visits without individual tracking", pageviews: "Page views", pagesOpened: "pages opened",
       pagesPerVisit: "Pages / visit", visitAverage: "average per visit", engagement: "Time on page", engagementNote: "active average",
@@ -206,7 +206,6 @@
     const refreshedAt = liveData?.generated_at_utc;
     byId("traffic-state").textContent = `${available ? text("live") : text("noData")} · ${updatedStamp(refreshedAt)}`;
     byId("traffic-state").classList.toggle("loading", !available);
-    byId("page-refreshed").textContent = `${text("lastRefreshed")}: ${exactDateTime(refreshedAt || staticData?.generated_at_utc)}`;
     byId("clicks-freshness").textContent = updatedStamp(refreshedAt);
     byId("audience-freshness").textContent = updatedStamp(refreshedAt);
     byId("performance-freshness").textContent = updatedStamp(refreshedAt);
