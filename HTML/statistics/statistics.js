@@ -241,6 +241,7 @@
     setMetric("click-booking", clicks?.available ? number(clicks.booking_com) : "—");
   }
 
+  let selectedInteractionSeries = null;
 
   function renderInteractions(clicks) {
     const target = byId("interaction-bars");
@@ -263,6 +264,8 @@
       values: series.map(([key]) => Math.max(0, Number(point[key]) || 0)),
     }));
     const totals = points.map(point => point.values.reduce((sum, value) => sum + value, 0));
+    const selectedIndex = series.findIndex(([key]) => key === selectedInteractionSeries);
+    const labelColor = selectedIndex < 0 ? "#000" : series[selectedIndex][2];
     const minSlot = Math.max(24, ...totals.map(total => number(total).length * 8 + 10));
     const width = Math.max(240, target.clientWidth, points.length * minSlot + 56);
     const height = 200, left = 36, right = 20, top = 24, bottom = 28;
@@ -285,7 +288,8 @@
           return `<rect data-series="${series[seriesIndex][0]}" x="${x(index) - barWidth / 2}" y="${y(total)}" width="${barWidth}" height="${plotHeight * value / max}" fill="${series[seriesIndex][2]}"><title>${date(point.date)} · ${series[seriesIndex][1]}: ${number(value)}</title></rect>`;
         }).join("");
         const showLabel = index === points.length - 1 || (index % labelStep === 0 && points.length - 1 - index >= labelStep / 2);
-        return `<g data-day="${index}">${bars}<text class="day-total" text-anchor="middle" x="${x(index)}" y="${y(total) - 7}"><title>${date(point.date)}</title>${number(total)}</text></g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
+        const labelValue = selectedIndex < 0 ? total : point.values[selectedIndex];
+        return `<g data-day="${index}">${bars}<text class="day-total" style="fill:${labelColor}" text-anchor="middle" x="${x(index)}" y="${y(total) - 7}"><title>${date(point.date)}${selectedIndex < 0 ? "" : ` · ${series[selectedIndex][1]}`}</title>${number(labelValue)}</text></g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
       }).join("")}
     </svg>`;
     target.append(scroll);
@@ -372,6 +376,17 @@
   }).observe(byId("interaction-bars"));
   new ResizeObserver(() => renderChart(liveData?.traffic?.trend)).observe(byId("traffic-chart"));
 
+  document.querySelectorAll("[data-interaction-series]").forEach(button => button.addEventListener("click", () => {
+    const key = button.dataset.interactionSeries;
+    selectedInteractionSeries = selectedInteractionSeries === key ? null : key;
+    document.querySelectorAll("[data-interaction-series]").forEach(item => {
+      item.setAttribute("aria-pressed", String(item.dataset.interactionSeries === selectedInteractionSeries));
+    });
+    const previousScroll = byId("interaction-bars").querySelector(".interaction-scroll")?.scrollLeft;
+    renderInteractions(liveData?.traffic?.clicks);
+    const scroll = byId("interaction-bars").querySelector(".interaction-scroll");
+    if (scroll && previousScroll != null) scroll.scrollLeft = previousScroll;
+  }));
   document.querySelectorAll("[data-lang]").forEach((button) => button.addEventListener("click", () => { language = button.dataset.lang; applyLanguage(); }));
   document.querySelectorAll("[data-days]").forEach((button) => button.addEventListener("click", async () => {
     days = Number(button.dataset.days);
