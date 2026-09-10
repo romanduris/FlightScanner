@@ -48,9 +48,13 @@
     else flush();
   });
   addEventListener("pagehide", flush);
-  document.addEventListener("click", (clickEvent) => {
+  function trackLinkClick(clickEvent) {
     const target = clickEvent.target.closest?.("[data-stat-click]");
     if (target) trackClick(target.dataset.statClick, target.dataset.statProvider || "");
+  }
+  document.addEventListener("click", trackLinkClick);
+  document.addEventListener("auxclick", (event) => {
+    if (event.button === 1) trackLinkClick(event);
   });
   setInterval(() => {
     flush();

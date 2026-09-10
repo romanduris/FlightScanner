@@ -182,8 +182,9 @@
       return;
     }
     target.className = "line-chart";
-    const width = Math.max(240, target.clientWidth), height = 180, left = 40, right = 18, top = 10, bottom = 25;
+    const width = Math.max(240, target.clientWidth), height = 180, right = 3, top = 10, bottom = 25;
     const max = Math.max(...points.map((item) => item.visits || 0), 1);
+    const left = Math.max(22, String(Math.round(max)).length * 6 + 8);
     const x = (index) => left + (points.length === 1 ? (width - left - right) / 2 : index * (width - left - right) / (points.length - 1));
     const y = (value) => top + (height - top - bottom) * (1 - value / max);
     const line = (key) => points.map((item, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(item[key] || 0).toFixed(1)}`).join(" ");
@@ -200,7 +201,7 @@
         ${[0, .25, .5, .75, 1].map((part) => `<line class="grid" x1="${left}" y1="${y(max * part)}" x2="${width - right}" y2="${y(max * part)}"/><text class="axis-label" x="0" y="${y(max * part) + 3}">${Math.round(max * part)}</text>`).join("")}
         <path class="area" d="${line("visits")} L${x(points.length - 1)},${height - bottom} L${x(0)},${height - bottom} Z"/>
         <path class="visits-line" d="${line("visits")}"/>
-        ${labels.map((item) => { const index = points.indexOf(item); return `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(new Date(`${item.date}T12:00:00Z`))}</text>`; }).join("")}
+        ${labels.map((item) => { const index = points.indexOf(item); const anchor = points.length === 1 ? "middle" : index === 0 ? "start" : index === points.length - 1 ? "end" : "middle"; return `<text class="axis-label" text-anchor="${anchor}" x="${x(index)}" y="${height - 5}">${new Intl.DateTimeFormat(language === "sk" ? "sk-SK" : "en-GB", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(new Date(`${item.date}T12:00:00Z`))}</text>`; }).join("")}
       </svg>`;
     target.innerHTML = svg;
   }
@@ -255,9 +256,9 @@
     }
     const series = [
       ["offer_opens", text("offersOpened"), "var(--interaction-offers)"],
-      ["booking_com", "Booking.com", "var(--interaction-booking)"],
-      ["ryanair", "Ryanair", "var(--interaction-ryanair)"],
       ["wizz_air", "Wizz Air", "var(--interaction-wizz)"],
+      ["ryanair", "Ryanair", "var(--interaction-ryanair)"],
+      ["booking_com", "Booking.com", "var(--interaction-booking)"],
     ];
     const points = clicks.trend.map(point => ({
       date: point.date,
@@ -267,10 +268,10 @@
     const selectedIndex = series.findIndex(([key]) => key === selectedInteractionSeries);
     const labelColor = selectedIndex < 0 ? "#000" : series[selectedIndex][2];
     const minSlot = Math.max(24, ...totals.map(total => number(total).length * 8 + 10));
-    const width = Math.max(240, target.clientWidth, points.length * minSlot + 56);
-    const height = 200, left = 36, right = 20, top = 24, bottom = 28;
-    const plotHeight = height - top - bottom;
     const max = Math.ceil(Math.max(4, ...totals) / 4) * 4;
+    const height = 200, left = Math.max(22, number(max).length * 6 + 8), right = 3, top = 24, bottom = 28;
+    const width = Math.max(240, target.clientWidth, points.length * minSlot + left + right);
+    const plotHeight = height - top - bottom;
     const slot = (width - left - right) / points.length;
     const barWidth = Math.min(32, slot * .72);
     const x = index => left + (index + .5) * slot;
@@ -289,7 +290,8 @@
         }).join("");
         const showLabel = index === points.length - 1 || (index % labelStep === 0 && points.length - 1 - index >= labelStep / 2);
         const labelValue = selectedIndex < 0 ? total : point.values[selectedIndex];
-        return `<g data-day="${index}">${bars}<text class="day-total" style="fill:${labelColor}" text-anchor="middle" x="${x(index)}" y="${y(total) - 7}"><title>${date(point.date)}${selectedIndex < 0 ? "" : ` · ${series[selectedIndex][1]}`}</title>${number(labelValue)}</text></g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
+        const anchor = points.length === 1 ? "middle" : index === 0 ? "start" : index === points.length - 1 ? "end" : "middle";
+        return `<g data-day="${index}">${bars}<text class="day-total" style="fill:${labelColor}" text-anchor="middle" x="${x(index)}" y="${y(total) - 7}"><title>${date(point.date)}${selectedIndex < 0 ? "" : ` · ${series[selectedIndex][1]}`}</title>${number(labelValue)}</text></g>${showLabel ? `<text class="axis-label" text-anchor="${anchor}" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
       }).join("")}
     </svg>`;
     target.append(scroll);
