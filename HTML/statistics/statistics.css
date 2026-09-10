@@ -162,12 +162,7 @@ footer a { color: var(--blue); text-decoration: none; }
 .interaction-timeline { display: block; max-width: none; height: 200px; }
 .interaction-timeline .grid { stroke: #e8edf4; }
 .interaction-timeline .axis-label { fill: var(--ink); font-family: inherit; font-size: 9px; font-weight: 700; }
-.day-selection { fill: transparent; }
-.selected .day-selection { fill: #133f9110; stroke: #9aafcd; stroke-width: 1px; }
-.interaction-timeline [data-day] { cursor: pointer; }
-.interaction-bars input[type="range"] { display: block; width: 100%; margin: 12px 0; accent-color: var(--blue); cursor: pointer; }
-.interaction-readout { font-size: 10px; }
-.interaction-readout > .muted { margin-left: 10px; }
+.interaction-timeline .day-total { fill: var(--ink); font-family: inherit; font-size: 11px; font-weight: 700; }
 @media (max-width: 480px) {
   .interaction-chart { margin: 0 10px 10px; padding: 14px; }
 }
@@ -194,8 +189,6 @@ footer a { color: var(--blue); text-decoration: none; }
   .page-heading h1 { font-size: 18px; }
 }
 
-.interaction-hint { margin: 12px 0 0; }
-.interaction-bars input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 .interaction-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .interaction-metrics .metric-card { position: relative; min-width: 0; overflow: hidden; padding-bottom: 18px; }
 .traffic-metrics .metric-card > span, .interaction-metrics .metric-card > span { font-size: 12px; letter-spacing: 0; text-transform: none; }

@@ -241,7 +241,6 @@
     setMetric("click-booking", clicks?.available ? number(clicks.booking_com) : "—");
   }
 
-  let selectedInteractionDate = null;
 
   function renderInteractions(clicks) {
     const target = byId("interaction-bars");
@@ -263,10 +262,12 @@
       date: point.date,
       values: series.map(([key]) => Math.max(0, Number(point[key]) || 0)),
     }));
-    const width = Math.max(240, target.clientWidth, points.length * 12 + 56);
-    const height = 200, left = 36, right = 20, top = 12, bottom = 28;
+    const totals = points.map(point => point.values.reduce((sum, value) => sum + value, 0));
+    const minSlot = Math.max(24, ...totals.map(total => number(total).length * 8 + 10));
+    const width = Math.max(240, target.clientWidth, points.length * minSlot + 56);
+    const height = 200, left = 36, right = 20, top = 24, bottom = 28;
     const plotHeight = height - top - bottom;
-    const max = Math.ceil(Math.max(4, ...points.map(point => point.values.reduce((sum, value) => sum + value, 0))) / 4) * 4;
+    const max = Math.ceil(Math.max(4, ...totals) / 4) * 4;
     const slot = (width - left - right) / points.length;
     const barWidth = Math.min(32, slot * .72);
     const x = index => left + (index + .5) * slot;
@@ -284,43 +285,11 @@
           return `<rect data-series="${series[seriesIndex][0]}" x="${x(index) - barWidth / 2}" y="${y(total)}" width="${barWidth}" height="${plotHeight * value / max}" fill="${series[seriesIndex][2]}"><title>${date(point.date)} · ${series[seriesIndex][1]}: ${number(value)}</title></rect>`;
         }).join("");
         const showLabel = index === points.length - 1 || (index % labelStep === 0 && points.length - 1 - index >= labelStep / 2);
-        return `<g data-day="${index}"><rect class="day-selection" x="${left + index * slot}" y="${top}" width="${slot}" height="${plotHeight}"/>${bars}</g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
+        return `<g data-day="${index}">${bars}<text class="day-total" text-anchor="middle" x="${x(index)}" y="${y(total) - 7}"><title>${date(point.date)}</title>${number(total)}</text></g>${showLabel ? `<text class="axis-label" text-anchor="middle" x="${x(index)}" y="${height - 5}">${shortDate(point.date)}</text>` : ""}`;
       }).join("")}
     </svg>`;
-    const control = document.createElement("input");
-    control.type = "range";
-    control.min = "0";
-    control.max = String(points.length - 1);
-    control.step = "1";
-    control.disabled = points.length === 1;
-    control.setAttribute("aria-label", text("selectDay"));
-    const readout = document.createElement("div");
-    readout.className = "interaction-readout";
-    readout.setAttribute("aria-live", "polite");
-    const hint = document.createElement("p");
-    hint.className = "interaction-hint muted";
-    hint.textContent = text("chartHint");
-    target.append(scroll, control, readout, hint);
-    function select(index, reveal = false) {
-      const point = points[index];
-      selectedInteractionDate = point.date;
-      control.value = String(index);
-      control.setAttribute("aria-valuetext", `${date(point.date)}: ${series.map(([, label], i) => `${label} ${number(point.values[i])}`).join(", ")}`);
-      scroll.querySelectorAll("[data-day]").forEach(group => group.classList.toggle("selected", Number(group.dataset.day) === index));
-      readout.innerHTML = `<strong>${date(point.date)}</strong><span class="muted">${text("dailyHint")}</span>`;
-      if (reveal) scroll.scrollLeft = x(index) - scroll.clientWidth / 2;
-    }
-    control.addEventListener("input", () => select(Number(control.value), true));
-    const selectPointerDay = event => {
-      const day = event.target.closest("[data-day]");
-      if (day) select(Number(day.dataset.day));
-    };
-    scroll.querySelector("svg").addEventListener("pointerdown", selectPointerDay);
-    scroll.querySelector("svg").addEventListener("pointermove", event => {
-      if (event.pointerType === "mouse") selectPointerDay(event);
-    });
-    const selected = points.findIndex(point => point.date === selectedInteractionDate);
-    select(selected < 0 ? points.length - 1 : selected, true);
+    target.append(scroll);
+    scroll.scrollLeft = scroll.scrollWidth;
   }
 
   function scanAge(value) {
