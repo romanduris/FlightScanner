@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BTSFLIGHTSCANER traffic, flight data and automation statistics.">
   <title>Statistics — BTSFLIGHTSCANER</title>
-  <link rel="stylesheet" href="statistics.css?v=2026091010">
+  <link rel="stylesheet" href="statistics.css?v=2026091301">
 </head>
 <body>
   <header class="topbar">
@@ -120,12 +120,17 @@
         <div class="header-side"><span class="muted" data-text="realVisitors">merané u skutočných návštevníkov</span><span id="performance-freshness" class="freshness section-updated">—</span></div>
       </div>
       <div id="performance-content" class="collapsible-content" hidden>
-      <div class="metric-grid metric-grid-five performance-grid">
-        <article class="metric-card"><span data-text="pageLoad">Načítanie stránky</span><strong id="metric-load">—</strong><small data-text="average">priemer</small></article>
+      <div class="metric-grid performance-grid">
         <article class="metric-card"><span>LCP</span><strong id="metric-lcp">—</strong><small data-text="largestContent">hlavný obsah</small></article>
         <article class="metric-card"><span>INP</span><strong id="metric-inp">—</strong><small data-text="interaction">odozva interakcií</small></article>
         <article class="metric-card"><span>CLS</span><strong id="metric-cls">—</strong><small data-text="layoutStability">stabilita rozloženia</small></article>
-        <article class="metric-card"><span>FCP</span><strong id="metric-fcp">—</strong><small data-text="firstContent">prvý obsah</small></article>
+        <article class="metric-card"><span data-text="pageLoad">Načítanie</span><strong id="metric-load">—</strong><small data-text="average">priemer</small></article>
+      </div>
+      <div class="performance-legend">
+        <p><b>LCP</b> - <span data-text="lcpHelp"></span></p>
+        <p><b>INP</b> - <span data-text="inpHelp"></span></p>
+        <p><b>CLS</b> - <span data-text="clsHelp"></span></p>
+        <p><b data-text="pageLoad">Načítanie</b> - <span data-text="loadHelp"></span></p>
       </div>
       </div>
     </section>
@@ -160,7 +165,7 @@
     <a href="../" data-text="back">← Späť na lety</a>
   </footer>
 
-  <script src="statistics.js?v=2026091010"></script>
+  <script src="statistics.js?v=2026091301"></script>
   <script src="engagement.js?v=2026091009"></script>
   <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8e9348f7f5274ca2b214e1482bdea2f3"}'></script>
 </body>

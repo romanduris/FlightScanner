@@ -12,7 +12,9 @@
       analyticsUnavailableBody: "História automatizácie nižšie funguje ďalej.", trafficTrend: "Vývoj návštevnosti",
       countries: "Krajiny", devices: "Zariadenia", browsers: "Prehliadače", operatingSystems: "Operačné systémy", topPages: "Najnavštevovanejšie stránky", sources: "Zdroje návštev",
       performanceEyebrow: "Výkon", performanceTitle: "Rýchlosť a stabilita", realVisitors: "merané u skutočných návštevníkov",
-      pageLoad: "Načítanie stránky", average: "priemer", largestContent: "hlavný obsah", interaction: "odozva interakcií", layoutStability: "stabilita rozloženia", firstContent: "prvý obsah",
+      pageLoad: "Načítanie", average: "priemer", largestContent: "hlavný obsah", interaction: "odozva interakcií", layoutStability: "stabilita rozloženia", firstContent: "prvý obsah",
+      lcpHelp: "Ako rýchlo sa zobrazí hlavný obsah stránky.", inpHelp: "Ako rýchlo stránka reaguje na kliknutie alebo dotyk.", clsHelp: "Ako veľmi sa obsah pri načítaní nečakane posúva; menej je lepšie.", loadHelp: "Ako dlho trvá načítanie stránky. Orientačne: dobré do 2 s, priemerné do 4 s, zlé nad 4 s.",
+      qualityGood: "Dobré", qualityFair: "Priemerné", qualityPoor: "Zlé", qualityUnknown: "Bez údajov",
       scannerEyebrow: "Letové dáta", scannerTitle: "Aktuálny zber", flightsFound: "Nájdené lety", routes: "Trasy", directDestinations: "priame destinácie",
       directConnections: "priame spojenia", returnFlights: "Spiatočné lety", possibleReturns: "nájdené návraty", providerErrors: "Chyby poskytovateľov", latestScan: "posledný zber",
       dataThrough: "Dáta do", cheapestFlight: "Najlacnejší nájdený let", averagePrice: "Priemerná jednosmerná cena", allAvailableFlights: "všetky dostupné odlety",
@@ -41,6 +43,8 @@
       countries: "Countries", devices: "Devices", browsers: "Browsers", operatingSystems: "Operating systems", topPages: "Most visited pages", sources: "Traffic sources",
       performanceEyebrow: "Performance", performanceTitle: "Speed and stability", realVisitors: "measured for real visitors",
       pageLoad: "Page load", average: "average", largestContent: "main content", interaction: "interaction response", layoutStability: "layout stability", firstContent: "first content",
+      lcpHelp: "How quickly the main page content appears.", inpHelp: "How quickly the page responds to a click or tap.", clsHelp: "How much content shifts unexpectedly while loading; lower is better.", loadHelp: "How long the page takes to load. Indicative: good up to 2 s, fair up to 4 s, poor above 4 s.",
+      qualityGood: "Good", qualityFair: "Fair", qualityPoor: "Poor", qualityUnknown: "No data",
       scannerEyebrow: "Flight data", scannerTitle: "Current scan", flightsFound: "Flights found", routes: "Routes", directDestinations: "direct destinations",
       directConnections: "direct connections", returnFlights: "Return flights", possibleReturns: "returns found", providerErrors: "Provider errors", latestScan: "latest scan",
       dataThrough: "Data through", cheapestFlight: "Cheapest flight found", averagePrice: "Average one-way price", allAvailableFlights: "all available departures",
@@ -138,6 +142,16 @@
 
   function setMetric(id, value) { byId(id).textContent = value; }
 
+  function setPerformanceMetric(id, value, good, fair, formatted) {
+    const valid = value != null && Number.isFinite(Number(value)) && Number(value) >= 0;
+    const quality = !valid ? "Unknown" : value <= good ? "Good" : value <= fair ? "Fair" : "Poor";
+    setMetric(id, valid ? formatted : "—");
+    const card = byId(id).closest(".metric-card");
+    card.dataset.quality = quality.toLowerCase();
+    card.title = text(`quality${quality}`);
+    byId(id).setAttribute("aria-label", `${valid ? formatted : "—"}: ${text(`quality${quality}`)}`);
+  }
+
   function barList(id, values, valueKey = "count") {
     const target = byId(id);
     target.replaceChildren();
@@ -224,11 +238,10 @@
     const mobile = (traffic?.devices || []).find((item) => item.label?.toLowerCase() === "mobile")?.count || 0;
     const allDevices = (traffic?.devices || []).reduce((sum, item) => sum + (item.count || 0), 0);
     setMetric("metric-mobile", available && allDevices ? `${number(mobile / allDevices * 100)} %` : "—");
-    setMetric("metric-load", milliseconds(summary.page_load_ms));
-    setMetric("metric-lcp", milliseconds(summary.lcp_ms));
-    setMetric("metric-inp", milliseconds(summary.inp_ms));
-    setMetric("metric-cls", summary.cls == null ? "—" : number(summary.cls, 3));
-    setMetric("metric-fcp", milliseconds(summary.fcp_ms));
+    setPerformanceMetric("metric-load", summary.page_load_ms, 2000, 4000, milliseconds(summary.page_load_ms));
+    setPerformanceMetric("metric-lcp", summary.lcp_ms, 2500, 4000, milliseconds(summary.lcp_ms));
+    setPerformanceMetric("metric-inp", summary.inp_ms, 200, 500, milliseconds(summary.inp_ms));
+    setPerformanceMetric("metric-cls", summary.cls, 0.1, 0.25, number(summary.cls, 3));
     renderChart(traffic?.trend || []);
     barList("country-list", (traffic?.countries || []).map((item) => ({ ...item, label: countryName(item.label) })));
     barList("device-list", traffic?.devices);

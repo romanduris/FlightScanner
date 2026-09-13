@@ -170,7 +170,30 @@ footer a { color: var(--blue); text-decoration: none; }
   .run-type { padding-inline: 3px; font-size: 8px; }
   .status { gap: 3px; }
   .metric-grid-five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .performance-grid .metric-card:last-child { grid-column: 1 / -1; }
+}
+
+.performance-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.performance-grid .metric-card { position: relative; min-width: 0; overflow: hidden; padding-bottom: 18px; }
+.performance-grid .metric-card > span { letter-spacing: 0; text-transform: none; }
+.performance-grid .metric-card strong { letter-spacing: 0; }
+.performance-grid .metric-card::after { position: absolute; right: 0; bottom: 0; left: 0; height: 4px; content: ""; background: #858b94; }
+.performance-grid [data-quality="good"]::after { background: #69947b; }
+.performance-grid [data-quality="fair"]::after { background: #c68b35; }
+.performance-grid [data-quality="poor"]::after { background: #c23f52; }
+.performance-legend { padding: 10px 16px 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.performance-legend p { margin: 4px 0 0; }
+@media (max-width: 700px) {
+  .performance-grid { gap: 6px; }
+  .performance-grid .metric-card { padding: 12px 5px 18px; }
+  .performance-grid .metric-card > span { font-size: 9px; }
+  .performance-grid .metric-card strong { font-size: 15px; white-space: nowrap; }
+  .performance-grid .metric-card small { font-size: 8px; }
+  .performance-legend { padding-inline: 10px; }
+}
+@media (max-width: 350px) {
+  .performance-grid { gap: 4px; }
+  .performance-grid .metric-card { padding-inline: 4px; }
+  .performance-grid .metric-card strong { font-size: 14px; }
 }
 
 .interaction-chart { margin: 0 16px 16px; padding: 16px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfe; }
