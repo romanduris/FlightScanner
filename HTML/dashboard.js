@@ -450,6 +450,7 @@
     elements.dateTo.max = windowEndDay;
     elements.dateTo.value = state.lastVisibleDay;
     elements.departure.value = addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10);
+    document.querySelector("#departure-picker-value").textContent = numericDate(elements.departure.value);
   }
 
   function calendarMonthTitle(value) {
@@ -491,12 +492,11 @@
     elements.calendarSchoolLegend.textContent = t(`calendar.schoolLegend.${schoolRegion}`);
     const firstMonth = startOfMonth(payload.start_date);
     const lastMonth = startOfMonth(addDays(payload.start_date, lastScanDay));
-    const singleMonth = window.matchMedia?.("(max-width: 680px)").matches;
-    const latestCursor = !singleMonth && lastMonth > firstMonth ? addMonths(lastMonth, -1) : lastMonth;
+    const latestCursor = lastMonth;
     if (calendarCursor < firstMonth) calendarCursor = firstMonth;
     if (calendarCursor > latestCursor) calendarCursor = latestCursor;
     elements.calendarSelectedDate.textContent = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
-    elements.calendarMonths.innerHTML = [calendarCursor, addMonths(calendarCursor, 1)].map(renderCalendarMonth).join("");
+    elements.calendarMonths.innerHTML = renderCalendarMonth(calendarCursor);
     elements.calendarPrevious.disabled = calendarCursor <= firstMonth;
     elements.calendarNext.disabled = calendarCursor >= latestCursor;
   }
@@ -898,6 +898,24 @@
 
   function bindEvents() {
     bindCollapsibleSections();
+    const calendarPopover = document.querySelector("#calendar-content");
+    const departurePicker = document.querySelector("#departure-picker");
+    function positionCalendar() {
+      const rect = departurePicker.getBoundingClientRect();
+      const width = Math.min(320, window.innerWidth - 24);
+      calendarPopover.style.width = `${width}px`;
+      calendarPopover.style.left = `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`;
+      calendarPopover.style.top = `${Math.max(12, Math.min(rect.bottom + 6, window.innerHeight - 450))}px`;
+    }
+    calendarPopover.addEventListener("beforetoggle", (event) => {
+      if (event.newState === "open") {
+        calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
+        renderCalendar();
+        positionCalendar();
+      }
+      departurePicker.setAttribute("aria-expanded", String(event.newState === "open"));
+    });
+    window.addEventListener?.("resize", () => { if (calendarPopover.matches(":popover-open")) positionCalendar(); });
     window.matchMedia?.("(max-width: 680px)").addEventListener("change", renderCalendar);
     elements.departure.addEventListener("change", () => {
       if (elements.departure.value) selectCalendarDay(dayOffset(elements.departure.value));
@@ -930,6 +948,8 @@
       const button = event.target.closest("button[data-calendar-day]");
       if (!button || button.disabled) return;
       selectCalendarDay(Number(button.dataset.calendarDay));
+      calendarPopover.hidePopover?.();
+      departurePicker.focus?.();
     });
     elements.calendarRegion.addEventListener("change", (event) => {
       schoolRegion = event.target.value;

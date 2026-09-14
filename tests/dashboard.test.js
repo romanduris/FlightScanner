@@ -287,7 +287,7 @@ assert.equal(element("#date-from-output").value, "4. 9. 2026 (Pia)");
 assert.equal(element("#date-to-output").value, "3. 10. 2026 (Sob)");
 assert.equal(element("#calendar-selected-date").textContent, "4. 9. 2026 (Pia)");
 assert.match(element("#calendar-months").innerHTML, /september 2026/i);
-assert.match(element("#calendar-months").innerHTML, /október 2026/i);
+assert.doesNotMatch(element("#calendar-months").innerHTML, /október 2026/i);
 assert.match(element("#calendar-months").innerHTML, /data-calendar-day="2"[^>]*aria-pressed="true"/);
 assert.equal(element("#stat-routes").textContent, 2);
 assert.equal(element("#stat-routes-total").textContent, "z 2 destinácií");
@@ -428,7 +428,7 @@ assert.match(javascript, /class="column-destination"><span class="destination-ce
 assert.match(css, /max-width:\s*680px[\s\S]+column-duration[\s\S]+column-destination[\s\S]+width:\s*34%/);
 assert.match(css, /\.responsive-duration\s*\{\s*display:\s*none;/);
 assert.match(css, /max-width:\s*680px[\s\S]+\.responsive-duration\s*\{\s*display:\s*inline;/);
-assert.equal((html.match(/data-collapsible/g) || []).length, 6);
+assert.equal((html.match(/data-collapsible/g) || []).length, 5);
 assert.match(html, /aria-controls="overview-content"/);
 assert.match(html, /aria-controls="filters-content"/);
 assert.match(html, /aria-controls="map-content"/);
@@ -447,8 +447,9 @@ const calendarContent = html.match(/id="calendar-content"[\s\S]*?<\/section>/)?.
 assert.doesNotMatch(filterContent, /id="weekday-buttons"/);
 assert.doesNotMatch(calendarContent, /id="weekday-buttons"|filters\.departureDay/);
 assert.ok(html.indexOf('class="map-card') < html.indexOf('class="filter-panel'));
-assert.ok(html.indexOf('class="filter-panel') < html.indexOf('class="calendar-card'));
-assert.ok(html.indexOf('class="calendar-card') < html.indexOf('class="results-card'));
+assert.doesNotMatch(html, /class="calendar-card/);
+assert.match(html, /id="departure-picker"[^>]*popovertarget="calendar-content"/);
+assert.match(html, /id="calendar-content"[^>]*popover="auto"/);
 assert.doesNotMatch(css, /weekend-marker|weekend-legend|weekend-day|--weekend/);
 assert.match(css, /\.single-range\s*\{[^}]*--range-to:\s*100%/);
 assert.doesNotMatch(css, /\.planning-slider|\.dual-range/);
@@ -515,11 +516,14 @@ setImmediate(() => {
   const region = element('#calendar-region');
   const hasSchoolHoliday = (offset) => new RegExp(`class="[^"]*school-holiday[^"]*" data-calendar-day="${offset}"`).test(element('#calendar-months').innerHTML);
   assert.equal(element('#calendar-school-legend').textContent, 'Školské prázdniny západného Slovenska');
+  element('#calendar-next').listeners.click();
   assert.ok(hasSchoolHoliday(28), 'West is the default: March 1');
   assert.ok(hasSchoolHoliday(32), 'West includes March 5');
   assert.ok(!hasSchoolHoliday(14), 'West excludes February 15');
   const selected = element('#calendar-selected-date').textContent;
+  element('#calendar-prev').listeners.click();
   for (const [value, start, end] of [['central', 14, 18], ['east', 21, 25], ['west', 28, 32]]) {
+    if (value === 'west') element('#calendar-next').listeners.click();
     region.listeners.change({ target: { value } });
     const regionNames = { west: 'západného', central: 'stredného', east: 'východného' };
     assert.equal(element('#calendar-school-legend').textContent, `Školské prázdniny ${regionNames[value]} Slovenska`);

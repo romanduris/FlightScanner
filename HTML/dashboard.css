@@ -282,7 +282,7 @@ td strong { color: var(--ink); }
 .return-heading h3 { margin: 2px 0 0; font-size: 14px; }
 .return-heading small { color: var(--muted); font-size: 9px; text-align: right; }
 .return-list { display: grid; gap: 6px; }
-.return-option { display: grid; grid-template-columns: minmax(0, 1fr) 95px; align-items: stretch; gap: 8px; min-height: 53px; }
+.return-option { display: grid; grid-template-columns: minmax(0, 1fr) 95px; align-items: stretch; gap: 8px; min-height: 80px; }
 .return-option.no-hotel-link { grid-template-columns: 1fr; }
 .return-flight-link { position: relative; display: grid; grid-template-columns: 30px minmax(125px, 1.2fr) minmax(82px, .8fr) minmax(90px, .85fr); align-items: center; gap: 8px; min-width: 0; padding: 8px 15px 8px 10px; color: inherit; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; text-decoration: none; transition: border-color .15s ease, box-shadow .15s ease, background .15s ease; }
 .return-airline-logo { position: relative; display: flex; width: 30px; height: 30px; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; }
@@ -482,3 +482,15 @@ footer a { color: inherit; }
 .support-fallback { margin: 0; padding: 12px 16px; text-align: center; font-size: 11px; }
 .support-fallback a { color: var(--blue); }
 html:has(#support-dialog[open]) { overflow: hidden; }
+
+.departure-picker { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 38px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fbfcfe; color: var(--ink); font-size: 12px; font-weight: 400; cursor: pointer; }
+.departure-calendar { position: fixed; inset: auto; margin: 0; padding: 12px; max-width: calc(100vw - 24px); max-height: calc(100dvh - 24px); overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); box-shadow: var(--shadow); }
+.departure-calendar .calendar-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; margin-bottom: 12px; }
+.departure-calendar .calendar-region { grid-column: 1 / -1; grid-row: 2; width: 100%; }
+.departure-calendar .calendar-region select { width: 100%; min-height: 36px; font-size: 11px; }
+.departure-calendar .calendar-months { display: block; }
+.departure-calendar .calendar-month { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.departure-calendar .calendar-days { grid-template-rows: repeat(6, 32px); }
+.departure-calendar .calendar-days button, .departure-calendar .calendar-blank { width: 30px; height: 30px; }
+.departure-calendar .calendar-legend { font-size: 10px; }
+.departure-picker:focus-visible, .departure-calendar button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }

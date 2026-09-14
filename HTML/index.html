@@ -105,7 +105,7 @@
 
       <div class="primary-filters">
         <label class="field"><span data-i18n="filters.destination">Destinácia</span><select id="destination-filter"><option value="">Všetky destinácie</option></select></label>
-        <label class="field"><span data-i18n="results.departure">Odlet</span><input id="departure-filter" type="date"></label>
+        <div class="field"><label for="departure-picker" data-i18n="results.departure">Odlet</label><input id="departure-filter" type="hidden"><button id="departure-picker" class="departure-picker" type="button" popovertarget="calendar-content" aria-controls="calendar-content" aria-expanded="false"><span id="departure-picker-value"></span><span class="section-chevron" aria-hidden="true"></span></button></div>
         <label class="field"><span data-i18n="filters.stay">Dĺžka pobytu</span><select id="stay-filter"><option value="" data-i18n="filters.anyStay">Ľubovoľná</option><option value="2-4" data-i18n="filters.stayShort">2–4 noci</option><option value="5-8" data-i18n="filters.stayWeek">5–8 nocí</option><option value="9-10" data-i18n="filters.stayLong">9–10 nocí</option></select></label>
         <label class="field"><span data-i18n="filters.sort">Zoradiť</span><select id="sort-filter"><option value="departure_local" data-i18n="filters.soonest">Najbližší odlet</option><option value="price" data-i18n="filters.cheapest">Najlacnejší odlet</option><option value="round_trip" data-i18n="filters.cheapestReturn">Cena tam + späť</option><option value="" data-i18n="filters.customSort" disabled>Vlastné poradie</option></select></label>
         <label class="weekend-filter"><input id="weekend-filter" type="checkbox"><span data-i18n="filters.weekend">Víkendový pobyt</span><small data-i18n="filters.weekendNote">Pi/So → Ne/Po</small></label>
@@ -132,22 +132,11 @@
       </div>
     </section>
 
-    <section class="calendar-card collapsible-section collapsed" data-collapsible aria-label="Výber dátumu odletu" data-i18n-aria="calendar.aria">
-      <div class="section-header">
-        <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="calendar-content" aria-label="Zobraziť kalendár" data-i18n-aria="calendar.toggle" data-section-key="calendar.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
-          <div>
-            <span class="eyebrow" data-i18n="calendar.eyebrow">Kalendár</span>
-            <h2 data-i18n="calendar.title">Vyber deň odletu</h2>
-          </div>
-        </div>
-      </div>
-      <div id="calendar-content" class="calendar-content collapsible-content" hidden>
+      <div id="calendar-content" class="departure-calendar" popover="auto" role="dialog" aria-label="Výber dátumu odletu" data-i18n-aria="calendar.aria">
         <div class="calendar-toolbar">
           <div class="calendar-selection">
             <span data-i18n="calendar.selected">Vybraný začiatok</span>
             <strong id="calendar-selected-date">—</strong>
-            <small data-i18n="calendar.window">Zobrazí sa najviac nasledujúcich 30 dní</small>
           </div>
           <label class="field calendar-region">
             <span data-i18n="calendar.region">Školské prázdniny podľa regiónu</span>
@@ -168,7 +157,6 @@
           <p><i class="calendar-legend-dot calendar-legend-dot-school" aria-hidden="true"></i><span id="calendar-school-legend" aria-live="polite">Školské prázdniny západného Slovenska</span></p>
         </div>
       </div>
-    </section>
 
     <section class="results-card collapsible-section" data-collapsible>
       <div class="section-header results-heading">
