@@ -50,7 +50,11 @@
     sortKey: "departure_local",
     sortDirection: "asc",
     selectedOffer: null,
+    stay: "",
+    weekend: false,
   };
+  let visibleLimit = 30;
+  const initialQuery = new URLSearchParams(window.location?.search || "");
   let map = null;
   let routeLayer = null;
   let publicHolidays = new Set();
@@ -63,6 +67,10 @@
   const elements = {
     country: document.querySelector("#country-filter"),
     destination: document.querySelector("#destination-filter"),
+    departure: document.querySelector("#departure-filter"),
+    stay: document.querySelector("#stay-filter"),
+    weekend: document.querySelector("#weekend-filter"),
+    sort: document.querySelector("#sort-filter"),
     price: document.querySelector("#price-filter"),
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
@@ -259,7 +267,76 @@
   }
 
   function displayDestination(offer) {
-    return i18n.destinationName(offer.destination_iata, offer.destination_name);
+    const name = i18n.destinationName(offer.destination_iata, offer.destination_name);
+    return name === name.toLocaleUpperCase(i18n.locale)
+      ? name.toLocaleLowerCase(i18n.locale).replace(/(^|[\s/\-])\p{L}/gu, part => part.toLocaleUpperCase(i18n.locale))
+      : name;
+  }
+
+  function offerKey(offer) {
+    return [offer.airline, offer.destination_iata, offer.departure_local, offer.flight_number || ""].join("|");
+  }
+
+  function searchUrl(offer = null) {
+    const url = new URL(window.location?.href || "https://btsflightscaner.rodulab.com/");
+    const params = url.searchParams;
+    const values = {
+      country: state.country, destination: state.destination,
+      from: addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10),
+      to: addDays(payload.start_date, state.lastVisibleDay).toISOString().slice(0, 10),
+      price: state.maxPrice < maxPrice ? state.maxPrice : "",
+      duration: state.maxDuration < maxDuration ? state.maxDuration : "",
+      travellers: state.travellers > 1 ? state.travellers : "",
+      stay: state.stay, weekend: state.weekend ? "1" : "",
+      sort: state.sortKey, direction: state.sortDirection, offer: offer ? offerKey(offer) : "",
+    };
+    Object.entries(values).forEach(([key, value]) => value === "" ? params.delete(key) : params.set(key, String(value)));
+    url.hash = "";
+    return url;
+  }
+
+  function syncUrl() {
+    window.history?.replaceState(null, "", searchUrl(state.selectedOffer));
+  }
+
+  function restoreSearch() {
+    const q = initialQuery;
+    state.country = offers.some(offer => offer.country_code === q.get("country")) ? q.get("country") : "";
+    state.destination = offers.some(offer => offer.destination_iata === q.get("destination") && (!state.country || offer.country_code === state.country)) ? q.get("destination") : "";
+    state.stay = ["2-4", "5-8", "9-10"].includes(q.get("stay")) ? q.get("stay") : "";
+    state.weekend = q.get("weekend") === "1";
+    for (const [key, field, min, max] of [["price", "maxPrice", 0, maxPrice], ["duration", "maxDuration", 0, maxDuration], ["travellers", "travellers", 1, 9]]) {
+      if (q.has(key) && q.get(key).trim() && Number.isFinite(Number(q.get(key)))) state[field] = Math.max(min, Math.min(max, Number(q.get(key))));
+    }
+    state.travellers = Math.floor(state.travellers);
+    const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || "") && isoDate(value)?.toISOString().slice(0, 10) === value;
+    if (validDate(q.get("from"))) {
+      state.firstVisibleDay = clampVisibleDay(dayOffset(q.get("from")));
+      state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
+    }
+    if (validDate(q.get("to"))) state.lastVisibleDay = clampVisibleDay(dayOffset(q.get("to")));
+    if (["departure_local", "price", "round_trip", "airline", "destination_name", "flight_number", "duration_minutes", "distance_km"].includes(q.get("sort"))) state.sortKey = q.get("sort");
+    state.sortDirection = q.get("direction") === "desc" ? "desc" : "asc";
+    calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
+  }
+
+  async function shareSelection(offer = null) {
+    const url = searchUrl(offer).toString();
+    const status = offer ? elements.detail.querySelector(".detail-share-status") : document.querySelector("#share-status");
+    try {
+      await navigator.clipboard.writeText(url);
+      status.textContent = t("share.copied");
+      document.querySelector("#share-fallback").hidden = true;
+    } catch (_error) {
+      status.textContent = t("share.manual");
+      const input = offer ? elements.detail.querySelector(".detail-share-url") : document.querySelector("#share-url");
+      if (!offer) document.querySelector("#share-fallback").hidden = false;
+      input.hidden = false;
+      input.value = url;
+      input.focus();
+      input.select();
+    }
+    status.hidden = false;
   }
 
   function displayCountry(offer) {
@@ -318,11 +395,16 @@
       `<option value="">${t("filters.allCountries")}</option>`,
       ...sortedCountries.map(([code, name]) => `<option value="${escapeHtml(code)}">${escapeHtml(name)}</option>`),
     ].join("");
+    elements.country.value = state.country;
     populateDestinations();
     syncPriceControl();
     updateTravellerControl();
     elements.duration.max = maxDuration;
-    elements.duration.value = maxDuration;
+    elements.duration.value = state.maxDuration;
+    elements.departure.min = payload.start_date;
+    elements.departure.max = addDays(payload.start_date, lastScanDay).toISOString().slice(0, 10);
+    elements.stay.value = state.stay;
+    elements.weekend.checked = state.weekend;
     syncDateRange();
     renderCalendar();
     updateRangeLabels();
@@ -365,6 +447,7 @@
     elements.dateTo.min = state.firstVisibleDay;
     elements.dateTo.max = windowEndDay;
     elements.dateTo.value = state.lastVisibleDay;
+    elements.departure.value = addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10);
   }
 
   function calendarMonthTitle(value) {
@@ -406,7 +489,8 @@
     elements.calendarSchoolLegend.textContent = t(`calendar.schoolLegend.${schoolRegion}`);
     const firstMonth = startOfMonth(payload.start_date);
     const lastMonth = startOfMonth(addDays(payload.start_date, lastScanDay));
-    const latestCursor = lastMonth > firstMonth ? addMonths(lastMonth, -1) : firstMonth;
+    const singleMonth = window.matchMedia?.("(max-width: 680px)").matches;
+    const latestCursor = !singleMonth && lastMonth > firstMonth ? addMonths(lastMonth, -1) : lastMonth;
     if (calendarCursor < firstMonth) calendarCursor = firstMonth;
     if (calendarCursor > latestCursor) calendarCursor = latestCursor;
     elements.calendarSelectedDate.textContent = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
@@ -434,11 +518,18 @@
         && (!state.destination || offer.destination_iata === state.destination)
         && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
         && offer.price <= state.maxPrice
-        && (offer.duration_minutes || Infinity) <= state.maxDuration;
+        && (offer.duration_minutes || Infinity) <= state.maxDuration
+        && (!(state.stay || state.weekend) || availableReturnOffers(offer).length > 0);
     });
 
     const direction = state.sortDirection === "asc" ? 1 : -1;
     return filtered.sort((a, b) => {
+      if (state.sortKey === "round_trip") {
+        const priceA = cheapestReturnPrice(a), priceB = cheapestReturnPrice(b);
+        if (priceA == null) return priceB == null ? 0 : 1;
+        if (priceB == null) return -1;
+        return ((Number(a.price) + priceA) - (Number(b.price) + priceB)) * direction;
+      }
       const valueA = a[state.sortKey] ?? "";
       const valueB = b[state.sortKey] ?? "";
       if (typeof valueA === "number" && typeof valueB === "number") return (valueA - valueB) * direction;
@@ -460,10 +551,17 @@
     const lastDay = addDays(offer.departure_local, windowDays);
     return offer.return_offers.filter((item) => {
       const departure = isoDate(item.departure_local);
+      const outbound = isoDate(offer.departure_local);
+      const arrival = isoDate(offer.arrival_local || offer.departure_local);
+      const nights = departure && arrival ? (departure - arrival) / 86400000 : 0;
+      const [minNights, maxNights] = state.stay ? state.stay.split("-").map(Number) : [0, windowDays];
+      const weekend = outbound && departure && [5, 6].includes(outbound.getUTCDay()) && [0, 1].includes(departure.getUTCDay()) && (departure - outbound) <= 3 * 86400000;
       return departure && firstDay && lastDay
         && departure >= firstDay
         && departure <= lastDay
-        && Number.isFinite(Number(item.price));
+        && item.price != null && Number.isFinite(Number(item.price))
+        && nights >= minNights && nights <= maxNights
+        && (!state.weekend || weekend);
     });
   }
 
@@ -475,7 +573,9 @@
   function renderTable(items) {
     elements.resultCount.textContent = items.length;
     elements.empty.hidden = items.length !== 0;
-    elements.rows.innerHTML = items.map((offer) => {
+    document.querySelector("#more-offers").hidden = items.length <= visibleLimit;
+    document.querySelector("#visible-count").textContent = t("results.shown", { shown: Math.min(visibleLimit, items.length), total: items.length });
+    elements.rows.innerHTML = items.slice(0, visibleLimit).map((offer) => {
       const [date, time] = shortDate(offer.departure_local);
       const departureWeekday = weekdayFor(offer.departure_local);
       const responsiveDuration = offer.duration_minutes
@@ -491,7 +591,7 @@
           <td class="column-departure"><span class="date-cell"><strong>${date} (${escapeHtml(departureWeekday || "—")})</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")}${responsiveDuration}</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell">${euro(groupPrice(offer.price))}<small>${returnPrice == null ? t("results.totalUnavailable") : `${euro(groupPrice(offer.price + returnPrice))}*`}</small></td>
+          <td class="column-price price-cell"><span class="fare-label">${t("results.oneWay")}</span><strong>${euro(groupPrice(offer.price))}</strong><small>${returnPrice == null ? t("results.totalUnavailable") : `${t("results.returnFrom")}<b>${euro(groupPrice(Number(offer.price) + returnPrice))}</b>`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");
@@ -509,6 +609,7 @@
   }
 
   function renderSortHeaders() {
+    elements.sort.value = state.sortDirection === "asc" && ["departure_local", "price", "round_trip"].includes(state.sortKey) ? state.sortKey : "";
     document.querySelectorAll("th button[data-sort]").forEach((button) => {
       const active = button.dataset.sort === state.sortKey;
       button.classList.toggle("active", active);
@@ -545,7 +646,8 @@
               </div>
               <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>
               <div class="return-price"><span>${t("return.journey")}</span><strong>${euro(groupPrice(item.price))}</strong></div>
-              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(groupPrice(offer.price + item.price))}</strong></div>`;
+              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(groupPrice(Number(offer.price) + Number(item.price)))}</strong></div>
+              <span class="booking-action">${escapeHtml(t("return.openAirline", { airline: offer.airline === "RYANAIR" ? "Ryanair" : offer.airline }))}</span>`;
           const flightButton = window.FlightBookingButtons.createReturnButton({
             airline: offer.airline,
             trip: {
@@ -589,14 +691,14 @@
       <section class="return-section">
         <div class="return-heading">
           <div><span class="eyebrow">${t("return.eyebrow")}</span><h3>${t("return.title")}</h3></div>
-          <small>${t("return.period", { period })}</small>
+          <small>${t("return.period", { period, travellers: state.travellers })}</small>
         </div>
         ${content}
       </section>`;
   }
 
-  function showOffer(offer) {
-    window.FlightStatistics?.trackClick("offer_open", offer.airline);
+  function showOffer(offer, track = true) {
+    if (track) window.FlightStatistics?.trackClick("offer_open", offer.airline);
     state.selectedOffer = offer;
     const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(translatedSchedule(item))}</span>`).join("");
     const cssClass = airlineClass(offer.airline);
@@ -616,6 +718,7 @@
         </div>
       </div>
       <div class="detail-body">
+        <div class="detail-share"><button class="button button-ghost" id="share-offer" type="button">${t("share.offer")}</button><span class="detail-share-status" role="status" hidden></span><input class="detail-share-url" aria-label="${escapeHtml(t("share.link"))}" type="url" readonly hidden></div>
         <div class="detail-price">
           <div><span>${t("detail.selectedPrice")}</span><strong>${euro(groupPrice(offer.price))}</strong><small>${t("detail.oneWayFare")}</small></div>
           <div><span>${t("detail.cheapestRoundTrip")}</span><strong>${roundTripPrice == null ? "—" : euro(groupPrice(roundTripPrice))}</strong><small>${t("detail.roundTrip")}</small></div>
@@ -631,6 +734,8 @@
         ${renderReturnOffers(offer)}
       </div>`;
     if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();
+    elements.detail.querySelector("#share-offer")?.addEventListener("click", () => shareSelection(offer));
+    syncUrl();
     focusRouteOnMap(offer);
     renderTable(visibleOffers);
   }
@@ -641,7 +746,7 @@
       document.querySelector("#map-fallback").hidden = false;
       return;
     }
-    map = L.map("map", { zoomControl: true, minZoom: 2 }).setView([48.5, 15], 4);
+    map = L.map("map", { zoomControl: true, minZoom: 2, zoomSnap: 0.25 }).setView([48.5, 15], 4);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -693,7 +798,7 @@
     const points = [[payload.origin.latitude, payload.origin.longitude], ...visibleOffers
       .filter((offer) => offer.latitude != null && offer.longitude != null)
       .map((offer) => [offer.latitude, offer.longitude])];
-    if (points.length > 1) map.fitBounds(points, { padding: [28, 28], maxZoom: 6 });
+    if (points.length > 1) map.fitBounds(points, { padding: [16, 16], maxZoom: 6 });
   }
 
   function focusRouteOnMap(offer) {
@@ -705,11 +810,13 @@
   }
 
   function render() {
+    visibleLimit = 30;
     visibleOffers = filteredAndSortedOffers();
     renderStats(visibleOffers);
     renderTable(visibleOffers);
     renderMap(visibleOffers);
     renderSortHeaders();
+    syncUrl();
   }
 
   function resetFilters() {
@@ -718,6 +825,13 @@
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
     state.travellers = 1;
+    state.stay = "";
+    state.weekend = false;
+    state.sortKey = "departure_local";
+    state.sortDirection = "asc";
+    state.selectedOffer = null;
+    elements.stay.value = "";
+    elements.weekend.checked = false;
     state.firstVisibleDay = defaultVisibleDay();
     state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
@@ -763,6 +877,17 @@
 
   function bindEvents() {
     bindCollapsibleSections();
+    window.matchMedia?.("(max-width: 680px)").addEventListener("change", renderCalendar);
+    elements.departure.addEventListener("change", () => {
+      if (elements.departure.value) selectCalendarDay(dayOffset(elements.departure.value));
+      else syncDateRange();
+    });
+    elements.stay.addEventListener("change", () => { state.stay = elements.stay.value; render(); });
+    elements.weekend.addEventListener("change", () => { state.weekend = elements.weekend.checked; render(); });
+    elements.sort.addEventListener("change", () => { state.sortKey = elements.sort.value; state.sortDirection = "asc"; render(); });
+    document.querySelector("#more-offers").addEventListener("click", () => { visibleLimit += 30; renderTable(visibleOffers); });
+    document.querySelector("#share-search").addEventListener("click", () => shareSelection());
+    elements.dialog.addEventListener("close", () => { state.selectedOffer = null; syncUrl(); renderTable(visibleOffers); });
     elements.country.addEventListener("change", (event) => {
       state.country = event.target.value;
       state.destination = "";
@@ -828,6 +953,7 @@
     document.querySelector("#scan-time").innerHTML = `<span class="scan-label">${t("header.updated")}</span><span class="scan-date">${scanned.toLocaleString(i18n.locale, { dateStyle: "short", timeStyle: "short", timeZone: "UTC" })} UTC</span>`;
   }
 
+  restoreSearch();
   populateControls();
   renderAirlineSummary();
   initHeader();
@@ -835,6 +961,15 @@
   bindEvents();
   render();
   fitVisibleMap();
+  if (initialQuery.has("offer")) {
+    const sharedOffer = flights.find(offer => offerKey(offer) === initialQuery.get("offer"));
+    if (sharedOffer) showOffer(sharedOffer, false);
+    else {
+      const status = document.querySelector("#share-status");
+      status.textContent = t("share.expired");
+      status.hidden = false;
+    }
+  }
   if (typeof fetch === "function") {
     const readJson = (path) => fetch(path, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : Promise.reject(new Error(`${path}_unavailable`)));

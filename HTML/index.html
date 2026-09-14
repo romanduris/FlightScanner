@@ -13,7 +13,7 @@
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="stylesheet" href="dashboard.css?v=2026091001">
+  <link rel="stylesheet" href="dashboard.css?v=2026091302">
 </head>
 <body>
   <header class="topbar">
@@ -69,10 +69,10 @@
       </div>
     </section>
 
-    <section class="map-card collapsible-section" data-collapsible>
+    <section class="map-card collapsible-section collapsed" data-collapsible>
       <div class="section-header">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="map-content" aria-label="Skryť mapu" data-i18n-aria="map.toggle" data-section-key="map.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="map-content" aria-label="Zobraziť mapu" data-i18n-aria="map.toggle" data-section-key="map.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div>
             <span class="eyebrow" data-i18n="map.eyebrow">Mapa spojení</span>
             <h2 data-i18n="map.title">Kam sa lieta z BTS</h2>
@@ -83,7 +83,7 @@
           <span><i class="legend-line wizz"></i>Wizz Air</span>
         </div>
       </div>
-      <div id="map-content" class="collapsible-content">
+      <div id="map-content" class="collapsible-content" hidden>
         <div id="map" aria-label="Mapa leteckých spojení z Bratislavy" data-i18n-aria="map.aria"></div>
         <div id="map-fallback" class="map-fallback" hidden data-i18n="map.fallback">
           Mapu sa nepodarilo načítať. Skontroluj internetové pripojenie; tabuľka funguje aj offline.
@@ -103,15 +103,21 @@
         <button id="reset-filters" class="button button-ghost" type="button" data-i18n="filters.reset">↺ Zrušiť filtre</button>
       </div>
 
+      <div class="primary-filters">
+        <label class="field"><span data-i18n="filters.destination">Destinácia</span><select id="destination-filter"><option value="">Všetky destinácie</option></select></label>
+        <label class="field"><span data-i18n="results.departure">Odlet</span><input id="departure-filter" type="date"></label>
+        <label class="field"><span data-i18n="filters.stay">Dĺžka pobytu</span><select id="stay-filter"><option value="" data-i18n="filters.anyStay">Ľubovoľná</option><option value="2-4" data-i18n="filters.stayShort">2–4 noci</option><option value="5-8" data-i18n="filters.stayWeek">5–8 nocí</option><option value="9-10" data-i18n="filters.stayLong">9–10 nocí</option></select></label>
+        <label class="field"><span data-i18n="filters.sort">Zoradiť</span><select id="sort-filter"><option value="departure_local" data-i18n="filters.soonest">Najbližší odlet</option><option value="price" data-i18n="filters.cheapest">Najlacnejší odlet</option><option value="round_trip" data-i18n="filters.cheapestReturn">Cena tam + späť</option><option value="" data-i18n="filters.customSort" disabled>Vlastné poradie</option></select></label>
+        <label class="weekend-filter"><input id="weekend-filter" type="checkbox"><span data-i18n="filters.weekend">Víkendový pobyt</span><small data-i18n="filters.weekendNote">Pi/So → Ne/Po</small></label>
+        <button id="share-search" class="button button-ghost" type="button" data-i18n="share.search">Zdieľať výber</button>
+      </div>
+      <p id="share-status" class="share-status" role="status" hidden></p>
+      <div id="share-fallback" class="share-fallback" hidden><label for="share-url" data-i18n="share.link">Odkaz</label><input id="share-url" type="url" readonly></div>
       <div id="filters-content" class="collapsible-content" hidden>
         <div class="filter-grid">
           <label class="field">
             <span data-i18n="filters.country">Krajina</span>
             <select id="country-filter"><option value="">Všetky krajiny</option></select>
-          </label>
-          <label class="field">
-            <span data-i18n="filters.destination">Destinácia</span>
-            <select id="destination-filter"><option value="">Všetky destinácie</option></select>
           </label>
           <label class="field range-field">
             <span><span data-i18n="filters.maxPrice">Max. cena</span> <output id="price-output">—</output></span>
@@ -126,17 +132,17 @@
       </div>
     </section>
 
-    <section class="calendar-card collapsible-section" data-collapsible aria-label="Výber dátumu odletu" data-i18n-aria="calendar.aria">
+    <section class="calendar-card collapsible-section collapsed" data-collapsible aria-label="Výber dátumu odletu" data-i18n-aria="calendar.aria">
       <div class="section-header">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="calendar-content" aria-label="Skryť kalendár" data-i18n-aria="calendar.toggle" data-section-key="calendar.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="calendar-content" aria-label="Zobraziť kalendár" data-i18n-aria="calendar.toggle" data-section-key="calendar.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div>
             <span class="eyebrow" data-i18n="calendar.eyebrow">Kalendár</span>
             <h2 data-i18n="calendar.title">Vyber deň odletu</h2>
           </div>
         </div>
       </div>
-      <div id="calendar-content" class="calendar-content collapsible-content">
+      <div id="calendar-content" class="calendar-content collapsible-content" hidden>
         <div class="calendar-toolbar">
           <div class="calendar-selection">
             <span data-i18n="calendar.selected">Vybraný začiatok</span>
@@ -215,7 +221,8 @@
             <span data-i18n="results.emptyBody">Skús zvýšiť cenu, dĺžku letu alebo zrušiť niektorý filter.</span>
           </div>
         </div>
-        <p class="table-note table-note-bottom" data-i18n="results.priceNote">* Cena spolu: zobrazený let tam + najlacnejší nájdený let späť v období 1 až 10 dní po odlete.</p>
+        <div class="results-pagination"><span id="visible-count" aria-live="polite"></span><button id="more-offers" class="button button-ghost" type="button" data-i18n="results.more" hidden>Zobraziť ďalších 30</button></div>
+        <p class="table-note table-note-bottom" data-i18n="results.priceNote">Cena tam + späť zahŕňa najlacnejší nájdený návrat podľa filtrov pobytu. Ceny sú orientačné a bez doplnkových služieb.</p>
       </div>
     </section>
 
@@ -300,8 +307,8 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="i18n/sk.js?v=2026090901"></script>
-  <script src="i18n/en.js?v=2026090901"></script>
+  <script src="i18n/sk.js?v=2026091302"></script>
+  <script src="i18n/en.js?v=2026091302"></script>
   <script src="i18n/i18n.js?v=20260904112023"></script>
   <script src="booking/booking-com-config.js?v=20260904112023"></script>
   <script src="booking/booking-com.js?v=20260905052000"></script>
@@ -309,7 +316,7 @@
   <script src="booking/ryanair.js?v=20260904112023"></script>
   <script src="booking/wizzair.js?v=20260904112023"></script>
   <script src="support.js?v=2026090901"></script>
-  <script src="dashboard.js?v=2026090901"></script>
+  <script src="dashboard.js?v=2026091302"></script>
   <script src="contact/contact.js?v=20260904114649"></script>
   <script src="statistics/engagement.js?v=2026091009"></script>
   <!-- Cloudflare Web Analytics -->
