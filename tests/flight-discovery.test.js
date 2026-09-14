@@ -106,6 +106,8 @@ test("a shared search restores dates, travellers and filters, and a shared offer
   const detail = app(`?${params}`);
   assert.equal(detail.element("#flight-detail").open, true);
   assert.match(detail.element("#detail-content").innerHTML, /23\.09\.2026/);
+  assert.doesNotMatch(detail.element("#detail-content").innerHTML, /class="return-price"/);
+  assert.match(detail.element("#detail-content").innerHTML, /class="return-total"[^]*?<strong>62,00/);
   const expired = app("?offer=missing");
   assert.equal(expired.element("#share-status").hidden, false);
 });
