@@ -61,6 +61,37 @@ test("compact fares omit one-way labels and keep the return price beside its lab
   assert.match(html, /Spiatočne od <b>/);
 });
 
+test("traveller changes preserve expanded rows and multiply both fares without changing order", () => {
+  const page = app();
+  page.element("#more-offers").listeners.click();
+  const ids = () => [...page.element("#flight-rows").innerHTML.matchAll(/<td class="column-flight"><strong>(.*?)<\/strong>/g)].map(match => match[1]);
+  const before = ids();
+  page.element("#traveller-plus").listeners.click();
+  assert.equal(page.rows(), 60);
+  assert.deepEqual(ids(), before);
+  assert.match(page.element("#flight-rows").innerHTML, /<strong>20,00/);
+  assert.match(page.element("#flight-rows").innerHTML, /Spiatočne od <b>120,00/);
+});
+
+test("cached return results remain correct when switching stay and weekend settings repeatedly", () => {
+  const page = app();
+  for (let i = 0; i < 3; i++) {
+    page.change("#stay-filter", "5-8");
+    assert.equal(page.rows(), 1);
+    assert.match(page.element("#flight-rows").innerHTML, /31,00/);
+    page.element("#weekend-filter").checked = true;
+    page.element("#weekend-filter").listeners.change();
+    assert.equal(page.rows(), 0);
+    page.change("#stay-filter", "2-4");
+    assert.equal(page.rows(), 1);
+    assert.match(page.element("#flight-rows").innerHTML, /60,00/);
+    page.element("#weekend-filter").checked = false;
+    page.element("#weekend-filter").listeners.change();
+    page.change("#stay-filter", "");
+    assert.equal(page.rows(), 30);
+  }
+});
+
 test("search sharing controls are removed and all filters are inside the collapsible content", () => {
   const html = fs.readFileSync(path.join(__dirname, "../HTML/index.html"), "utf8");
   assert.doesNotMatch(html, /id="share-search"|id="share-fallback"/);

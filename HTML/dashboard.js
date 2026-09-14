@@ -51,6 +51,11 @@
     weekend: false,
   };
   let visibleLimit = 30;
+  const sortCollator = new Intl.Collator(i18n.locale, { numeric: true });
+  const returnIndexes = new WeakMap();
+  const returnResults = new WeakMap();
+  let mappedRoutes = new Map();
+  let mapMarkers = [];
   const initialQuery = new URLSearchParams(window.location?.search || "");
   let map = null;
   let detailMap = null;
@@ -347,12 +352,15 @@
   }
 
   function setTravellers(value) {
-    state.travellers = Math.max(1, Math.min(9, Number(value) || 1));
+    const travellers = Math.max(1, Math.min(9, Number(value) || 1));
+    if (travellers === state.travellers) return;
+    state.travellers = travellers;
     syncPriceControl();
     updateTravellerControl();
-    renderAirlineSummary();
     updateRangeLabels();
-    render();
+    renderTable(visibleOffers);
+    updateOpenMapPopups();
+    syncUrl();
   }
 
   function populateControls() {
@@ -481,7 +489,7 @@
       const valueA = a[state.sortKey] ?? "";
       const valueB = b[state.sortKey] ?? "";
       if (typeof valueA === "number" && typeof valueB === "number") return (valueA - valueB) * direction;
-      return String(valueA).localeCompare(String(valueB), i18n.locale, { numeric: true }) * direction;
+      return sortCollator.compare(String(valueA), String(valueB)) * direction;
     });
   }
 
@@ -493,30 +501,55 @@
     document.querySelector("#overview-flight-count").textContent = integer(flights.length);
   }
 
-  function availableReturnOffers(offer) {
-    if (!Array.isArray(offer.return_offers) || offer.return_search_error) return [];
+  function matchingReturns(offer) {
+    const key = `${state.stay}|${state.weekend}`;
+    let results = returnResults.get(offer);
+    if (!results) { results = new Map(); returnResults.set(offer, results); }
+    if (results.has(key)) return results.get(key);
+    const result = { items: [], price: null };
+    results.set(key, result);
+    if (!Array.isArray(offer.return_offers) || offer.return_search_error) return result;
     const windowDays = Number(payload.return_window_days) || 10;
-    const firstDay = addDays(offer.departure_local, 1);
-    const lastDay = addDays(offer.departure_local, windowDays);
-    return offer.return_offers.filter((item) => {
-      const departure = isoDate(item.departure_local);
-      const outbound = isoDate(offer.departure_local);
-      const arrival = isoDate(offer.arrival_local || offer.departure_local);
-      const nights = departure && arrival ? (departure - arrival) / 86400000 : 0;
-      const [minNights, maxNights] = state.stay ? state.stay.split("-").map(Number) : [0, windowDays];
-      const weekend = outbound && departure && [5, 6].includes(outbound.getUTCDay()) && [0, 1].includes(departure.getUTCDay()) && (departure - outbound) <= 3 * 86400000;
-      return departure && firstDay && lastDay
-        && departure >= firstDay
-        && departure <= lastDay
-        && item.price != null && Number.isFinite(Number(item.price))
-        && nights >= minNights && nights <= maxNights
-        && (!state.weekend || weekend);
+    const outbound = isoDate(offer.departure_local);
+    const arrival = isoDate(offer.arrival_local || offer.departure_local);
+    if (!outbound || (state.weekend && ![5, 6].includes(outbound.getUTCDay()))) return result;
+    let index = returnIndexes.get(offer.return_offers);
+    if (!index) {
+      index = new Map();
+      offer.return_offers.forEach((item, position) => {
+        const date = isoDate(item.departure_local);
+        if (!date || item.price == null || !Number.isFinite(Number(item.price))) return;
+        const day = date.getTime();
+        if (!index.has(day)) index.set(day, []);
+        index.get(day).push({ item, position });
+      });
+      returnIndexes.set(offer.return_offers, index);
+    }
+    const [minNights, maxNights] = state.stay ? state.stay.split("-").map(Number) : [0, windowDays];
+    const candidates = [];
+    const lastDay = addDays(offer.departure_local, windowDays).getTime();
+    // Return lists are shared by outbound flights. Inspect only the eligible days.
+    for (let day = outbound.getTime() + 86400000; day <= lastDay; day += 86400000) {
+      const nights = arrival ? (day - arrival.getTime()) / 86400000 : 0;
+      if (nights < minNights || nights > maxNights) continue;
+      if (state.weekend && (![0, 1].includes(new Date(day).getUTCDay()) || day - outbound.getTime() > 3 * 86400000)) continue;
+      candidates.push(...(index.get(day) || []));
+    }
+    candidates.sort((a, b) => a.position - b.position);
+    result.items = candidates.map(({ item }) => item);
+    result.items.forEach(item => {
+      const price = Number(item.price);
+      if (result.price == null || price < result.price) result.price = price;
     });
+    return result;
+  }
+
+  function availableReturnOffers(offer) {
+    return matchingReturns(offer).items;
   }
 
   function cheapestReturnPrice(offer) {
-    const availableReturns = availableReturnOffers(offer);
-    return availableReturns.length ? Math.min(...availableReturns.map((item) => Number(item.price))) : null;
+    return matchingReturns(offer).price;
   }
 
   function renderTable(items) {
@@ -728,7 +761,6 @@
 
   function renderMap(items) {
     if (!map || !routeLayer) return;
-    routeLayer.clearLayers();
     const origin = [payload.origin.latitude, payload.origin.longitude];
     const routes = new Map();
     items.filter((offer) => offer.latitude != null && offer.longitude != null).forEach((offer) => {
@@ -736,6 +768,13 @@
       const current = routes.get(routeKey);
       if (!current || offer.price < current.price) routes.set(routeKey, offer);
     });
+    if (routes.size === mappedRoutes.size && [...routes].every(([key, offer]) => mappedRoutes.get(key) === offer)) {
+      updateOpenMapPopups();
+      return;
+    }
+    mappedRoutes = routes;
+    routeLayer.clearLayers();
+    mapMarkers = [];
     routes.forEach((offer) => {
       const destination = [offer.latitude, offer.longitude];
       const cssClass = airlineClass(offer.airline);
@@ -746,19 +785,36 @@
       const marker = L.circleMarker(destination, {
         radius: 4.5, color: "#fff", weight: 1.5, fillColor: color, fillOpacity: .95,
       }).addTo(routeLayer);
-      marker.bindPopup(`
+      mapMarkers.push({ marker, offer });
+      marker.bindPopup(() => renderMapPopup(offer));
+      marker.on("popupopen", (event) => {
+        bindMapPopup(event.popup, offer);
+      });
+    });
+  }
+
+  function bindMapPopup(popup, offer) {
+    const button = popup.getElement()?.querySelector("[data-map-offer]");
+    button?.addEventListener("click", () => showOffer(offer), { once: true });
+  }
+
+  function updateOpenMapPopups() {
+    mapMarkers.forEach(({ marker, offer }) => {
+      if (!marker.isPopupOpen()) return;
+      marker.setPopupContent(renderMapPopup(offer));
+      bindMapPopup(marker.getPopup(), offer);
+    });
+  }
+
+  function renderMapPopup(offer) {
+    return `
         <div class="map-popup">
           <strong>${escapeHtml(displayDestination(offer))} (${escapeHtml(offer.destination_iata)})</strong>
           <div class="popup-route">${flag(offer.country_code)} ${escapeHtml(displayCountry(offer))} · ${escapeHtml(offer.airline)}</div>
           <div class="popup-line"><span>${t("map.priceFrom")}</span><b>${euro(groupPrice(offer.price))}</b></div>
           <div class="popup-line"><span>${t("map.duration")}</span><b>${duration(offer.duration_minutes)}</b></div>
           <button type="button" data-map-offer="${escapeHtml(`${offer.airline}|${offer.destination_iata}`)}">${t("map.flightDetail")}</button>
-        </div>`);
-      marker.on("popupopen", (event) => {
-        const button = event.popup.getElement()?.querySelector("[data-map-offer]");
-        button?.addEventListener("click", () => showOffer(offer), { once: true });
-      });
-    });
+        </div>`;
   }
 
   function fitVisibleMap() {
