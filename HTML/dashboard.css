@@ -494,3 +494,14 @@ html:has(#support-dialog[open]) { overflow: hidden; }
 .departure-calendar .calendar-days button, .departure-calendar .calendar-blank { width: 30px; height: 30px; }
 .departure-calendar .calendar-legend { font-size: 10px; }
 .departure-picker:focus-visible, .departure-calendar button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.overview-grid { grid-template-columns: minmax(0, 1fr); }
+.airline-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; background: white; }
+.airline-summary .airline-card { grid-template-columns: 65px minmax(0, 1fr); min-width: 0; min-height: 56px; gap: 8px; padding: 8px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.airline-summary .airline-card + .airline-card { border-left: 1px solid var(--line); }
+.airline-summary .airline-logo { grid-column: auto; padding: 0; }
+.airline-summary .airline-card img { width: 65px; height: 24px; object-fit: contain; }
+.airline-summary .airline-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 12px; min-width: 0; }
+.airline-summary .airline-meta span { display: flex; align-items: baseline; gap: 4px; font-size: 9px; text-transform: none; }
+.airline-summary .airline-meta strong { order: -1; display: inline; margin: 0; font-size: 12px; }
+.airline-summary .airline-meta span:nth-child(3), .airline-summary .airline-best { display: none; }

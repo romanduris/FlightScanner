@@ -342,9 +342,9 @@ assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.ok(rows.innerHTML.indexOf("10.09.2026") < rows.innerHTML.indexOf("18.09.2026"));
 assert.ok(rows.innerHTML.indexOf("18.09.2026") < rows.innerHTML.indexOf("28.09.2026"));
 
-element("#country-filter").listeners.change({ target: { value: "GR" } });
+element("#destination-filter").listeners.change({ target: { value: "ATH" } });
 assert.match(element("#destination-filter").innerHTML, /Atény \(ATH\)/);
-assert.doesNotMatch(element("#destination-filter").innerHTML, /Skorší Let/);
+assert.match(element("#destination-filter").innerHTML, /Skorší Let/);
 assert.match(rows.innerHTML, /Atény/);
 assert.doesNotMatch(rows.innerHTML, /Skorší Let/);
 assert.equal(element("#stat-flights").textContent, "3");

@@ -40,7 +40,6 @@
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
   const maxDuration = Math.ceil(Math.max(...flights.map((offer) => offer.duration_minutes || 0)) / 15) * 15;
   const state = {
-    country: "",
     destination: "",
     maxPrice,
     maxDuration,
@@ -66,7 +65,6 @@
   let calendarCursor = startOfMonth(addDays(payload.start_date, initialVisibleDay));
 
   const elements = {
-    country: document.querySelector("#country-filter"),
     destination: document.querySelector("#destination-filter"),
     departure: document.querySelector("#departure-filter"),
     stay: document.querySelector("#stay-filter"),
@@ -282,7 +280,7 @@
     const url = new URL(window.location?.href || "https://btsflightscaner.rodulab.com/");
     const params = url.searchParams;
     const values = {
-      country: state.country, destination: state.destination,
+      country: "", destination: state.destination,
       from: addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10),
       to: addDays(payload.start_date, state.lastVisibleDay).toISOString().slice(0, 10),
       price: state.maxPrice < maxPrice ? state.maxPrice : "",
@@ -302,8 +300,7 @@
 
   function restoreSearch() {
     const q = initialQuery;
-    state.country = offers.some(offer => offer.country_code === q.get("country")) ? q.get("country") : "";
-    state.destination = offers.some(offer => offer.destination_iata === q.get("destination") && (!state.country || offer.country_code === state.country)) ? q.get("destination") : "";
+    state.destination = offers.some(offer => offer.destination_iata === q.get("destination")) ? q.get("destination") : "";
     state.stay = ["2-4", "5-8", "9-10"].includes(q.get("stay")) ? q.get("stay") : "";
     state.weekend = q.get("weekend") === "1";
     for (const [key, field, min, max] of [["price", "maxPrice", 0, maxPrice], ["duration", "maxDuration", 0, maxDuration], ["travellers", "travellers", 1, 9]]) {
@@ -352,11 +349,8 @@
   }
 
   function populateDestinations() {
-    const matchingOffers = state.country
-      ? offers.filter((offer) => offer.country_code === state.country)
-      : offers;
     const destinations = new Map();
-    matchingOffers.forEach((offer) => destinations.set(offer.destination_iata, displayDestination(offer)));
+    offers.forEach((offer) => destinations.set(offer.destination_iata, displayDestination(offer)));
     const sortedDestinations = [...destinations.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, i18n.locale));
 
     if (state.destination && !destinations.has(state.destination)) state.destination = "";
@@ -390,14 +384,6 @@
   }
 
   function populateControls() {
-    const countries = new Map();
-    offers.forEach((offer) => countries.set(offer.country_code, displayCountry(offer)));
-    const sortedCountries = [...countries.entries()].sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB, i18n.locale));
-    elements.country.innerHTML = [
-      `<option value="">${t("filters.allCountries")}</option>`,
-      ...sortedCountries.map(([code, name]) => `<option value="${escapeHtml(code)}">${escapeHtml(name)}</option>`),
-    ].join("");
-    elements.country.value = state.country;
     populateDestinations();
     syncPriceControl();
     updateTravellerControl();
@@ -516,8 +502,7 @@
     const lastVisibleDate = addDays(payload.start_date, state.lastVisibleDay);
     const filtered = flights.filter((offer) => {
       const departureDate = isoDate(offer.departure_local);
-      return (!state.country || offer.country_code === state.country)
-        && (!state.destination || offer.destination_iata === state.destination)
+      return (!state.destination || offer.destination_iata === state.destination)
         && (!firstVisibleDate || !lastVisibleDate || (departureDate && departureDate >= firstVisibleDate && departureDate <= lastVisibleDate))
         && offer.price <= state.maxPrice
         && (offer.duration_minutes || Infinity) <= state.maxDuration
@@ -841,7 +826,6 @@
   }
 
   function resetFilters() {
-    state.country = "";
     state.destination = "";
     state.maxPrice = maxPrice;
     state.maxDuration = maxDuration;
@@ -856,7 +840,6 @@
     state.firstVisibleDay = defaultVisibleDay();
     state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
-    elements.country.value = "";
     populateDestinations();
     syncPriceControl();
     updateTravellerControl();
@@ -927,12 +910,6 @@
     document.querySelector("#more-offers").addEventListener("click", () => { visibleLimit += 30; renderTable(visibleOffers); });
     document.querySelector("#share-search").addEventListener("click", () => shareSelection());
     elements.dialog.addEventListener("close", () => { clearDetailMap(); state.selectedOffer = null; syncUrl(); renderTable(visibleOffers); });
-    elements.country.addEventListener("change", (event) => {
-      state.country = event.target.value;
-      state.destination = "";
-      populateDestinations();
-      render();
-    });
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value) / state.travellers; updateRangeLabels(); render(); });
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });

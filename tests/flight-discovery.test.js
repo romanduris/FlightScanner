@@ -121,6 +121,13 @@ test("malformed shared filters fall back to usable defaults", () => {
   assert.equal(page.element("#destination-filter").value, "");
 });
 
+test("legacy country filters no longer restrict destinations or persist in shared URLs", () => {
+  const page = app("?country=GR&destination=ATH");
+  assert.equal(page.rows(), 30);
+  assert.equal(page.element("#destination-filter").value, "ATH");
+  assert.equal(page.location.searchParams.has("country"), false);
+});
+
 test("detail replaces flight sharing with a destination map and handles missing coordinates", () => {
   const page = app("?offer=" + encodeURIComponent("Wizz Air|ATH|2026-09-18T08:00|W0"));
   const html = page.element("#detail-content").innerHTML;
