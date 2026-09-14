@@ -647,8 +647,7 @@
                 <span>${escapeHtml(item.origin_iata)} → BTS · ${escapeHtml(time)}</span>
               </div>
               <span class="return-badge">${cheapest ? t("return.cheapest") : ""}</span>
-              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(groupPrice(Number(offer.price) + Number(item.price)))}</strong></div>
-              <span class="booking-action">${escapeHtml(t("return.openAirline", { airline: offer.airline === "RYANAIR" ? "Ryanair" : offer.airline }))}</span>`;
+              <div class="return-total"><span>${t("return.total")}</span><strong>${euro(groupPrice(Number(offer.price) + Number(item.price)))}</strong></div>`;
           const flightButton = window.FlightBookingButtons.createReturnButton({
             airline: offer.airline,
             trip: {

@@ -289,7 +289,6 @@ td strong { color: var(--ink); }
 .hotel-booking-link { display: flex; min-width: 0; align-items: center; justify-content: center; padding: 7px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #f7f9fc; text-align: center; text-decoration: none; transition: background .15s ease; }
 .hotel-booking-link:hover { background: #e8eef6; }
 .hotel-booking-link strong { color: #064b9e; font-size: 11px; font-weight: 800; letter-spacing: 0; white-space: nowrap; }
-.booking-action { grid-column: 1 / -1; display: block; padding: 8px 12px; color: white; background: var(--blue); border-radius: 4px; font-size: 12px; font-weight: 750; text-align: center; }
 .hotel-booking-link strong span:last-child { color: #49a9e8; }
 .return-option.cheapest .return-flight-link { border-color: #84c9b4; background: #f0fbf7; box-shadow: inset 3px 0 var(--green); }
 .return-when strong, .return-when span, .return-total span, .return-total strong { display: block; }
