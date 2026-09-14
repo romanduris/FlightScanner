@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-function app(query = "") {
+function app(query = "", writeText = async () => {}) {
   const elements = new Map();
   function element(key) {
     if (!elements.has(key)) elements.set(key, {
@@ -15,6 +15,7 @@ function app(query = "") {
       setAttribute() {}, addEventListener(type, handler) { this.listeners[type] = handler; },
       querySelector() { return null; }, querySelectorAll() { return []; },
       showModal() { this.open = true; },
+      focus() {}, select() {},
     });
     return elements.get(key);
   }
@@ -31,7 +32,7 @@ function app(query = "") {
     FlightBookingButtons: { createReturnButton: ({content}) => content },
     BookingComLinks: {createButton: () => ""},
   };
-  const context = vm.createContext({ window, URL, URLSearchParams, Intl, document: {querySelector: element, querySelectorAll: () => [], documentElement: {}}, console });
+  const context = vm.createContext({ window, URL, URLSearchParams, Intl, navigator: { clipboard: { writeText } }, document: {querySelector: element, querySelectorAll: () => [], documentElement: {}}, console });
   for (const name of ["i18n/sk.js", "i18n/en.js", "i18n/i18n.js", "dashboard.js"]) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, "../HTML", name), "utf8"), context);
   }
@@ -50,6 +51,27 @@ test("pagination reveals 30 at a time and filters reset the visible count", () =
   assert.equal(page.element("#more-offers").hidden, true);
   page.change("#sort-filter", "price");
   assert.equal(page.rows(), 30);
+});
+
+test("compact fares omit one-way labels and keep the return price beside its label", () => {
+  const html = app().element("#flight-rows").innerHTML;
+  assert.doesNotMatch(html, /fare-label|jednosmerne/);
+  assert.match(html, /Spiatočne od <b>/);
+});
+
+test("sharing copies silently but keeps the manual fallback when clipboard access fails", async () => {
+  let copied;
+  const page = app("", async (url) => { copied = url; });
+  await page.element("#share-search").listeners.click();
+  assert.match(copied, /from=/);
+  assert.equal(page.element("#share-status").hidden, true);
+  assert.equal(page.element("#share-status").textContent, "");
+  assert.equal(page.element("#share-fallback").hidden, true);
+  const denied = app("", async () => { throw new Error("denied"); });
+  await denied.element("#share-search").listeners.click();
+  assert.equal(denied.element("#share-fallback").hidden, false);
+  assert.equal(denied.element("#share-status").hidden, false);
+  assert.match(denied.element("#share-url").value, /from=/);
 });
 
 test("stay and weekend filters use matching returns and round-trip sort keeps missing returns last", () => {

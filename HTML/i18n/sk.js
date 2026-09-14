@@ -12,7 +12,7 @@
       "filters.sort": "Zoradiť", "filters.soonest": "Najbližší odlet", "filters.cheapest": "Najlacnejší odlet", "filters.cheapestReturn": "Cena tam + späť", "filters.customSort": "Vlastné poradie",
       "filters.weekend": "Víkendový pobyt", "filters.weekendNote": "Pi/So → Ne/Po",
       "share.search": "Zdieľať výber", "share.offer": "Zdieľať let", "share.copied": "Odkaz bol skopírovaný.", "share.link": "Odkaz", "share.manual": "Odkaz môžete skopírovať z poľa nižšie.", "share.expired": "Zdieľaný let už nie je v aktuálnych ponukách. Zobrazené sú dostupné lety.",
-      "results.more": "Zobraziť ďalších 30", "results.shown": "Zobrazených {shown} z {total}", "results.oneWay": "jednosmerne", "results.returnFrom": "tam + späť od",
+      "results.more": "Zobraziť ďalších 30", "results.shown": "Zobrazených {shown} z {total}", "results.returnFrom": "Spiatočne od",
       "return.openAirline": "Otvoriť {airline}",
       "meta.title": "BTSFLIGHTSCANER — lety z Bratislavy",
       "meta.description": "Interaktívny prehľad priamych letov z Bratislavy.",

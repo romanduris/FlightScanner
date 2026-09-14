@@ -107,7 +107,7 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .button-ghost:hover { border-color: #a7b8d0; background: #f7f9fc; }
 
 .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)) repeat(2, minmax(160px, 1.15fr)); gap: 14px; margin-top: 12px; }
-.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .25px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; color: var(--muted); font-size: 9px; font-weight: 400; letter-spacing: .25px; }
 .primary-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 10px 0 0; }
 .primary-filters .field { font-size: 11px; letter-spacing: 0; }
 .primary-filters select, .primary-filters input[type="date"] { width: 100%; min-width: 0; min-height: 38px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fbfcfe; color: var(--ink); }
@@ -214,7 +214,7 @@ th button.active.desc i::after { content: "↓"; }
 tbody tr { cursor: pointer; transition: background .12s ease; }
 tbody tr:hover { background: #f1f6fc; }
 tbody tr.selected { background: #eaf2ff; box-shadow: inset 3px 0 var(--blue); }
-td { height: 46px; padding: 6px 9px; overflow: hidden; border-bottom: 1px solid #e9eef4; color: #263c5d; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }
+td { height: 44px; padding: 4px 9px; overflow: hidden; border-bottom: 1px solid #e9eef4; color: #263c5d; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; }
 td strong { color: var(--ink); }
 .airline-cell { display: flex; align-items: center; gap: 7px; }
 .airline-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--blue); }
@@ -230,9 +230,8 @@ td strong { color: var(--ink); }
 .date-cell small { margin-top: 2px; color: var(--muted); font-size: 8px; }
 .responsive-duration { display: none; }
 .price-cell { color: var(--blue-dark); font-size: 13px; font-weight: 950; text-align: right; }
-.price-cell small { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; font-weight: 500; white-space: normal; }
-.price-cell small b { display: block; font-size: 12px; color: var(--ink); font-weight: 700; }
-.fare-label { display: block; color: var(--muted); font-size: 9px; font-weight: 500; }
+.price-cell small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 500; white-space: normal; }
+.price-cell small b { display: inline; font-size: 12px; color: var(--ink); font-weight: 700; white-space: nowrap; }
 .price-cell > strong { display: block; }
 .detail-share { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .detail-share-status { color: var(--muted); font-size: 11px; }
@@ -410,7 +409,7 @@ footer a { color: inherit; }
   table .column-departure { width: 38%; }
   table .column-price { width: 28%; }
   .price-cell { font-size: 12px; }
-  .price-cell small, .fare-label { font-size: 9px; }
+  .price-cell small { font-size: 9px; }
   .price-cell small b { font-size: 11px; }
   .date-cell strong { white-space: normal; }
   .date-cell small { font-size: 9px; white-space: normal; }

@@ -325,8 +325,10 @@
     const status = offer ? elements.detail.querySelector(".detail-share-status") : document.querySelector("#share-status");
     try {
       await navigator.clipboard.writeText(url);
-      status.textContent = t("share.copied");
+      status.textContent = "";
+      status.hidden = true;
       document.querySelector("#share-fallback").hidden = true;
+      if (offer) elements.detail.querySelector(".detail-share-url").hidden = true;
     } catch (_error) {
       status.textContent = t("share.manual");
       const input = offer ? elements.detail.querySelector(".detail-share-url") : document.querySelector("#share-url");
@@ -335,8 +337,8 @@
       input.value = url;
       input.focus();
       input.select();
+      status.hidden = false;
     }
-    status.hidden = false;
   }
 
   function displayCountry(offer) {
@@ -591,7 +593,7 @@
           <td class="column-departure"><span class="date-cell"><strong>${date} (${escapeHtml(departureWeekday || "—")})</strong><small>${time} → ${escapeHtml((offer.arrival_local || "").split("T")[1] || "—")}${responsiveDuration}</small></span></td>
           <td class="column-duration"><strong>${duration(offer.duration_minutes)}</strong></td>
           <td class="column-distance">${offer.distance_km ? `${integer(offer.distance_km)} km` : "—"}</td>
-          <td class="column-price price-cell"><span class="fare-label">${t("results.oneWay")}</span><strong>${euro(groupPrice(offer.price))}</strong><small>${returnPrice == null ? t("results.totalUnavailable") : `${t("results.returnFrom")}<b>${euro(groupPrice(Number(offer.price) + returnPrice))}</b>`}</small></td>
+          <td class="column-price price-cell"><strong>${euro(groupPrice(offer.price))}</strong><small>${returnPrice == null ? t("results.totalUnavailable") : `${t("results.returnFrom")} <b>${euro(groupPrice(Number(offer.price) + returnPrice))}</b>`}</small></td>
           <td class="column-detail"><span class="detail-chevron">›</span></td>
         </tr>`;
     }).join("");

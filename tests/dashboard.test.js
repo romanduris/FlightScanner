@@ -278,7 +278,7 @@ assert.match(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /10\.09\.2026 \(Štv\)/);
 assert.match(rows.innerHTML, /08:00 → 09:00<span class="responsive-duration"> \(1 h 00 min\)<\/span>/);
 assert.doesNotMatch(rows.innerHTML, /miestny čas|local time/);
-assert.match(rows.innerHTML, /tam \+ späť od<b>124,99\s*€/);
+assert.match(rows.innerHTML, /Spiatočne od <b>124,99\s*€/);
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
 assert.equal(element("#date-to-filter").min, 2);
@@ -310,7 +310,7 @@ assert.equal(element("#price-filter").max, 200);
 assert.equal(element("#price-filter").value, 200);
 assert.equal(element("#price-output").value, "200,00 €");
 assert.match(rows.innerHTML, /198,00\s*€/);
-assert.match(rows.innerHTML, /tam \+ späť od<b>249,98\s*€/);
+assert.match(rows.innerHTML, /Spiatočne od <b>249,98\s*€/);
 element("#traveller-minus").listeners.click();
 assert.equal(element("#traveller-count").value, 1);
 
