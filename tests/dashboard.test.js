@@ -471,7 +471,7 @@ assert.doesNotMatch(javascript, /class="booking-link|detail\.openAirline|airline
 assert.match(css, /\.detail-price > div:last-child\s*\{[^}]*text-align:\s*right/);
 assert.match(html, /booking\/booking-com-config\.js[\s\S]+booking\/booking-com\.js[\s\S]+booking\/booking-buttons\.js[\s\S]+booking\/ryanair\.js[\s\S]+booking\/wizzair\.js[\s\S]+dashboard\.js/);
 assert.match(css, /\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 95px/);
-assert.match(css, /max-width:\s*680px[\s\S]+\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\);/);
+assert.match(css, /max-width:\s*680px[\s\S]+\.return-option\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 74px;/);
 assert.match(css, /\.hotel-booking-link\s*\{[^}]*background:\s*#f7f9fc/);
 assert.match(css, /\.return-option\s*\{[^}]*gap:\s*8px/);
 assert.match(css, /\.return-flight-link\s*\{[^}]*border:\s*1px solid var\(--line\)[^}]*border-radius:\s*8px/);

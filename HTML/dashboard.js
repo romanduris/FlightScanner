@@ -711,8 +711,7 @@
       maxZoom: 18,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(detailMap);
-    L.circleMarker([offer.latitude, offer.longitude], { radius: 6, color: "#fff", weight: 2, fillColor: "#c01878", fillOpacity: 1 })
-      .bindTooltip(escapeHtml(`${displayDestination(offer)} (${offer.destination_iata})`), { permanent: true, direction: "top" }).addTo(detailMap);
+    L.circleMarker([offer.latitude, offer.longitude], { radius: 6, color: "#fff", weight: 2, fillColor: "#dc2626", fillOpacity: 1 }).addTo(detailMap);
     detailMap.invalidateSize();
   }
 

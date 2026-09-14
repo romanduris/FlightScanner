@@ -261,11 +261,10 @@ td strong { color: var(--ink); }
 .detail-price strong { display: block; color: var(--blue); font-size: clamp(16px, 17cqi, 28px); white-space: nowrap; }
 .detail-price small { color: var(--muted); }
 .detail-price > div:last-child { margin-left: auto; text-align: right; }
-.detail-price.has-map { display: grid; grid-template-columns: minmax(0, 1fr) 240px minmax(0, 1fr); align-items: center; gap: 12px; }
+.detail-price.has-map { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr) minmax(0, 1fr); align-items: center; gap: 12px; }
 .detail-price.has-map > div:last-child { margin-left: 0; }
 .detail-minimap { height: 170px; min-width: 0; isolation: isolate; border: 1px solid var(--line); border-radius: 6px; background: #eef3f7; }
 .detail-minimap > a { display: grid; height: 100%; align-content: center; text-align: center; }
-.detail-minimap .leaflet-tooltip { max-width: 210px; white-space: normal; text-align: center; }
 .detail-minimap .leaflet-control-attribution { font-size: 9px; }
 @media (max-width: 680px) {
   .detail-price.has-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -424,7 +423,7 @@ footer a { color: inherit; }
   .detail-body, .detail-hero { padding-left: 17px; padding-right: 17px; }
   .return-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
   .return-heading small { text-align: left; }
-  .return-option { grid-template-columns: minmax(0, 1fr); }
+  .return-option { grid-template-columns: minmax(0, 1fr) 74px; gap: 6px; }
   .return-flight-link { grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr); gap: 7px 8px; padding-left: 6px; }
   .hotel-booking-link { padding: 5px; }
   .hotel-booking-link strong { font-size: 10px; }
