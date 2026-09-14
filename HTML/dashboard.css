@@ -424,18 +424,25 @@ footer a { color: inherit; }
   .return-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
   .return-heading small { text-align: left; }
   .return-option { grid-template-columns: minmax(0, 1fr) 74px; gap: 6px; }
-  .return-flight-link { grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr); gap: 7px 8px; padding-left: 6px; }
+  .return-flight-link { grid-template-columns: 30px minmax(0, 1fr) minmax(65px, auto); gap: 6px; padding-left: 6px; }
   .hotel-booking-link { padding: 5px; }
   .hotel-booking-link strong { font-size: 10px; }
-  .return-airline-logo { grid-row: 1 / span 2; }
-  .return-when { grid-column: 2 / -1; }
-  .return-total { grid-column: 2 / -1; }
+  .return-when { min-width: 0; }
+  .return-total { min-width: 0; }
   .contact-content { grid-template-columns: 1fr; gap: 16px; padding: 16px; }
   .contact-intro p { max-width: none; }
   .contact-fields { grid-template-columns: 1fr; }
   .contact-fields input, .contact-fields textarea { font-size: 16px; }
   .contact-message-field { grid-column: auto; }
   footer { flex-direction: column; padding: 0 11px 18px; }
+}
+
+@media (max-width: 380px) {
+  .return-flight-link { grid-template-columns: 20px minmax(0, 1fr) 60px; gap: 4px; padding-right: 8px; }
+  .return-flight-link .return-airline-logo { width: 20px; height: 20px; }
+  .return-when strong, .return-when span { font-size: 9px; }
+  .return-total { container-type: inline-size; }
+  .return-total strong { font-size: clamp(9px, 18cqi, 14px); white-space: nowrap; }
 }
 
 .support-card { grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 0 0 16px; }
