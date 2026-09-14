@@ -34,7 +34,6 @@
   });
   const scanDays = Math.max(1, Number(payload.scan_days) || 30);
   const lastScanDay = scanDays - 1;
-  const visibleWindowDays = Math.min(30, scanDays);
   const initialVisibleDay = defaultVisibleDay();
   const totalDestinations = new Set(offers.map((offer) => offer.destination_iata)).size;
   const maxPrice = Math.ceil(Math.max(...flights.map((offer) => offer.price)) / 5) * 5;
@@ -45,7 +44,6 @@
     maxDuration,
     travellers: 1,
     firstVisibleDay: initialVisibleDay,
-    lastVisibleDay: Math.min(lastScanDay, initialVisibleDay + visibleWindowDays - 1),
     sortKey: "departure_local",
     sortDirection: "asc",
     selectedOffer: null,
@@ -74,10 +72,6 @@
     priceOutput: document.querySelector("#price-output"),
     duration: document.querySelector("#duration-filter"),
     durationOutput: document.querySelector("#duration-output"),
-    dateTo: document.querySelector("#date-to-filter"),
-    dateFromOutput: document.querySelector("#date-from-output"),
-    dateToOutput: document.querySelector("#date-to-output"),
-    dateRange: document.querySelector("#date-range"),
     travellerMinus: document.querySelector("#traveller-minus"),
     travellerCount: document.querySelector("#traveller-count"),
     travellerPlus: document.querySelector("#traveller-plus"),
@@ -282,7 +276,7 @@
     const values = {
       country: "", destination: state.destination,
       from: addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10),
-      to: addDays(payload.start_date, state.lastVisibleDay).toISOString().slice(0, 10),
+      to: "",
       price: state.maxPrice < maxPrice ? state.maxPrice : "",
       duration: state.maxDuration < maxDuration ? state.maxDuration : "",
       travellers: state.travellers > 1 ? state.travellers : "",
@@ -310,9 +304,7 @@
     const validDate = value => /^\d{4}-\d{2}-\d{2}$/.test(value || "") && isoDate(value)?.toISOString().slice(0, 10) === value;
     if (validDate(q.get("from"))) {
       state.firstVisibleDay = clampVisibleDay(dayOffset(q.get("from")));
-      state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     }
-    if (validDate(q.get("to"))) state.lastVisibleDay = clampVisibleDay(dayOffset(q.get("to")));
     if (["departure_local", "price", "round_trip", "airline", "destination_name", "flight_number", "duration_minutes", "distance_km"].includes(q.get("sort"))) state.sortKey = q.get("sort");
     state.sortDirection = q.get("direction") === "desc" ? "desc" : "asc";
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
@@ -402,19 +394,9 @@
   function updateRangeLabels() {
     elements.priceOutput.value = `${euro(groupPrice(state.maxPrice))}`;
     elements.durationOutput.value = duration(state.maxDuration);
-    elements.dateFromOutput.value = rangeDateLabel(addDays(payload.start_date, state.firstVisibleDay));
-    elements.dateToOutput.value = rangeDateLabel(addDays(payload.start_date, state.lastVisibleDay));
-    const windowEndDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
-    const scale = Math.max(1, windowEndDay - state.firstVisibleDay);
-    elements.dateRange.style.setProperty("--range-to", `${((state.lastVisibleDay - state.firstVisibleDay) / scale) * 100}%`);
   }
 
   function syncDateRange() {
-    const windowEndDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
-    state.lastVisibleDay = Math.max(state.firstVisibleDay, Math.min(state.lastVisibleDay, windowEndDay));
-    elements.dateTo.min = state.firstVisibleDay;
-    elements.dateTo.max = windowEndDay;
-    elements.dateTo.value = state.lastVisibleDay;
     elements.departure.value = addDays(payload.start_date, state.firstVisibleDay).toISOString().slice(0, 10);
     document.querySelector("#departure-picker-value").textContent = numericDate(elements.departure.value);
   }
@@ -469,7 +451,6 @@
 
   function selectCalendarDay(requestedDay) {
     state.firstVisibleDay = clampVisibleDay(requestedDay);
-    state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     syncDateRange();
     renderCalendar();
     updateRangeLabels();
@@ -479,7 +460,7 @@
 
   function filteredAndSortedOffers() {
     const firstVisibleDate = addDays(payload.start_date, state.firstVisibleDay);
-    const lastVisibleDate = addDays(payload.start_date, state.lastVisibleDay);
+    const lastVisibleDate = addDays(payload.start_date, lastScanDay);
     const filtered = flights.filter((offer) => {
       const departureDate = isoDate(offer.departure_local);
       return (!state.destination || offer.destination_iata === state.destination)
@@ -509,6 +490,7 @@
     document.querySelector("#stat-routes-total").textContent = t("overview.destinationCount", { count: totalDestinations });
     document.querySelector("#stat-countries").textContent = new Set(items.map((item) => item.country_code)).size;
     document.querySelector("#stat-flights").textContent = integer(flights.length);
+    document.querySelector("#overview-flight-count").textContent = integer(flights.length);
   }
 
   function availableReturnOffers(offer) {
@@ -818,7 +800,6 @@
     elements.stay.value = "";
     elements.weekend.checked = false;
     state.firstVisibleDay = defaultVisibleDay();
-    state.lastVisibleDay = Math.min(lastScanDay, state.firstVisibleDay + visibleWindowDays - 1);
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
     populateDestinations();
     syncPriceControl();
@@ -895,12 +876,6 @@
     elements.duration.addEventListener("input", (event) => { state.maxDuration = Number(event.target.value); updateRangeLabels(); render(); });
     elements.travellerMinus.addEventListener("click", () => setTravellers(state.travellers - 1));
     elements.travellerPlus.addEventListener("click", () => setTravellers(state.travellers + 1));
-    elements.dateTo.addEventListener("input", (event) => {
-      state.lastVisibleDay = Number(event.target.value);
-      updateRangeLabels();
-      render();
-      fitVisibleMap();
-    });
     elements.calendarMonths.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-calendar-day]");
       if (!button || button.disabled) return;

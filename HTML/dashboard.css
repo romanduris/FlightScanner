@@ -170,7 +170,7 @@ h1, h2 { margin: 1px 0 0; color: var(--ink); font-size: 16px; line-height: 1.2; 
 .calendar-days button.selected { color: white; border-color: var(--blue); background: var(--blue); box-shadow: 0 0 0 2px white, 0 0 0 3px var(--blue); }
 .calendar-days button:disabled { cursor: default; color: #c8d0db; background: transparent; opacity: .65; }
 
-.results-heading { display: grid; grid-template-areas: "heading range travellers"; grid-template-columns: minmax(120px, 1fr) minmax(300px, 500px) minmax(90px, 1fr); align-items: end; }
+.results-heading { display: grid; grid-template-areas: "heading travellers"; grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
 .results-heading > .heading-with-toggle { grid-area: heading; }
 .results-date-controls { display: grid; grid-area: range; width: 100%; }
 .results-card.collapsed .results-heading { display: flex; }
@@ -383,14 +383,14 @@ footer a { color: inherit; }
   .primary-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .primary-filters select, .primary-filters input[type="date"] { font-size: 12px; }
   .weekend-filter { flex-wrap: wrap; gap: 4px; grid-column: 1 / -1; }
-  .map-card .section-header { align-items: flex-start; flex-direction: column; }
-  .map-actions { width: 100%; flex-wrap: wrap; }
+  .map-card .section-header { align-items: center; flex-direction: row; }
+  .map-actions { width: auto; flex: 0 0 auto; flex-direction: column; align-items: flex-start; gap: 3px; }
   .map-actions .button { margin-left: auto; }
   .map-card.collapsed .section-header { align-items: center; flex-direction: row; }
   .map-card.collapsed .heading-with-toggle { flex: 1 1 auto; }
   .map-card.collapsed .map-actions { width: auto; flex: 0 0 auto; align-items: flex-start; flex-direction: column; gap: 3px; }
   #map { height: 350px; }
-  .results-heading { grid-template-areas: "heading travellers" "range range"; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 9px 10px; }
+  .results-heading { grid-template-areas: "heading travellers"; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 9px 10px; }
   .results-date-controls { width: 100%; }
   .calendar-toolbar { align-items: flex-start; flex-wrap: wrap; }
   .calendar-region { order: 3; width: 100%; }
@@ -500,3 +500,7 @@ html:has(#support-dialog[open]) { overflow: hidden; }
 .airline-summary .airline-meta span { display: flex; align-items: baseline; gap: 4px; font-size: 9px; text-transform: none; }
 .airline-summary .airline-meta strong { order: -1; display: inline; margin: 0; font-size: 12px; }
 .airline-summary .airline-meta span:nth-child(3), .airline-summary .airline-best { display: none; }
+.map-actions { flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; }
+.overview-flight-count { display: none; }
+.overview-section.collapsed .overview-flight-count { display: grid; flex-shrink: 0; gap: 2px; text-align: right; color: var(--muted); font-size: 10px; }
+.overview-flight-count strong { color: var(--ink); font-size: 14px; }

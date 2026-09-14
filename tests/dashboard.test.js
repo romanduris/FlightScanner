@@ -281,10 +281,7 @@ assert.doesNotMatch(rows.innerHTML, /miestny čas|local time/);
 assert.match(rows.innerHTML, /Spiatočne od <b>124,99\s*€/);
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
-assert.equal(element("#date-to-filter").min, 2);
-assert.equal(element("#date-to-filter").max, 31);
-assert.equal(element("#date-from-output").value, "4. 9. 2026 (Pia)");
-assert.equal(element("#date-to-output").value, "3. 10. 2026 (Sob)");
+assert.equal(element("#departure-filter").value, "2026-09-04");
 assert.equal(element("#calendar-selected-date").textContent, "4. 9. 2026 (Pia)");
 assert.match(element("#calendar-months").innerHTML, /september 2026/i);
 assert.doesNotMatch(element("#calendar-months").innerHTML, /október 2026/i);
@@ -322,15 +319,10 @@ assert.match(dashboardCss, /@media \(max-width: 400px\)[\s\S]*\.airline-meta spa
 const selectedSeptember18 = { dataset: { calendarDay: "16" }, disabled: false };
 element("#calendar-months").listeners.click({ target: { closest: () => selectedSeptember18 } });
 assert.equal(element("#calendar-selected-date").textContent, "18. 9. 2026 (Pia)");
-assert.equal(element("#date-from-output").value, "18. 9. 2026 (Pia)");
-assert.equal(element("#date-to-output").value, "17. 10. 2026 (Sob)");
-assert.equal(element("#date-to-filter").min, 16);
-assert.equal(element("#date-to-filter").max, 45);
+assert.equal(element("#departure-filter").value, "2026-09-18");
 assert.doesNotMatch(rows.innerHTML, /10\.09\.2026/);
 assert.match(rows.innerHTML, /18\.09\.2026|28\.09\.2026/);
 
-element("#date-to-filter").listeners.input({ target: { value: "26" } });
-assert.equal(element("#date-to-output").value, "28. 9. 2026 (Pon)");
 assert.match(rows.innerHTML, /18\.09\.2026/);
 assert.match(rows.innerHTML, /28\.09\.2026/);
 
@@ -393,7 +385,7 @@ assert.ok(html.indexOf('data-i18n="overview.countries"') < html.indexOf('data-i1
 assert.match(html, /id="destination-filter"/);
 assert.doesNotMatch(html, /id="search-input"|id="airline-filter"/);
 assert.doesNotMatch(html, /Najnižšia cena|Priemerná cena|Najkratší let/);
-assert.match(html, /id="date-to-filter"[^>]+value="29"/);
+assert.doesNotMatch(html, /id="date-to-filter"|id="date-range"/);
 assert.doesNotMatch(html, /id="date-from-filter"|id="planning-window-filter"/);
 assert.match(html, /id="calendar-selected-date"/);
 assert.match(html, /id="calendar-prev"[\s\S]+id="calendar-next"[\s\S]+id="calendar-months"/);
@@ -456,8 +448,7 @@ assert.match(css, /\.single-range\s*\{[^}]*--range-to:\s*100%/);
 assert.doesNotMatch(css, /\.planning-slider|\.dual-range/);
 assert.match(css, /\.calendar-months\s*\{[^}]*grid-template-columns:\s*repeat\(2/);
 assert.match(css, /max-width:\s*680px[\s\S]+\.calendar-months\s*\{[^}]*grid-template-columns:\s*1fr/);
-assert.match(css, /\.results-heading\s*\{[^}]*grid-template-areas:\s*"heading range travellers"/);
-assert.match(css, /max-width:\s*680px[\s\S]+\.results-heading\s*\{[^}]*grid-template-areas:\s*"heading travellers" "range range"/);
+assert.match(css, /\.results-heading\s*\{[^}]*grid-template-areas:\s*"heading travellers"/);
 assert.match(css, /\.table-note-bottom\s*\{[^}]*text-align:\s*left/);
 assert.match(javascript, /function bindCollapsibleSections\(\)/);
 assert.match(javascript, /map\.invalidateSize\(\)/);

@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-function app(query = "", writeText = async () => {}) {
+function app(query = "", writeText = async () => {}, configureOffers = () => {}) {
   const elements = new Map();
   function element(key) {
     if (!elements.has(key)) elements.set(key, {
@@ -25,6 +25,7 @@ function app(query = "", writeText = async () => {}) {
     ...(i === 0 ? { latitude: 37.9364, longitude: 23.9445 } : {}),
     return_offers: i < 3 ? [{ departure_local: `2026-09-${[20, 23, 27][i]}T10:00`, price: [50, 20, 10][i], origin_iata: "ATH" }] : [],
   }));
+  configureOffers(offers);
   const location = new URL(`https://example.com/${query}`);
   const window = {
     FLIGHTSCANNER_TODAY: "2026-09-18", location,
@@ -118,6 +119,17 @@ test("legacy country filters no longer restrict destinations or persist in share
   assert.equal(page.rows(), 30);
   assert.equal(page.element("#destination-filter").value, "ATH");
   assert.equal(page.location.searchParams.has("country"), false);
+});
+
+test("pagination includes later months and ignores obsolete end-date limits", () => {
+  const page = app("?from=2026-09-18&to=2026-09-20", undefined, offers => { offers[64].departure_local = "2026-11-20T08:00"; });
+  page.change("#sort-filter", "departure_local");
+  page.element("#more-offers").listeners.click();
+  page.element("#more-offers").listeners.click();
+  assert.equal(page.rows(), 65);
+  assert.match(page.element("#flight-rows").innerHTML, /20\.11\.2026/);
+  assert.equal(page.location.searchParams.has("to"), false);
+  assert.equal(page.element("#overview-flight-count").textContent, page.element("#stat-flights").textContent);
 });
 
 test("detail replaces flight sharing with a destination map and handles missing coordinates", () => {

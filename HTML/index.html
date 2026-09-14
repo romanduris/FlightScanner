@@ -46,6 +46,7 @@
             <h2 data-i18n="overview.label">Prehľad letov</h2>
           </div>
         </div>
+        <div class="overview-flight-count"><strong id="overview-flight-count">0</strong><span data-i18n="overview.flights">Lety</span></div>
       </div>
       <div id="overview-content" class="overview-grid collapsible-content">
         <div class="summary-grid">
@@ -159,17 +160,6 @@
           <div>
             <span class="eyebrow" data-i18n="results.allOffers">Všetky ponuky</span>
             <h2><span id="result-count">0</span> <span data-i18n="results.flights">letov</span></h2>
-          </div>
-        </div>
-        <div class="results-date-controls">
-          <div class="results-range">
-            <div class="range-dates">
-              <span><span data-i18n="results.from">Od</span> <output id="date-from-output">—</output></span>
-              <label for="date-to-filter"><span data-i18n="results.to">Do</span> <output id="date-to-output">—</output></label>
-            </div>
-            <div id="date-range" class="single-range">
-              <input id="date-to-filter" type="range" min="0" max="29" value="29" step="1" aria-label="Zobraziť lety do dátumu" data-i18n-aria="results.dateToAria">
-            </div>
           </div>
         </div>
         <div class="traveller-picker">
