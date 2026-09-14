@@ -24,7 +24,7 @@
       "filters.sort": "Sort by", "filters.soonest": "Soonest flight", "filters.cheapest": "One-way price", "filters.cheapestReturn": "Return price", "filters.customSort": "Custom order",
       "filters.weekend": "Weekend trip", "filters.weekendNote": "Fri/Sat → Sun/Mon",
       "share.search": "Share search", "share.offer": "Share flight", "share.copied": "Link copied.", "share.link": "Link", "share.manual": "You can copy the link from the field below.", "share.expired": "This shared flight is no longer in the current offers. Available flights are shown instead.",
-      "results.more": "Show 30 more", "results.shown": "Showing {shown} of {total}", "results.returnFrom": "Return from",
+      "results.more": "Show 30 more flights", "results.shown": "Showing {shown} of {total} flights", "results.returnFrom": "Return from",
       "return.openAirline": "Open {airline}",
       "meta.title": "BTSFLIGHTSCANER — flights from Bratislava",
       "meta.description": "Interactive overview of direct flights from Bratislava.",

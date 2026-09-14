@@ -556,7 +556,7 @@
     elements.resultCount.textContent = items.length;
     elements.empty.hidden = items.length !== 0;
     document.querySelector("#more-offers").hidden = items.length <= visibleLimit;
-    document.querySelector("#visible-count").textContent = t("results.shown", { shown: Math.min(visibleLimit, items.length), total: items.length });
+    document.querySelector("#visible-count").textContent = t("results.shown", { shown: integer(Math.min(visibleLimit, items.length)), total: integer(items.length) });
     elements.rows.innerHTML = items.slice(0, visibleLimit).map((offer) => {
       const [date, time] = shortDate(offer.departure_local);
       const departureWeekday = weekdayFor(offer.departure_local);
