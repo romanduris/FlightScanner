@@ -56,6 +56,7 @@
   let visibleLimit = 30;
   const initialQuery = new URLSearchParams(window.location?.search || "");
   let map = null;
+  let detailMap = null;
   let routeLayer = null;
   let publicHolidays = new Set();
   let schoolHolidays = new Set();
@@ -320,19 +321,18 @@
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
   }
 
-  async function shareSelection(offer = null) {
-    const url = searchUrl(offer).toString();
-    const status = offer ? elements.detail.querySelector(".detail-share-status") : document.querySelector("#share-status");
+  async function shareSelection() {
+    const url = searchUrl().toString();
+    const status = document.querySelector("#share-status");
     try {
       await navigator.clipboard.writeText(url);
       status.textContent = "";
       status.hidden = true;
       document.querySelector("#share-fallback").hidden = true;
-      if (offer) elements.detail.querySelector(".detail-share-url").hidden = true;
     } catch (_error) {
       status.textContent = t("share.manual");
-      const input = offer ? elements.detail.querySelector(".detail-share-url") : document.querySelector("#share-url");
-      if (!offer) document.querySelector("#share-fallback").hidden = false;
+      const input = document.querySelector("#share-url");
+      document.querySelector("#share-fallback").hidden = false;
       input.hidden = false;
       input.value = url;
       input.focus();
@@ -697,13 +697,35 @@
       </section>`;
   }
 
+  function clearDetailMap() {
+    detailMap?.remove();
+    detailMap = null;
+  }
+
+  function initDetailMap(offer) {
+    const container = elements.detail.querySelector("#detail-map");
+    if (!container || !window.L) return;
+    container.innerHTML = "";
+    detailMap = L.map(container, { zoomControl: false, scrollWheelZoom: false, dragging: false, touchZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false }).setView([offer.latitude, offer.longitude], 5);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(detailMap);
+    L.circleMarker([offer.latitude, offer.longitude], { radius: 6, color: "#fff", weight: 2, fillColor: "#c01878", fillOpacity: 1 })
+      .bindTooltip(escapeHtml(`${displayDestination(offer)} (${offer.destination_iata})`), { permanent: true, direction: "top" }).addTo(detailMap);
+    detailMap.invalidateSize();
+  }
+
   function showOffer(offer, track = true) {
+    clearDetailMap();
     if (track) window.FlightStatistics?.trackClick("offer_open", offer.airline);
     state.selectedOffer = offer;
     const schedule = (offer.operating_schedule || []).map((item) => `<span class="schedule-chip">${escapeHtml(translatedSchedule(item))}</span>`).join("");
     const cssClass = airlineClass(offer.airline);
     const returnPrice = cheapestReturnPrice(offer);
     const roundTripPrice = returnPrice == null ? null : Number(offer.price) + returnPrice;
+    const hasCoordinates = Number.isFinite(offer.latitude) && Number.isFinite(offer.longitude) && Math.abs(offer.latitude) <= 90 && Math.abs(offer.longitude) <= 180;
+    const mapUrl = hasCoordinates ? `https://www.openstreetmap.org/?mlat=${offer.latitude}&mlon=${offer.longitude}#map=5/${offer.latitude}/${offer.longitude}` : null;
     elements.detail.innerHTML = `
       <div class="detail-hero ${cssClass}">
         <div class="detail-airline">${airlineLogo(offer.airline)}</div>
@@ -718,9 +740,9 @@
         </div>
       </div>
       <div class="detail-body">
-        <div class="detail-share"><button class="button button-ghost" id="share-offer" type="button">${t("share.offer")}</button><span class="detail-share-status" role="status" hidden></span><input class="detail-share-url" aria-label="${escapeHtml(t("share.link"))}" type="url" readonly hidden></div>
-        <div class="detail-price">
+        <div class="detail-price${hasCoordinates ? " has-map" : ""}">
           <div><span>${t("detail.selectedPrice")}</span><strong>${euro(groupPrice(offer.price))}</strong><small>${t("detail.oneWayFare")}</small></div>
+          ${hasCoordinates ? `<section id="detail-map" class="detail-minimap" aria-label="${escapeHtml(t("detail.mapLabel", { destination: displayDestination(offer) }))}"><a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">${t("detail.openMap")}</a></section>` : ""}
           <div><span>${t("detail.cheapestRoundTrip")}</span><strong>${roundTripPrice == null ? "—" : euro(groupPrice(roundTripPrice))}</strong><small>${t("detail.roundTrip")}</small></div>
         </div>
         <div class="detail-grid">
@@ -734,7 +756,7 @@
         ${renderReturnOffers(offer)}
       </div>`;
     if (typeof elements.dialog.showModal === "function") elements.dialog.showModal();
-    elements.detail.querySelector("#share-offer")?.addEventListener("click", () => shareSelection(offer));
+    initDetailMap(offer);
     syncUrl();
     focusRouteOnMap(offer);
     renderTable(visibleOffers);
@@ -887,7 +909,7 @@
     elements.sort.addEventListener("change", () => { state.sortKey = elements.sort.value; state.sortDirection = "asc"; render(); });
     document.querySelector("#more-offers").addEventListener("click", () => { visibleLimit += 30; renderTable(visibleOffers); });
     document.querySelector("#share-search").addEventListener("click", () => shareSelection());
-    elements.dialog.addEventListener("close", () => { state.selectedOffer = null; syncUrl(); renderTable(visibleOffers); });
+    elements.dialog.addEventListener("close", () => { clearDetailMap(); state.selectedOffer = null; syncUrl(); renderTable(visibleOffers); });
     elements.country.addEventListener("change", (event) => {
       state.country = event.target.value;
       state.destination = "";

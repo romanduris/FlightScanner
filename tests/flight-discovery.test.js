@@ -22,6 +22,7 @@ function app(query = "", writeText = async () => {}) {
   const offers = Array.from({ length: 65 }, (_, i) => ({
     airline: "Wizz Air", origin_iata: "BTS", destination_iata: "ATH", destination_name: "ATÉNY", country_code: "GR", country: "Grécko",
     flight_number: `W${i}`, departure_local: "2026-09-18T08:00", arrival_local: "2026-09-18T10:00", duration_minutes: 120, price: i + 10,
+    ...(i === 0 ? { latitude: 37.9364, longitude: 23.9445 } : {}),
     return_offers: i < 3 ? [{ departure_local: `2026-09-${[20, 23, 27][i]}T10:00`, price: [50, 20, 10][i], origin_iata: "ATH" }] : [],
   }));
   const location = new URL(`https://example.com/${query}`);
@@ -118,4 +119,14 @@ test("malformed shared filters fall back to usable defaults", () => {
   assert.equal(page.rows(), 30);
   assert.equal(page.element("#traveller-count").value, 9);
   assert.equal(page.element("#destination-filter").value, "");
+});
+
+test("detail replaces flight sharing with a destination map and handles missing coordinates", () => {
+  const page = app("?offer=" + encodeURIComponent("Wizz Air|ATH|2026-09-18T08:00|W0"));
+  const html = page.element("#detail-content").innerHTML;
+  assert.doesNotMatch(html, /share-offer|detail-share/);
+  assert.match(html, /id="detail-map"/);
+  assert.match(html, /mlat=37\.9364&amp;mlon=23\.9445/);
+  const missing = app("?offer=" + encodeURIComponent("Wizz Air|ATH|2026-09-18T08:00|W1"));
+  assert.doesNotMatch(missing.element("#detail-content").innerHTML, /id="detail-map"/);
 });

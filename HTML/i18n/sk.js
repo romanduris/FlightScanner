@@ -114,6 +114,8 @@
       "detail.roundTrip": "tam + späť",
       "detail.country": "Krajina",
       "detail.distance": "Vzdialenosť",
+      "detail.mapLabel": "Poloha cieľového letiska: {destination}",
+      "detail.openMap": "Otvoriť mapu",
       "detail.departure": "Odlet",
       "detail.arrival": "Prílet",
       "detail.schedule": "Všetky dni a časy odletov v mesiaci",

@@ -126,6 +126,8 @@
       "detail.roundTrip": "outbound + return",
       "detail.country": "Country",
       "detail.distance": "Distance",
+      "detail.mapLabel": "Destination airport location: {destination}",
+      "detail.openMap": "Open map",
       "detail.departure": "Departure",
       "detail.arrival": "Arrival",
       "detail.schedule": "All departure days and times in the month",
