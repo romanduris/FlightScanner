@@ -91,29 +91,27 @@
       </div>
     </section>
 
-    <section class="filter-panel collapsible-section collapsed" data-collapsible aria-label="Filtrovanie letov" data-i18n-aria="filters.aria">
+    <section class="filter-panel collapsible-section" data-collapsible aria-label="Filtrovanie letov" data-i18n-aria="filters.aria">
       <div class="filter-heading">
         <div class="heading-with-toggle">
-          <button class="section-toggle" type="button" aria-expanded="false" aria-controls="filters-content" aria-label="Zobraziť filtre" data-i18n-aria="filters.toggle" data-section-key="filters.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
+          <button class="section-toggle" type="button" aria-expanded="true" aria-controls="filters-content" aria-label="Skryť vyhľadávanie" data-i18n-aria="filters.toggle" data-section-key="filters.sectionName"><span class="section-chevron" aria-hidden="true"></span></button>
           <div>
-            <span class="eyebrow" data-i18n="filters.quick">Rýchly výber</span>
+            <span class="eyebrow" data-i18n="filters.quick">Vyhľadávanie</span>
             <h1 data-i18n="filters.title">Lety z Bratislavy</h1>
           </div>
         </div>
         <button id="reset-filters" class="button button-ghost" type="button" data-i18n="filters.reset">↺ Zrušiť filtre</button>
       </div>
 
+      <div id="filters-content" class="collapsible-content">
       <div class="primary-filters">
         <label class="field"><span data-i18n="filters.destination">Destinácia</span><select id="destination-filter"><option value="">Všetky destinácie</option></select></label>
         <div class="field"><label for="departure-picker" data-i18n="results.departure">Odlet</label><input id="departure-filter" type="hidden"><button id="departure-picker" class="departure-picker" type="button" popovertarget="calendar-content" aria-controls="calendar-content" aria-expanded="false"><span id="departure-picker-value"></span><span class="section-chevron" aria-hidden="true"></span></button></div>
         <label class="field"><span data-i18n="filters.stay">Dĺžka pobytu</span><select id="stay-filter"><option value="" data-i18n="filters.anyStay">Ľubovoľná</option><option value="2-4" data-i18n="filters.stayShort">2–4 noci</option><option value="5-8" data-i18n="filters.stayWeek">5–8 nocí</option><option value="9-10" data-i18n="filters.stayLong">9–10 nocí</option></select></label>
         <label class="field"><span data-i18n="filters.sort">Zoradiť</span><select id="sort-filter"><option value="departure_local" data-i18n="filters.soonest">Najbližší odlet</option><option value="price" data-i18n="filters.cheapest">Najlacnejší odlet</option><option value="round_trip" data-i18n="filters.cheapestReturn">Cena tam + späť</option><option value="" data-i18n="filters.customSort" disabled>Vlastné poradie</option></select></label>
         <label class="weekend-filter"><input id="weekend-filter" type="checkbox"><span data-i18n="filters.weekend">Víkendový pobyt</span><small data-i18n="filters.weekendNote">Pi/So → Ne/Po</small></label>
-        <button id="share-search" class="button button-ghost" type="button" data-i18n="share.search">Zdieľať výber</button>
       </div>
       <p id="share-status" class="share-status" role="status" hidden></p>
-      <div id="share-fallback" class="share-fallback" hidden><label for="share-url" data-i18n="share.link">Odkaz</label><input id="share-url" type="url" readonly></div>
-      <div id="filters-content" class="collapsible-content" hidden>
         <div class="filter-grid">
           <label class="field range-field">
             <span><span data-i18n="filters.maxPrice">Max. cena</span> <output id="price-output">—</output></span>

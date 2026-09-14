@@ -318,26 +318,6 @@
     calendarCursor = startOfMonth(addDays(payload.start_date, state.firstVisibleDay));
   }
 
-  async function shareSelection() {
-    const url = searchUrl().toString();
-    const status = document.querySelector("#share-status");
-    try {
-      await navigator.clipboard.writeText(url);
-      status.textContent = "";
-      status.hidden = true;
-      document.querySelector("#share-fallback").hidden = true;
-    } catch (_error) {
-      status.textContent = t("share.manual");
-      const input = document.querySelector("#share-url");
-      document.querySelector("#share-fallback").hidden = false;
-      input.hidden = false;
-      input.value = url;
-      input.focus();
-      input.select();
-      status.hidden = false;
-    }
-  }
-
   function displayCountry(offer) {
     return i18n.countryName(offer.country_code, offer.country);
   }
@@ -868,6 +848,7 @@
         }));
         section.classList.toggle("collapsed", collapsed);
         content.hidden = collapsed;
+        if (collapsed && contentId === "filters-content") document.querySelector("#calendar-content").hidePopover?.();
 
         if (!collapsed && contentId === "map-content" && map) {
           window.setTimeout(() => {
@@ -908,7 +889,6 @@
     elements.weekend.addEventListener("change", () => { state.weekend = elements.weekend.checked; render(); });
     elements.sort.addEventListener("change", () => { state.sortKey = elements.sort.value; state.sortDirection = "asc"; render(); });
     document.querySelector("#more-offers").addEventListener("click", () => { visibleLimit += 30; renderTable(visibleOffers); });
-    document.querySelector("#share-search").addEventListener("click", () => shareSelection());
     elements.dialog.addEventListener("close", () => { clearDetailMap(); state.selectedOffer = null; syncUrl(); renderTable(visibleOffers); });
     elements.destination.addEventListener("change", (event) => { state.destination = event.target.value; render(); });
     elements.price.addEventListener("input", (event) => { state.maxPrice = Number(event.target.value) / state.travellers; updateRangeLabels(); render(); });

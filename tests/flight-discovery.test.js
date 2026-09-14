@@ -60,19 +60,11 @@ test("compact fares omit one-way labels and keep the return price beside its lab
   assert.match(html, /Spiatočne od <b>/);
 });
 
-test("sharing copies silently but keeps the manual fallback when clipboard access fails", async () => {
-  let copied;
-  const page = app("", async (url) => { copied = url; });
-  await page.element("#share-search").listeners.click();
-  assert.match(copied, /from=/);
-  assert.equal(page.element("#share-status").hidden, true);
-  assert.equal(page.element("#share-status").textContent, "");
-  assert.equal(page.element("#share-fallback").hidden, true);
-  const denied = app("", async () => { throw new Error("denied"); });
-  await denied.element("#share-search").listeners.click();
-  assert.equal(denied.element("#share-fallback").hidden, false);
-  assert.equal(denied.element("#share-status").hidden, false);
-  assert.match(denied.element("#share-url").value, /from=/);
+test("search sharing controls are removed and all filters are inside the collapsible content", () => {
+  const html = fs.readFileSync(path.join(__dirname, "../HTML/index.html"), "utf8");
+  assert.doesNotMatch(html, /id="share-search"|id="share-fallback"/);
+  const content = html.slice(html.indexOf('id="filters-content"'), html.indexOf('id="calendar-content"'));
+  for (const id of ['destination-filter', 'departure-picker', 'stay-filter', 'sort-filter', 'weekend-filter', 'price-filter', 'duration-filter']) assert.ok(content.includes(`id="${id}"`));
 });
 
 test("stay and weekend filters use matching returns and round-trip sort keeps missing returns last", () => {
