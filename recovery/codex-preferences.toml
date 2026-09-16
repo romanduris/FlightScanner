@@ -1,0 +1,3 @@
+# Only non-secret preferences. Authentication must be performed separately.
+model = "gpt-6-astra"
+model_reasoning_effort = "low"
