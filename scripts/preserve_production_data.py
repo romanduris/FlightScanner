@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -18,7 +19,11 @@ INDEX = PROJECT_DIR / "HTML" / "index.html"
 
 
 def main() -> int:
-    request = urllib.request.Request(DATA_URL, headers={"User-Agent": "FlightScanner-deployer"})
+    # The unversioned URL can remain cached after a successful Pages deployment.
+    request = urllib.request.Request(
+        f"{DATA_URL}?v={time.time_ns()}",
+        headers={"User-Agent": "FlightScanner-deployer", "Cache-Control": "no-cache"},
+    )
     try:
         with urllib.request.urlopen(request, timeout=15) as response:
             source = response.read().decode("utf-8")
