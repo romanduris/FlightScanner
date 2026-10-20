@@ -511,3 +511,5 @@ html:has(#support-dialog[open]) { overflow: hidden; }
 .overview-flight-count { display: none; }
 .overview-section.collapsed .overview-flight-count { display: grid; flex-shrink: 0; gap: 2px; text-align: right; color: var(--muted); font-size: 10px; }
 .overview-flight-count strong { color: var(--ink); font-size: 14px; }
+
+.airline-warning { grid-column: 1 / -1; margin: 2px 0 0; color: #934600; font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }

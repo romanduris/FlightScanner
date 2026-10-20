@@ -36,6 +36,8 @@
       "summary.routes": "Trasy",
       "summary.countries": "Krajiny",
       "summary.flightsPerDay": "Letov denne",
+      "summary.stale": "Aktualizácia zlyhala. Staršie ceny z {date} UTC.",
+      "summary.unavailable": "Aktualizácia zlyhala. Ceny nie sú dostupné.",
       "summary.dataUntil": "Dáta do",
       "filters.aria": "Filtrovanie letov",
       "filters.toggle": "Skryť vyhľadávanie",

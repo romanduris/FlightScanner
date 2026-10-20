@@ -383,7 +383,12 @@
       (result[offer.airline] ||= []).push(offer);
       return result;
     }, {});
+    Object.keys(payload.summary || {}).forEach((airline) => { groups[airline] ||= []; });
     document.querySelector("#airline-summary").innerHTML = Object.entries(groups).map(([airline, airlineOffers]) => {
+      const scan = payload.summary?.[airline] || {};
+      const warning = scan.status === "stale"
+        ? t("summary.stale", { date: new Date(scan.scanned_at_utc).toLocaleString(i18n.locale, { dateStyle: "short", timeStyle: "short", timeZone: "UTC" }) })
+        : scan.status === "unavailable" ? t("summary.unavailable") : "";
       const countries = new Set(airlineOffers.map((offer) => offer.country)).size;
       const dailyFlights = flights.filter((offer) => offer.airline === airline).length / scanDays;
       return `
@@ -394,7 +399,8 @@
             <span>${t("summary.countries")}<strong>${countries}</strong></span>
             <span>${t("summary.flightsPerDay")}<strong>${integer(Math.round(dailyFlights))}</strong></span>
           </div>
-          <div class="airline-best"><span>${t("summary.dataUntil")}</span><strong>${numericDate(payload.end_date)}</strong></div>
+          <div class="airline-best"><span>${t("summary.dataUntil")}</span><strong>${numericDate(scan.end_date || payload.end_date)}</strong></div>
+          ${warning ? `<p class="airline-warning" role="status">${escapeHtml(warning)}</p>` : ""}
         </article>`;
     }).join("");
   }

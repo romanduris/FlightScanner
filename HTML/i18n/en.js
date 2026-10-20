@@ -48,6 +48,8 @@
       "summary.routes": "Routes",
       "summary.countries": "Countries",
       "summary.flightsPerDay": "Flights per day",
+      "summary.stale": "Update failed. Older prices from {date} UTC.",
+      "summary.unavailable": "Update failed. Prices are unavailable.",
       "summary.dataUntil": "Data through",
       "filters.aria": "Flight filters",
       "filters.toggle": "Hide search",

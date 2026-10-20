@@ -21,6 +21,7 @@ from providers import (
     get_provider_classes,
 )
 from providers.base import ProviderError, build_weekly_schedule, parse_local_datetime
+from services.scan_recovery import recover_provider_data
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -181,13 +182,13 @@ def scan_all_providers(
 ) -> tuple[
     list[FlightOffer],
     dict[str, list[RouteFailure]],
-    dict[str, dict[str, int]],
+    dict[str, dict[str, Any]],
 ]:
     """Spustí providerov cez všetky mesiace zvoleného intervalu."""
 
     all_offers: list[FlightOffer] = []
     failures_by_airline: dict[str, list[RouteFailure]] = {}
-    summary: dict[str, dict[str, int]] = {}
+    summary: dict[str, dict[str, Any]] = {}
 
     for provider_class in PROVIDER_CLASSES:
         provider = create_provider(provider_class, max_workers)
@@ -208,6 +209,7 @@ def scan_all_providers(
                 "offers": 0,
                 "return_offers": 0,
                 "failures": 1,
+                "status": "unavailable",
             }
             continue
 
@@ -219,14 +221,26 @@ def scan_all_providers(
             f"{start_date.strftime('%d.%m.%Y')} – {end_date.strftime('%d.%m.%Y')}...",
             flush=True,
         )
+        provider_error = None
         for year, month in months:
             print(f"  Mesiac {month:02d}/{year}", flush=True)
-            offers, failures = provider.scan_month(
-                origin_iata="BTS",
-                destinations=destinations,
-                year=year,
-                month=month,
-            )
+            try:
+                offers, failures = provider.scan_month(
+                    origin_iata="BTS",
+                    destinations=destinations,
+                    year=year,
+                    month=month,
+                )
+            except ProviderError as error:
+                provider_error = str(error)
+                print(f"Upozornenie: {provider.airline_name}: {error}", flush=True)
+                # Partial months must not be presented as a complete fresh scan.
+                provider_offers = []
+                provider_failures = [
+                    RouteFailure(item.name, item.iata, provider_error)
+                    for item in destinations
+                ]
+                break
             provider_offers.extend(offers)
             provider_failures.extend(failures)
 
@@ -266,6 +280,8 @@ def scan_all_providers(
                 len(offer.return_offers) for offer in merged_offers
             ),
             "failures": len(final_failures),
+            "status": "unavailable" if not merged_offers and final_failures else "fresh",
+            "error": provider_error,
         }
 
     all_offers.sort(key=lambda item: (item.airline.casefold(), item.destination_name))
@@ -278,7 +294,7 @@ def save_results(
     end_date: date,
     offers: list[FlightOffer],
     failures_by_airline: dict[str, list[RouteFailure]],
-    summary: dict[str, dict[str, int]],
+    summary: dict[str, dict[str, Any]],
     scanned_at: datetime,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -304,6 +320,7 @@ def save_results(
             for airline, failures in failures_by_airline.items()
         },
     }
+    payload = recover_provider_data(payload, PROJECT_DIR / "HTML" / "flight-data.js")
     path.write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
@@ -322,7 +339,7 @@ def print_results(
     end_date: date,
     offers: list[FlightOffer],
     failures_by_airline: dict[str, list[RouteFailure]],
-    summary: dict[str, dict[str, int]],
+    summary: dict[str, dict[str, Any]],
     output_file: Path,
     scanned_at: datetime,
 ) -> None:

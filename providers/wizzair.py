@@ -37,7 +37,7 @@ from .base import (
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 AIRLINES_FILE = PROJECT_DIR / "Data" / "airlines.json"
-WIZZ_CONFIG_URL = "https://ssr-weu2.wizzair.com/en-gb"
+WIZZ_CONFIG_URL = "https://www.wizzair.com/en-gb"
 WIZZ_API_URL_PATTERN = re.compile(
     r'apiUrl:"(https://be\.wizzair\.com/[^"/]+/Api)"'
 )
@@ -170,7 +170,7 @@ class WizzAirProvider(BaseAirlineProvider):
                 page = response.read().decode("utf-8", errors="replace")
         except (HTTPError, URLError, TimeoutError, OSError) as error:
             raise ProviderError(
-                f"Konfiguráciu Wizz Air API sa nepodarilo načítať: {error}"
+                f"Konfiguráciu Wizz Air API z {WIZZ_CONFIG_URL} sa nepodarilo načítať: {error}"
             ) from error
 
         match = WIZZ_API_URL_PATTERN.search(page)
